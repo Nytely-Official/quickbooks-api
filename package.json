@@ -5,6 +5,13 @@
 	"version": "0.0.1",
 	"description": "An API for interacting with intuit's QuickBooks API",
 	"type": "module",
+	"keywords": [
+		"quickbooks",
+		"intuit",
+		"oauth2",
+		"authentication",
+		"api"
+	],
 	"scripts": {
 		"build": "cd packages/auth && bun build ./src/app.ts --outdir dist --format esm --declaration",
 		"publish:auth": "npm publish --workspace @quickbooks-api/auth"

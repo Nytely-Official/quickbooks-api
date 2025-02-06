@@ -1,9 +1,13 @@
 {
 	"name": "@quickbooks-api/auth",
+	"author": "JackNytely <jacknytely@gmail.com>",
 	"version": "0.1.0",
 	"description": "Authentication provider for QuickBooks OAuth 2.0",
 	"main": "src/app.ts",
+	"module": "src/app.ts",
+	"type": "module",
 	"types": "src/app.ts",
+	"license": "MIT",
 	"files": [
 		"src"
 	],
@@ -13,16 +17,12 @@
 		"oauth2",
 		"authentication"
 	],
-	"author": "JackNytely <jacknytely@gmail.com>",
-	"license": "MIT",
-	"module": "src/app.ts",
 	"scripts": {
 		"test": "bun test"
 	},
 	"peerDependencies": {
 		"typescript": "^5.0.0"
 	},
-	"type": "module",
 	"dependencies": {
 		"@types/bun": "^1.2.2",
 		"@types/express": "^5.0.0",
