@@ -3,8 +3,17 @@
 	"author": "JackNytely <jacknytely@gmail.com>",
 	"license": "MIT",
 	"version": "0.0.1",
-	"description": "An API for interacting with intuit's QuickBooks API",
+	"description": "A modular TypeScript SDK for seamless integration with Intuit QuickBooks APIs. Provides robust authentication handling and future-ready foundation for accounting, payments, and commerce operations.",
 	"type": "module",
+	"main": "dist/app.js",
+	"types": "dist/app.d.ts",
+	"files": [
+		"dist"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Nytely-Official/quickbooks-api.git"
+	},
 	"keywords": [
 		"quickbooks",
 		"intuit",
@@ -13,14 +22,18 @@
 		"api"
 	],
 	"scripts": {
-		"build": "cd packages/auth && bun build ./src/app.ts --outdir dist --format esm --declaration",
-		"publish:auth": "npm publish --workspace @quickbooks-api/auth"
+		"build": "bun build src/app.ts --outdir dist --format esm --declaration",
+		"test": "bun test",
+		"publish": "npm publish --access public --scope=@nytely"
 	},
-	"workspaces": [
-		"packages/*"
-	],
+	"dependencies": {
+		"express": "^4.21.2"
+	},
 	"devDependencies": {
-		"@types/bun": "^1.2.2"
+		"@types/bun": "latest",
+		"@types/express": "^5.0.0",
+		"express": "^4.21.2",
+		"typescript": "^5.0.0"
 	},
 	"peerDependencies": {
 		"typescript": "^5.0.0"

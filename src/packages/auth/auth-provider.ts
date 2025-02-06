@@ -1,5 +1,5 @@
 // Imports
-import { AuthEndpoints, AuthScopes, Environment, GrantType, type Token, type TokenResponse } from "./types/types";
+import { AuthEndpoints, AuthScopes, GrantType, type Token, type TokenResponse } from "../../types/types";
 
 /**
  * The Auth Provider is responsible for handling the OAuth2 flow for the application.
@@ -21,8 +21,7 @@ export class AuthProvider {
 		private readonly clientId: string,
 		private readonly clientSecret: string,
 		private readonly redirectUri: string,
-		private readonly scopes: Array<AuthScopes>,
-		private readonly environment: Environment
+		private readonly scopes: Array<AuthScopes>
 	) {
 		// Generate the Auth Header
 		this.authHeader = "Basic " + Buffer.from(`${this.clientId}:${this.clientSecret}`).toString("base64");

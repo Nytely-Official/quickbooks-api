@@ -1,6 +1,6 @@
-import { AuthProvider } from "../src/auth-provider";
-import { AuthScopes, Environment, TokenType } from "../src/types/types";
-import { describe, expect, it, beforeEach, mock, afterEach } from "bun:test";
+import { AuthProvider } from "../src/packages/auth/auth-provider";
+import { AuthScopes, Environment } from "../src/types/types";
+import { describe, expect, it, beforeEach, afterEach } from "bun:test";
 import { type Token } from "../src/types/interfaces/token";
 import { mockAuthResponseData, mockFetch, mockTokenData } from "./helpers";
 
@@ -24,13 +24,7 @@ describe("AuthProvider", () => {
 		globalFetch = global.fetch;
 
 		// Create the Auth Provider
-		authProvider = new AuthProvider(
-			TEST_CONFIG.clientId,
-			TEST_CONFIG.clientSecret,
-			TEST_CONFIG.redirectUri,
-			TEST_CONFIG.scopes,
-			TEST_CONFIG.environment
-		);
+		authProvider = new AuthProvider(TEST_CONFIG.clientId, TEST_CONFIG.clientSecret, TEST_CONFIG.redirectUri, TEST_CONFIG.scopes);
 	});
 
 	afterEach(() => {

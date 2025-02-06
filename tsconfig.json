@@ -20,6 +20,12 @@
 		// Some stricter flags (disabled by default)
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
-		"noPropertyAccessFromIndexSignature": false
+		"noPropertyAccessFromIndexSignature": false,
+
+		// Setup the Paths
+		"paths": {
+			"@/*": ["./src/*"],
+			"@auth/*": ["./src/packages/auth/*"]
+		}
 	}
 }

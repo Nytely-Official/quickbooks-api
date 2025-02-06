@@ -2,4 +2,4 @@
 export * from "./types/types";
 
 // Export the Auth Provider
-export { AuthProvider } from "./auth-provider";
+export { AuthProvider } from "./packages/auth/auth-provider";

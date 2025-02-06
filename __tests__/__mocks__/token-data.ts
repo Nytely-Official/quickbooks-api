@@ -1,5 +1,5 @@
 // Imports
-import { type Token, TokenType } from "../../src/app";
+import { type Token, TokenType } from "../../src/types/types";
 
 // Export the Mock Token Data
 export const mockTokenData: Token = {

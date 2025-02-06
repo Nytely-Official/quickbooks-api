@@ -1,5 +1,5 @@
 // Imports
-import { TokenType, type TokenResponse } from "../../src/app";
+import { TokenType, type TokenResponse } from "../../src/types/types";
 
 // Create the Auth Response Data
 export const mockAuthResponseData: { old: TokenResponse; new: TokenResponse } = {

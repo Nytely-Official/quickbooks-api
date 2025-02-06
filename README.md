@@ -1,7 +1,7 @@
 # QuickBooks API SDK
 
 [![CI](https://github.com/Nytely-Official/quickbooks-api/actions/workflows/ci.yml/badge.svg)](https://github.com/Nytely-Official/quickbooks-api/actions/workflows/ci.yml)
-[![npm version](https://badge.fury.io/js/%40quickbooks-api%2Fauth.svg)](https://www.npmjs.com/package/@quickbooks-api/auth)
+[![npm version](https://badge.fury.io/js/quickbooks-api.svg)](https://www.npmjs.com/package/quickbooks-api)
 
 A modular TypeScript SDK for seamless integration with Intuit QuickBooks APIs. Provides robust authentication handling and future-ready foundation for accounting, payments, and commerce operations.
 
@@ -36,14 +36,14 @@ Designed for developers building:
 
 ## Packages
 
-| Package                | Version                                                                                                                     | Description                                      |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| `@quickbooks-api/auth` | [![npm version](https://badge.fury.io/js/%40quickbooks-api%2Fauth.svg)](https://www.npmjs.com/package/@quickbooks-api/auth) | Authentication provider for QuickBooks OAuth 2.0 |
+| Package          | Version                                                                                                                     | Description                                      |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| `quickbooks-api` | [![npm version](https://badge.fury.io/js/%40quickbooks-api%2Fauth.svg)](https://www.npmjs.com/package/@quickbooks-api/auth) | Authentication provider for QuickBooks OAuth 2.0 |
 
 ## Installation
 
 ```bash
-bun add @quickbooks-api/auth
+bun add quickbooks-api
 ```
 
 ## Usage
@@ -51,15 +51,14 @@ bun add @quickbooks-api/auth
 ### Initialization
 
 ```typescript
-import { AuthProvider, Environment, AuthScopes } from "@quickbooks-api/auth";
+import { AuthProvider, Environment, AuthScopes } from "quickbooks-api";
 
 // Initialize with your application credentials
 const authProvider = new AuthProvider(
 	"YOUR_CLIENT_ID",
 	"YOUR_CLIENT_SECRET",
 	"YOUR_REDIRECT_URI",
-	[AuthScopes.Accounting, AuthScopes.OpenId], // Array of required scopes
-	Environment.Sandbox // or Environment.Production
+	[AuthScopes.Accounting, AuthScopes.OpenId] // Array of required scopes
 );
 ```
 
