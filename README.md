@@ -22,10 +22,7 @@ A modular TypeScript SDK for seamless integration with Intuit QuickBooks APIs. P
 ## Technical Highlights
 
 ⚡ Bun runtime optimized builds  
-📦 Scoped package architecture (`@quickbooks-api/*`)  
-🔒 Enterprise-grade security practices  
-📜 Full TypeScript declarations  
-✅ CI/CD with GitHub Actions
+📜 Full TypeScript declarations
 
 Designed for developers building:
 
@@ -152,10 +149,12 @@ GrantType.RefreshToken; // refresh_token
 > - Always handle token expiration dates
 > - Use HTTPS in production environments
 
+## Legal Disclaimer
+
+This project is not affiliated with, endorsed by, or in any way officially connected with Intuit Inc., QuickBooks®, or any related subsidiaries. All trademarks and registered trademarks are the property of their respective owners.
+
+QuickBooks® is a registered trademark of Intuit Inc., registered in the United States and other countries.
+
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md)
-
-## License
-
-MIT
