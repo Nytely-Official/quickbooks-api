@@ -24,14 +24,14 @@
 	"scripts": {
 		"build": "bun build src/app.ts --outdir dist --format esm --declaration",
 		"test": "bun test",
-		"publish": "npm publish --access public --scope=@nytely"
+		"publish": "bun run build && bun run test && bun publish --access public --scope=@nytely"
 	},
 	"dependencies": {},
 	"devDependencies": {
 		"@types/bun": "latest",
 		"@types/express": "^5.0.0",
 		"express": "^4.21.2",
-		"typescript": "^5.0.0"
+		"typescript": "^5.7.3"
 	},
 	"peerDependencies": {
 		"typescript": "^5.0.0"
