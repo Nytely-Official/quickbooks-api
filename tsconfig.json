@@ -8,9 +8,12 @@
 
 		// Bundler mode
 		"moduleResolution": "bundler",
-		"allowImportingTsExtensions": true,
 		"verbatimModuleSyntax": true,
-		"noEmit": true,
+		"noEmit": false,
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"declaration": true,
+		"sourceMap": true,
 
 		// Best practices
 		"strict": true,
@@ -27,5 +30,6 @@
 			"@/*": ["./src/*"],
 			"@auth/*": ["./src/packages/auth/*"]
 		}
-	}
+	},
+	"include": ["./src/**/*"]
 }
