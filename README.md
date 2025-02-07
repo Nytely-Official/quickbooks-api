@@ -10,12 +10,12 @@ A modular TypeScript SDK for seamless integration with Intuit QuickBooks APIs. P
 ✅ OAuth 2.0 Authentication Flow  
 ✅ Token Management (Refresh/Rotation)  
 ✅ Environment-Specific Endpoints (Sandbox/Production)  
-✅ Invoice API Search Operations
+✅ Invoice API Search Operations  
 ✅ Type-Safe API Surface
 
 ## Future Roadmap
 
-▶️ Accounting API Integration
+▶️ Accounting API Integration  
 ▶️ Tax API Support  
 ▶️ Webhook Management  
 ▶️ Batch Processing Utilities
@@ -105,6 +105,27 @@ async function refreshAccessToken(oldToken: Token) {
 }
 ```
 
+### Invoice API Example
+
+```typescript
+import { ApiClient, Environment } from "quickbooks-api";
+
+// Initialize API client after authentication
+const apiClient = new ApiClient(authProvider, Environment.Sandbox);
+
+// Get all invoices
+const allInvoices = await apiClient.invoices.getAllInvoices();
+
+// Get invoices within date range
+const januaryInvoices = await apiClient.invoices.getInvoicesForDateRange(new Date("2024-01-01"), new Date("2024-01-31"));
+
+// Get recently updated invoices
+const updatedInvoices = await apiClient.invoices.getUpdatedInvoices(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)); // Last 7 days
+
+// Get specific invoice by ID
+const invoice = await apiClient.invoices.getInvoiceById("129");
+```
+
 ### Key Interfaces
 
 ```typescript
@@ -159,29 +180,6 @@ QuickBooks® is a registered trademark of Intuit Inc., registered in the United 
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md)
-
-### Invoice API Example
-
-```typescript
-import { ApiClient, Environment } from "quickbooks-api";
-
-// Initialize API client after authentication
-const apiClient = new ApiClient(authProvider, Environment.Sandbox);
-
-// Get all invoices
-const allInvoices = await apiClient.invoices.getAllInvoices();
-
-// Get invoices within date range
-const januaryInvoices = await apiClient.invoices.getInvoicesForDateRange(new Date("2024-01-01"), new Date("2024-01-31"));
-
-// Get recently updated invoices
-const updatedInvoices = await apiClient.invoices.getUpdatedInvoices(
-	new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // Last 7 days
-);
-
-// Get specific invoice by ID
-const invoice = await apiClient.invoices.getInvoiceById("129");
-```
 
 ### Available Invoice Methods
 
