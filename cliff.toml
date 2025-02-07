@@ -47,4 +47,3 @@ limit_commits = 42
 [remote.github]
 owner = "Nytely-Official"
 repo = "quickbooks-api"
-token = ""
