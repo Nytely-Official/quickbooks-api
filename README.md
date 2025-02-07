@@ -94,9 +94,9 @@ async function handleCallback(query: UserAuthResponse) {
 ### Token Refresh
 
 ```typescript
-async function refreshAccessToken(oldToken: Token) {
+async function refreshAccessToken() {
 	try {
-		const newToken = await authProvider.refresh(oldToken);
+		const newToken = await authProvider.refresh();
 		return newToken;
 	} catch (error) {
 		console.error("Token refresh failed:", error);
@@ -104,6 +104,28 @@ async function refreshAccessToken(oldToken: Token) {
 	}
 }
 ```
+
+### Token Revoke
+
+```typescript
+async function revokeToken() {
+	try {
+		const revoked = await authProvider.revoke();
+		return revoked;
+	} catch (error) {
+		console.error("Token revoke failed:", error);
+	}
+}
+```
+
+### Available Auth Methods
+
+- `generateAuthUrl()` - Generate the authorization URL the user needs to visit
+- `exchangeCode(code: string, realmId: string)` - Exchange the authorization code for a token
+- `setToken(token: Token)` - Set the token manually (if expired, it will be refreshed)
+- `getToken()` - Get the current token (if expired, it will be refreshed)
+- `refresh()` - Refreshes the stored access token
+- `revoke()` - Revokes the stored access token
 
 ### Invoice API Example
 

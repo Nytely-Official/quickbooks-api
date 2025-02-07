@@ -25,7 +25,7 @@
 	"scripts": {
 		"build": "bunx tsc",
 		"test": "bun test",
-		"publish": "bun run build && bun run test && bun publish"
+		"publish:package": "bun run build && bun run test && bun publish"
 	},
 	"dependencies": {},
 	"devDependencies": {
