@@ -34,9 +34,9 @@ Designed for developers building:
 
 ## Packages
 
-| Package          | Version                                                                                                                     | Description                                      |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| `quickbooks-api` | [![npm version](https://badge.fury.io/js/%40quickbooks-api%2Fauth.svg)](https://www.npmjs.com/package/@quickbooks-api/auth) | Authentication provider for QuickBooks OAuth 2.0 |
+| Package          | Version                                                                                                        | Description                       |
+| ---------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| `quickbooks-api` | [![npm version](https://badge.fury.io/js/%40quickbooks-api.svg)](https://www.npmjs.com/package/quickbooks-api) | QuickBooks API SDK for TypeScript |
 
 ## Installation
 
@@ -126,6 +126,13 @@ const updatedInvoices = await apiClient.invoices.getUpdatedInvoices(new Date(Dat
 const invoice = await apiClient.invoices.getInvoiceById("129");
 ```
 
+### Available Invoice Methods
+
+- `getAllInvoices()` - Retrieve all accessible invoices
+- `getInvoiceById(id: string)` - Fetch specific invoice by ID
+- `getInvoicesForDateRange(start: Date, end: Date)` - Filter invoices by date
+- `getUpdatedInvoices(since: Date)` - Get invoices modified after specified date
+
 ### Key Interfaces
 
 ```typescript
@@ -180,10 +187,3 @@ QuickBooks® is a registered trademark of Intuit Inc., registered in the United 
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md)
-
-### Available Invoice Methods
-
-- `getAllInvoices()` - Retrieve all accessible invoices
-- `getInvoiceById(id: string)` - Fetch specific invoice by ID
-- `getInvoicesForDateRange(start: Date, end: Date)` - Filter invoices by date
-- `getUpdatedInvoices(since: Date)` - Get invoices modified after specified date
