@@ -1,5 +1,6 @@
 // Imports
-import { AuthEndpoints, AuthScopes, GrantType, type Token, type TokenResponse } from "../../types/types";
+import { Endpoints } from "@/types/enums/endpoints";
+import { AuthScopes, GrantType, type Token, type TokenResponse } from "../../types/types";
 
 /**
  * The Auth Provider is responsible for handling the OAuth2 flow for the application.
@@ -9,26 +10,59 @@ export class AuthProvider {
 	/**
 	 * The Auth Header for the application
 	 */
-	private readonly authHeader: string;
+	public readonly authHeader: string;
 
 	/**
 	 * Initialize the Auth Provider
-	 * @param clientId The client ID for the application
-	 * @param clientSecret The client secret for the application
-	 * @param redirectUri The redirect URI for the application
+	 * @param clientId The client ID for the application *Required*
+	 * @param clientSecret The client secret for the application *Required*
+	 * @param redirectUri The redirect URI for the application *Required*
+	 * @param scopes The scopes for the application *Required*
+	 * @param token The token for the application (optional)
 	 */
+
 	constructor(
 		private readonly clientId: string,
 		private readonly clientSecret: string,
 		private readonly redirectUri: string,
-		private readonly scopes: Array<AuthScopes>
+		private readonly scopes: Array<AuthScopes>,
+		private token?: Token
 	) {
 		// Generate the Auth Header
 		this.authHeader = "Basic " + Buffer.from(`${this.clientId}:${this.clientSecret}`).toString("base64");
 	}
 
 	/**
+	 * Get the Access Token
+	 * @returns {string} The access token
+	 */
+	public async getToken(): Promise<Token> {
+		// Check if the token is expired
+		if (!this.token) throw new Error("User is not Authorized, please re-authenticate or set the token manually with the setToken method");
+
+		// Check if the Token is Expired and Refresh it if it is
+		if (this.token.accessTokenExpiryDate < new Date()) await this.refresh(this.token);
+
+		// Return the Token
+		return this.token;
+	}
+
+	/**
+	 * Set the Token
+	 * @param token The token to set
+	 */
+	public async setToken(newToken: Token) {
+		// Refresh the Token
+		await this.refresh(newToken);
+
+		// Return the Token
+		return this.token;
+	}
+
+	/**
+
 	 * Generates the OAuth2 URL to get the auth code from the user
+
 	 * @returns {URL} The OAuth2 URL to get the auth code from the user
 	 */
 	public generateAuthUrl(): URL {
@@ -36,7 +70,7 @@ export class AuthProvider {
 		const scopeUriString = this.scopes.join(" ");
 
 		// Setup the Auth URL
-		const authUrl = new URL(AuthEndpoints.AuthUrl);
+		const authUrl = new URL(Endpoints.UserAuth);
 
 		// Generate a Unique State
 		const state = crypto.randomUUID();
@@ -77,7 +111,7 @@ export class AuthProvider {
 		};
 
 		// Request the Refresh Token
-		const response = await fetch(AuthEndpoints.TokenBearer, requestOptions);
+		const response = await fetch(Endpoints.TokenBearer, requestOptions);
 
 		// Check if the response is successful
 		if (!response.ok) {
@@ -95,6 +129,9 @@ export class AuthProvider {
 
 		// Parse the token response
 		const token = this.parseTokenResponse(data, realmId);
+
+		// Update the Token
+		this.token = token;
 
 		// Return the token
 		return token;
@@ -127,7 +164,7 @@ export class AuthProvider {
 		};
 
 		// Request the Refresh Token
-		const response = await fetch(AuthEndpoints.TokenBearer, requestOptions);
+		const response = await fetch(Endpoints.TokenBearer, requestOptions);
 
 		// Check if the response is successful
 		if (!response.ok) throw new Error("Failed to refresh token");
@@ -139,6 +176,9 @@ export class AuthProvider {
 
 		// Parse the token response
 		const newToken = this.parseTokenResponse(data, token.realmId);
+
+		// Update the Token
+		this.token = newToken;
 
 		// Return the new token
 		return newToken;

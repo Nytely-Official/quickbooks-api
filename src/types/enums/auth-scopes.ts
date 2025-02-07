@@ -7,7 +7,6 @@ export enum AuthScopes {
 	OpenId = "openid",
 	Profile = "profile",
 	Email = "email",
-
 	Phone = "phone",
 	Address = "address",
 }
