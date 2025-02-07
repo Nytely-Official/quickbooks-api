@@ -48,7 +48,7 @@ export class ApiClient {
 		if (!response.ok) {
 			// Get the Error Message
 			const errorMessage = await response.text();
-			console.log(errorMessage, response.status, response.statusText, requestInit);
+
 			// Throw an Error
 			throw new Error(`Failed to run request: ${errorMessage}`);
 		}

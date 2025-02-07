@@ -3,7 +3,7 @@
  */
 export interface Invoice {
 	/**################### MAIN PROPERTIES ###################*/
-	Id?: string; // Required for update, read-only
+	Id: string; // Required for update, read-only
 	Line: (SalesItemLine | GroupLine | DescriptionOnlyLine | DiscountLine | SubTotalLine)[];
 	CustomerRef: ReferenceType;
 	SyncToken?: string; // Required for update, read-only
@@ -13,8 +13,8 @@ export interface Invoice {
 	DocNumber?: string; // Conditionally required (max 21 chars)
 	ProjectRef?: ReferenceType; // Conditionally required (minorVersion: 69)
 	BillEmail?: EmailAddress; // Conditionally required
-	TxnDate?: Date;
-	ShipDate?: Date;
+	TxnDate?: string;
+	ShipDate?: string;
 	TrackingNum?: string;
 	ClassRef?: ReferenceType;
 	PrintStatus?: "NotSet" | "NeedToPrint" | "PrintComplete";
@@ -23,8 +23,10 @@ export interface Invoice {
 	LinkedTxn?: LinkedTxn[];
 	DepositToAccountRef?: ReferenceType;
 	AllowOnlineACHPayment?: boolean;
+	domain?: string;
+	sparse?: boolean;
 	TransactionLocationType?: string;
-	DueDate?: Date;
+	DueDate?: string;
 	MetaData?: ModificationMetaData;
 	PrivateNote?: string; // max 4000 chars
 	BillEmailCc?: EmailAddress;
@@ -73,16 +75,18 @@ interface ReferenceType {
  * The Physical Address Type
  */
 interface PhysicalAddress {
+	Id?: string;
 	Line1?: string;
 	Line2?: string;
 	Line3?: string;
 	Line4?: string;
 	Line5?: string;
-
 	City?: string;
 	Country?: string;
 	CountrySubDivisionCode?: string;
 	PostalCode?: string;
+	Lat?: string;
+	Long?: string;
 }
 
 /**
@@ -144,8 +148,8 @@ interface LinkedTxn {
  */
 
 interface ModificationMetaData {
-	CreateTime?: Date;
-	LastUpdatedTime?: Date;
+	CreateTime?: string;
+	LastUpdatedTime?: string;
 	LastUpdatedBy?: string;
 }
 
@@ -179,7 +183,7 @@ interface CustomField {
  */
 interface DeliveryInfo {
 	DeliveryType: "Email";
-	DeliveryTime?: Date;
+	DeliveryTime?: string;
 	DeliveryError?: {
 		ErrorCode?: string;
 		ErrorMessage?: string;

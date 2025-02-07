@@ -46,6 +46,9 @@ export class InvoiceAPI {
 		// Get the Invoices
 		const response = await this.apiClient.runRequest(url, { method: "GET" });
 
+		// Check if the response failed
+		if (!response || response?.QueryResponse?.Invoice?.length < 1) throw new Error("Invoices not found");
+
 		// Get the Invoices
 		const queryResponse = response.QueryResponse as InvoiceQueryResponse;
 
@@ -73,6 +76,9 @@ export class InvoiceAPI {
 		// Get the Invoices
 		const response = await this.apiClient.runRequest(url, { method: "GET" });
 
+		// Check if the Response Failed to find an Invoice
+		if (!response || response.QueryResponse?.Invoice?.length < 1) throw new Error("Invoice not found");
+
 		// Get the Invoices
 		const queryResponse = response.QueryResponse as InvoiceQueryResponse;
 
@@ -97,6 +103,9 @@ export class InvoiceAPI {
 
 		// Get the Invoices
 		const response = await this.apiClient.runRequest(url, { method: "GET" });
+
+		// Check if the Response Failed to find an Invoice
+		if (!response || response.QueryResponse?.Invoice?.length < 1) throw new Error("Invoice not found");
 
 		// Get the Invoices
 		const queryResponse = response.QueryResponse as InvoiceQueryResponse;
@@ -123,8 +132,14 @@ export class InvoiceAPI {
 		// Get the Invoice
 		const response = await this.apiClient.runRequest(url, { method: "GET" });
 
+		// Check if the Response Failed to find an Invoice
+		if (!response) throw new Error("Invoice not found");
+
 		// Get the Invoices
 		const queryResponse = response.QueryResponse as InvoiceQueryResponse;
+
+		// Check if the Response Failed to find an Invoice
+		if (queryResponse.Invoice.length < 1) throw new Error("Invoice not found");
 
 		// Return the Invoice
 		return queryResponse.Invoice[0];

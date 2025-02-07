@@ -52,11 +52,11 @@ export class AuthProvider {
 	 * @param token The token to set
 	 */
 	public async setToken(newToken: Token) {
-		// Refresh the Token
-		await this.refresh(newToken);
+		// Check if the Token is Expired
+		if (newToken.accessTokenExpiryDate < new Date()) await this.refresh(newToken);
 
-		// Return the Token
-		return this.token;
+		// Update the Token
+		this.token = newToken;
 	}
 
 	/**
@@ -165,6 +165,7 @@ export class AuthProvider {
 
 		// Request the Refresh Token
 		const response = await fetch(Endpoints.TokenBearer, requestOptions);
+		console.log(response);
 
 		// Check if the response is successful
 		if (!response.ok) throw new Error("Failed to refresh token");

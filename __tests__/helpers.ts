@@ -17,7 +17,7 @@ export function mockFetch(responseData: BodyInit, responseStatus = 200) {
 		const responseBody: BodyInit = responseData;
 
 		// Setup the New Response
-		const response = new Response(responseBody, { status: responseStatus });
+		const response = new Response(responseBody, { status: responseStatus, headers: { "Content-Type": "application/json" } });
 
 		// Return the Response
 		return response;
@@ -27,3 +27,4 @@ export function mockFetch(responseData: BodyInit, responseStatus = 200) {
 // Export the Mock Data
 export { mockAuthResponseData } from "./__mocks__/auth-response-data";
 export { mockTokenData } from "./__mocks__/token-data";
+export { mockInvoiceData } from "./__mocks__/invoice-data";
