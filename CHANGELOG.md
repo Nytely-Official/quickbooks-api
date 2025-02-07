@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
+---
+
 ## [0.0.2] - 2025-02-07
 
 ### Features
@@ -16,6 +18,8 @@ All notable changes to this project will be documented in this file.
 
 - Update documentation and Readme (84d7cb5)
 - Clean up Readme file (9979196)
+
+---
 
 ## [0.0.1] - 2025-02-06
 
