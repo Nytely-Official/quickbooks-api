@@ -9,6 +9,8 @@ A modular TypeScript SDK for seamless integration with Intuit QuickBooks APIs. P
 
 ✅ OAuth 2.0 Authentication Flow  
 ✅ Token Management (Refresh/Rotation)  
+✅ Secure Token Serialization/Deserialization  
+✅ Token Validation  
 ✅ Environment-Specific Endpoints (Sandbox/Production)  
 ✅ Invoice API Search Operations  
 ✅ Type-Safe API Surface
@@ -94,15 +96,57 @@ async function handleCallback(query: UserAuthResponse) {
 ### Token Refresh
 
 ```typescript
-async function refreshAccessToken(oldToken: Token) {
+async function refreshAccessToken() {
 	try {
-		const newToken = await authProvider.refresh(oldToken);
+		const newToken = await authProvider.refresh();
 		return newToken;
 	} catch (error) {
 		console.error("Token refresh failed:", error);
 		// Handle re-authentication
 	}
 }
+```
+
+### Token Revoke
+
+```typescript
+async function revokeToken() {
+	try {
+		const revoked = await authProvider.revoke();
+		return revoked;
+	} catch (error) {
+		console.error("Token revoke failed:", error);
+	}
+}
+```
+
+### Available Auth Methods
+
+- `generateAuthUrl()` - Generate the authorization URL the user needs to visit
+- `exchangeCode(code: string, realmId: string)` - Exchange the authorization code for a token
+- `validateToken()` - Verify token validity and auto-refresh if needed
+- `serializeToken(secretKey: string)` - Securely encrypt and serialize token for storage
+- `deserializeToken(serialized: string, secretKey: string)` - Decrypt and restore serialized token
+- `setToken(token: Token)` - Set the token manually (if expired, it will be refreshed)
+- `getToken()` - Get the current token (if expired, it will be refreshed)
+- `refresh()` - Refreshes the stored access token
+- `revoke()` - Revokes the stored access token
+
+### Secure Token Serialization Example
+
+```typescript
+// Validate secret key
+if (!process.env.SECRET_KEY || process.env.SECRET_KEY.length < 32) throw new Error("SECRET_KEY must be at least 32 characters long");
+
+// Serialize token for secure storage
+const serialized = await authProvider.serializeToken(process.env.SECRET_KEY!);
+
+// Later, restore the token from serialized format
+await authProvider.deserializeToken(serialized, process.env.SECRET_KEY!);
+const restoredToken = await authProvider.getToken();
+
+// Validate token integrity
+const isValid = await authProvider.validateToken();
 ```
 
 ### Invoice API Example
@@ -174,7 +218,15 @@ GrantType.RefreshToken; // refresh_token
 
 > **Important Considerations**
 >
-> - Store tokens securely (never in client-side storage)
+> - Store tokens securely:
+>   - Never store in client-side storage (localStorage, sessionStorage)
+>   - Use secure server-side storage (e.g., encrypted databases)
+>   - Implement proper key rotation policies
+>   - Use the built-in `serializeToken` and `deserializeToken` methods to serialize and deserialize tokens for storage
+> - Secret key requirements:
+>   - Minimum length: 32 characters
+>   - High entropy (use cryptographically secure random generation)
+>   - Regular rotation schedule
 > - Always handle token expiration dates
 > - Use HTTPS in production environments
 

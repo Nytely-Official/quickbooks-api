@@ -4,7 +4,8 @@
 export enum APIUrls {
 	// Auth Related URL's
 	UserAuth = "https://appcenter.intuit.com",
-	OAuth = "https://oauth.platform.intuit.com/oauth2/v1",
+	OAuth2 = "https://oauth.platform.intuit.com/oauth2/v1",
+	OAuthDeveloper = "https://developer.api.intuit.com/v2/oauth2",
 
 	// API Related URL's
 	SandboxApiBaseUrl = "https://sandbox-quickbooks.api.intuit.com/v3",

@@ -11,6 +11,7 @@ const TEST_CONFIG = {
 	redirectUri: "http://localhost:3000/auth-code",
 	scopes: [AuthScopes.Accounting],
 	environment: Environment.Sandbox,
+	secretKey: "test-secret-key-12345678901234567890123456789012",
 };
 
 describe("AuthProvider", () => {
@@ -89,8 +90,11 @@ describe("AuthProvider", () => {
 			// Setup the Mock
 			global.fetch = mockFetch(JSON.stringify(mockAuthResponseData.new));
 
+			// Set the Token
+			authProvider.setToken(oldToken);
+
 			// Refresh the Token
-			const newToken = await authProvider.refresh(oldToken);
+			const newToken = await authProvider.refresh();
 
 			// Assert the New Token
 			expect(newToken.accessToken).toBe(mockTokenData.accessToken);
@@ -101,8 +105,11 @@ describe("AuthProvider", () => {
 			// Setup the Mock
 			global.fetch = mockFetch(JSON.stringify({ error: "invalid_client" }), 400);
 
-			// Refresh a non-expired token
-			expect(authProvider.refresh(oldToken)).rejects.toThrow("Failed to refresh token");
+			// Set the Token
+			authProvider.setToken(oldToken);
+
+			// Refresh the Token
+			expect(authProvider.refresh()).rejects.toThrow("Failed to refresh token");
 		});
 
 		// Validate Refresh Failure
@@ -113,8 +120,213 @@ describe("AuthProvider", () => {
 			// Expire the Refresh Token
 			const expiredToken = { ...oldToken, refreshTokenExpiryDate: new Date(Date.now() - 1000) };
 
+			// Set the Token
+			authProvider.setToken(expiredToken);
+
 			// Refresh the Expired Token
-			expect(authProvider.refresh(expiredToken)).rejects.toThrow("Refresh token is expired, please re-authenticate");
+			expect(authProvider.refresh()).rejects.toThrow("Refresh token is expired, please re-authenticate");
+		});
+	});
+
+	// Validate Revoke
+	describe("revoke", () => {
+		// Validate Revoke Success
+		it("should revoke token successfully", async () => {
+			// Setup the Mock
+			global.fetch = mockFetch("", 200);
+
+			// Set the Token
+			authProvider.setToken(mockTokenData);
+
+			// Revoke the Token
+			const result = await authProvider.revoke();
+
+			// Assert the Result
+			expect(result).toBe(true);
+		});
+
+		// Validate Revoke Failure
+		it("should throw error on failed token revocation", async () => {
+			// Setup the Mock
+			global.fetch = mockFetch("", 400);
+
+			// Set the Token
+			authProvider.setToken(mockTokenData);
+
+			// Revoke the Token
+			expect(authProvider.revoke()).rejects.toThrow("Failed to revoke token: invalid_token");
+		});
+	});
+
+	// Validate Token
+	describe("validateToken", () => {
+		// Validate Token Success
+		it("should validate a valid token", async () => {
+			// Set valid token
+			authProvider.setToken(mockTokenData);
+
+			// Mock successful validation
+			global.fetch = mockFetch("", 200);
+
+			// Validate the Token
+			const isValid = await authProvider.validateToken();
+
+			// Assert the Result
+			expect(isValid).toBe(true);
+		});
+
+		// Validate Token Failure
+		it("should throw error when no token exists", async () => {
+			// Assert the Result
+			expect(authProvider.validateToken()).rejects.toThrow("Token is not provided, please set the token manually with the setToken method");
+		});
+
+		// Validate Token Failure
+		it("should refresh expired token during validation", async () => {
+			// Mock successful refresh
+			global.fetch = mockFetch(JSON.stringify(mockAuthResponseData.new), 200);
+
+			// Create expired token
+			const expiredToken = {
+				...mockTokenData,
+				accessToken: "old_access_token",
+				accessTokenExpiryDate: new Date(),
+			};
+
+			// Set expired token
+			await authProvider.setToken(expiredToken);
+
+			// Wait for the token to expire
+			await new Promise(resolve => setTimeout(resolve, 1100));
+
+			// Validate token
+			const isValid = await authProvider.validateToken();
+
+			// Assert token was refreshed
+			expect(isValid).toBe(true);
+
+			// Get the new token
+			const newToken = await authProvider.getToken();
+
+			// Assert the new token
+			expect(newToken.accessToken).not.toBe(expiredToken.accessToken);
+		});
+
+		// Validate Token Failure
+		it("should reject weak secret keys", async () => {
+			// Set valid token
+			authProvider.setToken(mockTokenData);
+
+			// Try to serialize with weak key
+			expect(authProvider.serializeToken("weak")).rejects.toThrow("Secret key must be at least 32 characters long");
+		});
+	});
+
+	// Validate Serialize
+	describe("serializeToken", () => {
+		// Validate Serialize Success
+		it("should serialize a valid token", async () => {
+			// Setup the Mock
+			global.fetch = mockFetch("", 200);
+
+			// Set the Token
+			authProvider.setToken(mockTokenData);
+
+			// Serialize the Token
+			const serialized = await authProvider.serializeToken(TEST_CONFIG.secretKey);
+
+			// Get the Serialization Header as base64
+			const base64Header = Buffer.from(authProvider.serializationHeader).toString("base64");
+
+			// Assert the Result
+			expect(serialized).toStartWith(base64Header);
+			expect(serialized).toInclude(":");
+		});
+
+		// Validate Serialize Failure
+		it("should throw error when no token exists", async () => {
+			// Serialize the Token
+			expect(authProvider.serializeToken(TEST_CONFIG.secretKey)).rejects.toThrow(
+				"Token is not provided, please set the token manually with the setToken method"
+			);
+		});
+	});
+
+	// Validate Deserialize
+	describe("deserializeToken", () => {
+		// Validate Deserialize Success
+		it("should deserialize a valid token", async () => {
+			// Setup the Mock
+			global.fetch = mockFetch("", 200);
+
+			// Set the Token
+			authProvider.setToken(mockTokenData);
+
+			// Serialize the Token
+			const serialized = await authProvider.serializeToken(TEST_CONFIG.secretKey);
+
+			// Clear existing token
+			authProvider.setToken(null);
+
+			// Deserialize the token
+			await authProvider.deserializeToken(serialized!, TEST_CONFIG.secretKey);
+
+			// Get the Token
+			const token = await authProvider.getToken();
+
+			// Assert the Token
+			expect(token).toMatchObject(mockTokenData);
+		});
+
+		// Validate Deserialize Failure
+		it("should throw error for invalid serialized format", async () => {
+			// Deserialize the Token
+			expect(authProvider.deserializeToken("invalid_format", TEST_CONFIG.secretKey)).rejects.toThrow("Invalid serialized token");
+		});
+
+		// Validate Deserialize Failure
+		it("should throw error for tampered data", async () => {
+			// Setup the Mock
+			global.fetch = mockFetch("", 200);
+
+			// Set the Token
+			authProvider.setToken(mockTokenData);
+
+			// Serialize the Token
+			const serialized = await authProvider.serializeToken(TEST_CONFIG.secretKey);
+
+			// Setup the Tampered Data
+			const tamperedData = Buffer.from("tampered_data").toString("base64");
+
+			// Tamper the Data
+			const tampered = serialized.replace(/:.*/g, `${tamperedData}:`);
+
+			// Deserialize the Token
+			expect(authProvider.deserializeToken(tampered, TEST_CONFIG.secretKey)).rejects.toThrow("Invalid serialized token");
+		});
+
+		// Validate Deserialize Failure
+		it("should throw error for tampered header", async () => {
+			// Setup the Mock
+			global.fetch = mockFetch("", 200);
+
+			// Set the Token
+			authProvider.setToken(mockTokenData);
+
+			// Serialize the Token
+			const serialized = await authProvider.serializeToken(TEST_CONFIG.secretKey);
+
+			// Expect serialized to be a string
+			expect(serialized).toBeTypeOf("string");
+
+			// Setup the Tampered Header
+			const tamperedHeader = Buffer.from("tampered_header").toString("base64");
+
+			// Tamper the Header
+			const tampered = serialized.replace(/.*:/g, `${tamperedHeader}:`);
+
+			// Deserialize the Token
+			expect(authProvider.deserializeToken(tampered, TEST_CONFIG.secretKey)).rejects.toThrow("Invalid serialized token");
 		});
 	});
 });

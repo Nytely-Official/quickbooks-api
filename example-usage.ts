@@ -38,6 +38,9 @@ app.get("/auth-code", async (req: Request, res: Response) => {
 		// Exchange authorization code for tokens
 		await authProvider.exchangeCode(code as string, realmId as string);
 
+		// Refresh the Token
+		await authProvider.refresh();
+
 		// Initialize API Client with the authenticated provider
 		const apiClient = new ApiClient(authProvider, Environment.Sandbox);
 
@@ -62,6 +65,18 @@ app.get("/auth-code", async (req: Request, res: Response) => {
 		// Example: Get updated invoices
 		const updatedInvoices = await apiClient.invoices.getUpdatedInvoices(new Date("2024-01-01"));
 
+		// Example: Serialize the Token
+		const serialized = await authProvider.serializeToken(process.env.SECRET_KEY!);
+
+		// Example: Deserialize the Token
+		await authProvider.deserializeToken(serialized!, process.env.SECRET_KEY!);
+
+		// Example: Get the Token
+		const deserialized = await authProvider.getToken();
+
+		// Example: Revoke the Token
+		const revoked = await authProvider.revoke();
+
 		// Return the Data
 		res.json({
 			invoices,
@@ -69,6 +84,9 @@ app.get("/auth-code", async (req: Request, res: Response) => {
 			foundInvoice,
 			invoicesForDateRange,
 			updatedInvoices,
+			revoked,
+			serialized,
+			deserialized,
 		});
 	} catch (error) {
 		// Log the Error
