@@ -89,8 +89,11 @@ describe("AuthProvider", () => {
 			// Setup the Mock
 			global.fetch = mockFetch(JSON.stringify(mockAuthResponseData.new));
 
+			// Set the Token
+			authProvider.setToken(oldToken);
+
 			// Refresh the Token
-			const newToken = await authProvider.refresh(oldToken);
+			const newToken = await authProvider.refresh();
 
 			// Assert the New Token
 			expect(newToken.accessToken).toBe(mockTokenData.accessToken);
@@ -101,8 +104,11 @@ describe("AuthProvider", () => {
 			// Setup the Mock
 			global.fetch = mockFetch(JSON.stringify({ error: "invalid_client" }), 400);
 
-			// Refresh a non-expired token
-			expect(authProvider.refresh(oldToken)).rejects.toThrow("Failed to refresh token");
+			// Set the Token
+			authProvider.setToken(oldToken);
+
+			// Refresh the Token
+			expect(authProvider.refresh()).rejects.toThrow("Failed to refresh token");
 		});
 
 		// Validate Refresh Failure
@@ -113,8 +119,41 @@ describe("AuthProvider", () => {
 			// Expire the Refresh Token
 			const expiredToken = { ...oldToken, refreshTokenExpiryDate: new Date(Date.now() - 1000) };
 
+			// Set the Token
+			authProvider.setToken(expiredToken);
+
 			// Refresh the Expired Token
-			expect(authProvider.refresh(expiredToken)).rejects.toThrow("Refresh token is expired, please re-authenticate");
+			expect(authProvider.refresh()).rejects.toThrow("Refresh token is expired, please re-authenticate");
+		});
+	});
+
+	// Validate Revoke
+	describe("revoke", () => {
+		// Validate Revoke Success
+		it("should revoke token successfully", async () => {
+			// Setup the Mock
+			global.fetch = mockFetch("", 200);
+
+			// Set the Token
+			authProvider.setToken(mockTokenData);
+
+			// Revoke the Token
+			const result = await authProvider.revoke();
+
+			// Assert the Result
+			expect(result).toBe(true);
+		});
+
+		// Validate Revoke Failure
+		it("should throw error on failed token revocation", async () => {
+			// Setup the Mock
+			global.fetch = mockFetch("", 400);
+
+			// Set the Token
+			authProvider.setToken(mockTokenData);
+
+			// Revoke the Token
+			expect(authProvider.revoke()).rejects.toThrow("Failed to revoke token: invalid_token");
 		});
 	});
 });

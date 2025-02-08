@@ -41,7 +41,7 @@ export class AuthProvider {
 		if (!this.token) throw new Error("User is not Authorized, please re-authenticate or set the token manually with the setToken method");
 
 		// Check if the Token is Expired and Refresh it if it is
-		if (this.token.accessTokenExpiryDate < new Date()) await this.refresh(this.token);
+		if (this.token.accessTokenExpiryDate < new Date()) await this.refresh();
 
 		// Return the Token
 		return this.token;
@@ -53,7 +53,7 @@ export class AuthProvider {
 	 */
 	public async setToken(newToken: Token) {
 		// Check if the Token is Expired
-		if (newToken.accessTokenExpiryDate < new Date()) await this.refresh(newToken);
+		if (newToken.accessTokenExpiryDate < new Date()) await this.refresh();
 
 		// Update the Token
 		this.token = newToken;
@@ -142,13 +142,16 @@ export class AuthProvider {
 	 * @param refreshToken The refresh token to exchange for a token
 	 * @returns {Promise<Token>} The token
 	 */
-	public async refresh(token: Token): Promise<Token> {
+	public async refresh(): Promise<Token> {
+		// Check if the token is provided
+		if (!this.token) throw new Error("Token is not provided, please set the token manually with the setToken method");
+
 		// Check if the refresh token is expired
-		if (token.refreshTokenExpiryDate < new Date()) throw new Error("Refresh token is expired, please re-authenticate");
+		if (this.token.refreshTokenExpiryDate < new Date()) throw new Error("Refresh token is expired, please re-authenticate");
 
 		// Setup the Request Data
 		const requestData = new URLSearchParams({
-			refresh_token: token.refreshToken,
+			refresh_token: this.token.refreshToken,
 			grant_type: GrantType.RefreshToken,
 		});
 
@@ -165,7 +168,6 @@ export class AuthProvider {
 
 		// Request the Refresh Token
 		const response = await fetch(Endpoints.TokenBearer, requestOptions);
-		console.log(response);
 
 		// Check if the response is successful
 		if (!response.ok) throw new Error("Failed to refresh token");
@@ -176,13 +178,51 @@ export class AuthProvider {
 		})) as TokenResponse;
 
 		// Parse the token response
-		const newToken = this.parseTokenResponse(data, token.realmId);
+		const newToken = this.parseTokenResponse(data, this.token.realmId);
 
 		// Update the Token
 		this.token = newToken;
 
 		// Return the new token
 		return newToken;
+	}
+
+	/**
+	 * Revokes a Token
+	 * @param token The token to revoke
+	 * @returns {Promise<boolean>} True if the token was revoked, false otherwise
+	 */
+	public async revoke(): Promise<boolean> {
+		// Check if the token is provided
+		if (!this.token) throw new Error("Token is not provided, please set the token manually with the setToken method");
+
+		// Setup the Request Data
+		const requestData = {
+			token: this.token.refreshToken,
+		};
+
+		// Setup the Request Options
+		const requestOptions: RequestInit = {
+			method: "POST",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+				Authorization: this.authHeader,
+			},
+			body: JSON.stringify(requestData),
+		};
+
+		// Request the Revoke
+		const response = await fetch(Endpoints.TokenRevoke, requestOptions);
+
+		// Check if the response is successful
+		if (!response.ok) throw new Error(`Failed to revoke token: invalid_token`);
+
+		// Clear the Token
+		this.token = undefined;
+
+		// Return true
+		return true;
 	}
 
 	private parseTokenResponse(response: TokenResponse, realmId: string): Token {
