@@ -1,8 +1,8 @@
 name: Publish
 
 on:
-  release:
-    types: [created]
+  push:
+    branches: [main]
 
 jobs:
   publish:
@@ -10,14 +10,47 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      pull-requests: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Needed to get full git history for version detection
+
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: 1.2.1
 
       - name: Install dependencies
         run: bun install
+
+      - name: Get published version
+        id: version-check
+        run: |
+          CURRENT_VERSION=$(npm view quickbooks-api version 2>/dev/null || echo "0.0.0")
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Determine version bump
+        id: bump-detector
+        run: |
+          # Get CodeRabbit's recommendation from PR comments
+          BUMP=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/${{ github.event.pull_request.number }}/comments" \
+            | jq -r '.[] | select(.user.login == "coderabbit[bot]") | .body' \
+            | grep -oP 'Version bump: \K(major|minor|patch)' \
+            | tail -1)
+
+          # Fallback to conventional commits if no CodeRabbit recommendation
+          BUMP=${BUMP:-$(git log --pretty=format:%s v${{ steps.version-check.outputs.current_version }}..HEAD | \
+            (grep -q 'BREAKING CHANGE' && echo 'major' || \
+             grep -q 'feat:' && echo 'minor' || \
+             echo 'patch'))}
+           
+          echo "bump_type=$BUMP" >> $GITHUB_OUTPUT
+
+      - name: Bump version
+        run: |
+          bunx standard-version --release-as ${{ steps.bump-detector.outputs.bump_type }} --skip.changelog
 
       - name: Run tests
         run: bun test
@@ -30,3 +63,7 @@ jobs:
         with:
           token: ${{ secrets.NPM_TOKEN }}
           access: public
+
+      - name: Push version tag
+        run: |
+          git push --follow-tags origin main
