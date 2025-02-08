@@ -3,7 +3,8 @@
 [![CI](https://github.com/Nytely-Official/quickbooks-api/actions/workflows/ci.yml/badge.svg)](https://github.com/Nytely-Official/quickbooks-api/actions/workflows/ci.yml)
 [![npm version](https://badge.fury.io/js/quickbooks-api.svg)](https://www.npmjs.com/package/quickbooks-api)
 
-A modular TypeScript SDK for seamless integration with Intuit QuickBooks APIs. Provides robust authentication handling and future-ready foundation for accounting, payments, and commerce operations.
+A modular TypeScript SDK for seamless integration with Intuit QuickBooks APIs. Provides robust authentication handling and future-ready
+foundation for accounting, payments, and commerce operations.
 
 ## Current Features
 
@@ -51,14 +52,14 @@ bun add quickbooks-api
 ### Initialization
 
 ```typescript
-import { AuthProvider, Environment, AuthScopes } from "quickbooks-api";
+import { AuthProvider, Environment, AuthScopes } from 'quickbooks-api';
 
 // Initialize with your application credentials
 const authProvider = new AuthProvider(
-	"YOUR_CLIENT_ID",
-	"YOUR_CLIENT_SECRET",
-	"YOUR_REDIRECT_URI",
-	[AuthScopes.Accounting, AuthScopes.OpenId] // Array of required scopes
+  'YOUR_CLIENT_ID',
+  'YOUR_CLIENT_SECRET',
+  'YOUR_REDIRECT_URI',
+  [AuthScopes.Accounting, AuthScopes.OpenId], // Array of required scopes
 );
 ```
 
@@ -74,22 +75,22 @@ const authUrl = authProvider.generateAuthUrl();
 ### Token Exchange (Callback Handler)
 
 ```typescript
-import type { UserAuthResponse } from "@quickbooks-api/auth";
+import type { UserAuthResponse } from '@quickbooks-api/auth';
 
 // After user redirects back to your app
 async function handleCallback(query: UserAuthResponse) {
-	try {
-		const token = await authProvider.exchangeCode(
-			query.code, // Authorization code from query params
-			query.realmId // Realm ID from query params
-		);
+  try {
+    const token = await authProvider.exchangeCode(
+      query.code, // Authorization code from query params
+      query.realmId, // Realm ID from query params
+    );
 
-		// Store token securely
-		console.log("Access Token:", token.accessToken);
-		console.log("Expires at:", token.accessTokenExpiryDate);
-	} catch (error) {
-		console.error("Authentication failed:", error);
-	}
+    // Store token securely
+    console.log('Access Token:', token.accessToken);
+    console.log('Expires at:', token.accessTokenExpiryDate);
+  } catch (error) {
+    console.error('Authentication failed:', error);
+  }
 }
 ```
 
@@ -97,13 +98,13 @@ async function handleCallback(query: UserAuthResponse) {
 
 ```typescript
 async function refreshAccessToken() {
-	try {
-		const newToken = await authProvider.refresh();
-		return newToken;
-	} catch (error) {
-		console.error("Token refresh failed:", error);
-		// Handle re-authentication
-	}
+  try {
+    const newToken = await authProvider.refresh();
+    return newToken;
+  } catch (error) {
+    console.error('Token refresh failed:', error);
+    // Handle re-authentication
+  }
 }
 ```
 
@@ -111,12 +112,12 @@ async function refreshAccessToken() {
 
 ```typescript
 async function revokeToken() {
-	try {
-		const revoked = await authProvider.revoke();
-		return revoked;
-	} catch (error) {
-		console.error("Token revoke failed:", error);
-	}
+  try {
+    const revoked = await authProvider.revoke();
+    return revoked;
+  } catch (error) {
+    console.error('Token revoke failed:', error);
+  }
 }
 ```
 
@@ -136,7 +137,7 @@ async function revokeToken() {
 
 ```typescript
 // Validate secret key
-if (!process.env.SECRET_KEY || process.env.SECRET_KEY.length < 32) throw new Error("SECRET_KEY must be at least 32 characters long");
+if (!process.env.SECRET_KEY || process.env.SECRET_KEY.length < 32) throw new Error('SECRET_KEY must be at least 32 characters long');
 
 // Serialize token for secure storage
 const serialized = await authProvider.serializeToken(process.env.SECRET_KEY!);
@@ -152,7 +153,7 @@ const isValid = await authProvider.validateToken();
 ### Invoice API Example
 
 ```typescript
-import { ApiClient, Environment } from "quickbooks-api";
+import { ApiClient, Environment } from 'quickbooks-api';
 
 // Initialize API client after authentication
 const apiClient = new ApiClient(authProvider, Environment.Sandbox);
@@ -161,13 +162,13 @@ const apiClient = new ApiClient(authProvider, Environment.Sandbox);
 const allInvoices = await apiClient.invoices.getAllInvoices();
 
 // Get invoices within date range
-const januaryInvoices = await apiClient.invoices.getInvoicesForDateRange(new Date("2024-01-01"), new Date("2024-01-31"));
+const januaryInvoices = await apiClient.invoices.getInvoicesForDateRange(new Date('2024-01-01'), new Date('2024-01-31'));
 
 // Get recently updated invoices
 const updatedInvoices = await apiClient.invoices.getUpdatedInvoices(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)); // Last 7 days
 
 // Get specific invoice by ID
-const invoice = await apiClient.invoices.getInvoiceById("129");
+const invoice = await apiClient.invoices.getInvoiceById('129');
 ```
 
 ### Available Invoice Methods
@@ -182,19 +183,19 @@ const invoice = await apiClient.invoices.getInvoiceById("129");
 ```typescript
 // Token structure
 interface Token {
-	tokenType: TokenType.Bearer;
-	refreshToken: string;
-	refreshTokenExpiryDate: Date;
-	accessToken: string;
-	accessTokenExpiryDate: Date;
-	realmId: string;
+  tokenType: TokenType.Bearer;
+  refreshToken: string;
+  refreshTokenExpiryDate: Date;
+  accessToken: string;
+  accessTokenExpiryDate: Date;
+  realmId: string;
 }
 
 // Authorization response
 interface UserAuthResponse {
-	code: string;
-	realmId: string;
-	state: string;
+  code: string;
+  realmId: string;
+  state: string;
 }
 ```
 
@@ -232,7 +233,8 @@ GrantType.RefreshToken; // refresh_token
 
 ## Legal Disclaimer
 
-This project is not affiliated with, endorsed by, or in any way officially connected with Intuit Inc., QuickBooks®, or any related subsidiaries. All trademarks and registered trademarks are the property of their respective owners.
+This project is not affiliated with, endorsed by, or in any way officially connected with Intuit Inc., QuickBooks®, or any related
+subsidiaries. All trademarks and registered trademarks are the property of their respective owners.
 
 QuickBooks® is a registered trademark of Intuit Inc., registered in the United States and other countries.
 
