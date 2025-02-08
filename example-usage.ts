@@ -65,6 +65,15 @@ app.get("/auth-code", async (req: Request, res: Response) => {
 		// Example: Get updated invoices
 		const updatedInvoices = await apiClient.invoices.getUpdatedInvoices(new Date("2024-01-01"));
 
+		// Example: Serialize the Token
+		const serialized = await authProvider.serializeToken(process.env.SECRET_KEY!);
+
+		// Example: Deserialize the Token
+		await authProvider.deserializeToken(serialized!, process.env.SECRET_KEY!);
+
+		// Example: Get the Token
+		const deserialized = await authProvider.getToken();
+
 		// Example: Revoke the Token
 		const revoked = await authProvider.revoke();
 
@@ -76,6 +85,8 @@ app.get("/auth-code", async (req: Request, res: Response) => {
 			invoicesForDateRange,
 			updatedInvoices,
 			revoked,
+			serialized,
+			deserialized,
 		});
 	} catch (error) {
 		// Log the Error

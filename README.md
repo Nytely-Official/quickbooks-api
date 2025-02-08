@@ -9,6 +9,8 @@ A modular TypeScript SDK for seamless integration with Intuit QuickBooks APIs. P
 
 ✅ OAuth 2.0 Authentication Flow  
 ✅ Token Management (Refresh/Rotation)  
+✅ Secure Token Serialization/Deserialization  
+✅ Token Validation  
 ✅ Environment-Specific Endpoints (Sandbox/Production)  
 ✅ Invoice API Search Operations  
 ✅ Type-Safe API Surface
@@ -122,10 +124,27 @@ async function revokeToken() {
 
 - `generateAuthUrl()` - Generate the authorization URL the user needs to visit
 - `exchangeCode(code: string, realmId: string)` - Exchange the authorization code for a token
+- `validateToken()` - Verify token validity and auto-refresh if needed
+- `serializeToken(secretKey: string)` - Securely encrypt and serialize token for storage
+- `deserializeToken(serialized: string, secretKey: string)` - Decrypt and restore serialized token
 - `setToken(token: Token)` - Set the token manually (if expired, it will be refreshed)
 - `getToken()` - Get the current token (if expired, it will be refreshed)
 - `refresh()` - Refreshes the stored access token
 - `revoke()` - Revokes the stored access token
+
+### Secure Token Serialization Example
+
+```typescript
+// Serialize token for secure storage
+const serialized = await authProvider.serializeToken(process.env.SECRET_KEY!);
+
+// Later, restore the token from serialized format
+await authProvider.deserializeToken(serialized, process.env.SECRET_KEY!);
+const restoredToken = await authProvider.getToken();
+
+// Validate token integrity
+const isValid = await authProvider.validateToken();
+```
 
 ### Invoice API Example
 
@@ -197,6 +216,7 @@ GrantType.RefreshToken; // refresh_token
 > **Important Considerations**
 >
 > - Store tokens securely (never in client-side storage)
+> - Serialize tokens before storing them with strong secret keys
 > - Always handle token expiration dates
 > - Use HTTPS in production environments
 
