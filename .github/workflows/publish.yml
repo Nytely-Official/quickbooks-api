@@ -34,7 +34,3 @@ jobs:
         with:
           token: ${{ secrets.NPM_TOKEN }}
           access: public
-
-      - name: Push version tag
-        run: |
-          git push --follow-tags origin main
