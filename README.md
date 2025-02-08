@@ -135,6 +135,9 @@ async function revokeToken() {
 ### Secure Token Serialization Example
 
 ```typescript
+// Validate secret key
+if (!process.env.SECRET_KEY || process.env.SECRET_KEY.length < 32) throw new Error("SECRET_KEY must be at least 32 characters long");
+
 // Serialize token for secure storage
 const serialized = await authProvider.serializeToken(process.env.SECRET_KEY!);
 
@@ -215,8 +218,15 @@ GrantType.RefreshToken; // refresh_token
 
 > **Important Considerations**
 >
-> - Store tokens securely (never in client-side storage)
-> - Serialize tokens before storing them with strong secret keys
+> - Store tokens securely:
+>   - Never store in client-side storage (localStorage, sessionStorage)
+>   - Use secure server-side storage (e.g., encrypted databases)
+>   - Implement proper key rotation policies
+>   - Use the built-in `serializeToken` and `deserializeToken` methods to serialize and deserialize tokens for storage
+> - Secret key requirements:
+>   - Minimum length: 32 characters
+>   - High entropy (use cryptographically secure random generation)
+>   - Regular rotation schedule
 > - Always handle token expiration dates
 > - Use HTTPS in production environments
 

@@ -54,15 +54,15 @@ export class AuthProvider {
 	 * Set the Token
 	 * @param token The token to set
 	 */
-	public async setToken(newToken: Token) {
+	public async setToken(newToken: Token): Promise<void> {
 		// Check if the Token is not provided and clear the token
 		if (!newToken) return (this.token = undefined);
 
-		// Check if the Token is Expired
-		if (newToken.accessTokenExpiryDate < new Date()) await this.refresh();
-
 		// Update the Token
 		this.token = newToken;
+
+		// Check if the Token is Expired
+		if (newToken.accessTokenExpiryDate < new Date()) await this.refresh();
 	}
 
 	/**
@@ -261,6 +261,9 @@ export class AuthProvider {
 	 * @returns {string | undefined} The serialized token
 	 */
 	public async serializeToken(secretKey: string): Promise<string | undefined> {
+		// Check if the secret key is weak
+		if (secretKey.length < 32) throw new Error("Secret key must be at least 32 characters long");
+
 		// Check if the token is not provided
 		if (!this.token) throw new Error("Token is not provided, please set the token manually with the setToken method");
 

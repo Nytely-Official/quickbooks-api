@@ -11,7 +11,7 @@ const TEST_CONFIG = {
 	redirectUri: "http://localhost:3000/auth-code",
 	scopes: [AuthScopes.Accounting],
 	environment: Environment.Sandbox,
-	secretKey: "test-secret-key-12345",
+	secretKey: "test-secret-key-12345678901234567890123456789012",
 };
 
 describe("AuthProvider", () => {
@@ -179,6 +179,46 @@ describe("AuthProvider", () => {
 		it("should throw error when no token exists", async () => {
 			// Assert the Result
 			expect(authProvider.validateToken()).rejects.toThrow("Token is not provided, please set the token manually with the setToken method");
+		});
+
+		// Validate Token Failure
+		it("should refresh expired token during validation", async () => {
+			// Mock successful refresh
+			global.fetch = mockFetch(JSON.stringify(mockAuthResponseData.new), 200);
+
+			// Create expired token
+			const expiredToken = {
+				...mockTokenData,
+				accessToken: "old_access_token",
+				accessTokenExpiryDate: new Date(),
+			};
+
+			// Set expired token
+			await authProvider.setToken(expiredToken);
+
+			// Wait for the token to expire
+			await new Promise(resolve => setTimeout(resolve, 1100));
+
+			// Validate token
+			const isValid = await authProvider.validateToken();
+
+			// Assert token was refreshed
+			expect(isValid).toBe(true);
+
+			// Get the new token
+			const newToken = await authProvider.getToken();
+
+			// Assert the new token
+			expect(newToken.accessToken).not.toBe(expiredToken.accessToken);
+		});
+
+		// Validate Token Failure
+		it("should reject weak secret keys", async () => {
+			// Set valid token
+			authProvider.setToken(mockTokenData);
+
+			// Try to serialize with weak key
+			expect(authProvider.serializeToken("weak")).rejects.toThrow("Secret key must be at least 32 characters long");
 		});
 	});
 
