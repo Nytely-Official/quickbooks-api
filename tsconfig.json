@@ -5,6 +5,7 @@
 		"target": "ESNext",
 		"module": "ESNext",
 		"moduleDetection": "force",
+		"esModuleInterop": true,
 
 		// Bundler mode
 		"moduleResolution": "bundler",

@@ -1,6 +1,7 @@
 // Imports
-import { Environment, type AuthProvider } from "@/app";
-import { InvoiceAPI } from "./invoices/invoice-api";
+import { AuthProvider } from '../auth/auth-provider';
+import { Environment } from '../../types/types';
+import { InvoiceAPI } from './invoices/invoice-api';
 
 /**
  * API Client
@@ -34,9 +35,9 @@ export class ApiClient {
 
 		// Setup the Request Data
 		requestInit.headers = {
-			Accept: "application/json",
-			"Content-Type": "application/json",
-			"Accept-Encoding": "gzip, deflate",
+			Accept: 'application/json',
+			'Content-Type': 'application/json',
+			'Accept-Encoding': 'gzip, deflate',
 			Authorization: `Bearer ${token.accessToken}`,
 			...requestInit.headers,
 		};
@@ -54,7 +55,7 @@ export class ApiClient {
 		}
 
 		// Check if the response is an Object and if it is, parse it as JSON
-		const responseData = response.headers.get("Content-Type")?.includes("application/json") ? await response.json() : null;
+		const responseData = response.headers.get('Content-Type')?.includes('application/json') ? await response.json() : null;
 
 		// Return the Response
 		return responseData;

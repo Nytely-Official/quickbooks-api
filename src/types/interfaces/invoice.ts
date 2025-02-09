@@ -9,7 +9,7 @@ export interface Invoice {
 	SyncToken?: string; // Required for update, read-only
 	ShipFromAddr?: PhysicalAddress; // Conditionally required
 	CurrencyRef?: CurrencyRefType; // Conditionally required
-	GlobalTaxCalculation?: "TaxExcluded" | "TaxInclusive" | "NotApplicable"; // Conditionally required
+	GlobalTaxCalculation?: 'TaxExcluded' | 'TaxInclusive' | 'NotApplicable'; // Conditionally required
 	DocNumber?: string; // Conditionally required (max 21 chars)
 	ProjectRef?: ReferenceType; // Conditionally required (minorVersion: 69)
 	BillEmail?: EmailAddress; // Conditionally required
@@ -17,7 +17,7 @@ export interface Invoice {
 	ShipDate?: string;
 	TrackingNum?: string;
 	ClassRef?: ReferenceType;
-	PrintStatus?: "NotSet" | "NeedToPrint" | "PrintComplete";
+	PrintStatus?: 'NotSet' | 'NeedToPrint' | 'PrintComplete';
 	SalesTermRef?: ReferenceType;
 	TxnSource?: string;
 	LinkedTxn?: LinkedTxn[];
@@ -31,7 +31,7 @@ export interface Invoice {
 	PrivateNote?: string; // max 4000 chars
 	BillEmailCc?: EmailAddress;
 	CustomerMemo?: MemoRef;
-	EmailStatus?: "NotSet" | "NeedToSend" | "EmailSent";
+	EmailStatus?: 'NotSet' | 'NeedToSend' | 'EmailSent';
 	ExchangeRate?: number;
 	Deposit?: number;
 	TxnTaxDetail?: TxnTaxDetail;
@@ -140,7 +140,7 @@ interface CurrencyRefType extends ReferenceType {
  */
 interface LinkedTxn {
 	TxnId: string;
-	TxnType: "Payment" | "Estimate" | "TimeActivity" | "ReimburseCharge" | "ChargeCredit" | "StatementCharge";
+	TxnType: 'Payment' | 'Estimate' | 'TimeActivity' | 'ReimburseCharge' | 'ChargeCredit' | 'StatementCharge';
 }
 
 /**
@@ -182,7 +182,7 @@ interface CustomField {
  * The Delivery Info Type
  */
 interface DeliveryInfo {
-	DeliveryType: "Email";
+	DeliveryType: 'Email';
 	DeliveryTime?: string;
 	DeliveryError?: {
 		ErrorCode?: string;
@@ -195,7 +195,7 @@ interface DeliveryInfo {
  */
 interface TaxLine {
 	Amount?: number;
-	DetailType: "TaxLineDetail";
+	DetailType: 'TaxLineDetail';
 	TaxLineDetail?: TaxLineDetail;
 }
 
