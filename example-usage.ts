@@ -68,10 +68,7 @@ app.get('/auth-code', async (req: Request, res: Response) => {
 		const firstInvoice = invoices[0];
 
 		// Check if the First Invoice is Invalid and Return
-		if (!firstInvoice || !firstInvoice.Id) {
-			res.status(400).send('No invoices found');
-			return;
-		}
+		if (!firstInvoice || !firstInvoice.Id) return res.status(400).send('No invoices found');
 
 		// Example: Get invoice by ID
 		const foundInvoice = await apiClient.invoices.getInvoiceById(firstInvoice.Id);
