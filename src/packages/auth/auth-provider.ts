@@ -1,13 +1,12 @@
 // Imports
-import { Endpoints } from "@/types/enums/endpoints";
-import { AuthScopes, GrantType, type Token, type TokenResponse } from "../../types/types";
+import { Endpoints, AuthScopes, GrantType, type Token, type TokenResponse } from '../../types/types';
 
 /**
  * The Auth Provider is responsible for handling the OAuth2 flow for the application.
  * It is responsible for generating the OAuth2 URL and handling the callback.
  */
 export class AuthProvider {
-	public readonly serializationHeader = "QBOAUTHTOKEN";
+	public readonly serializationHeader = 'QBOAUTHTOKEN';
 
 	/**
 	 * The Auth Header for the application
@@ -29,10 +28,10 @@ export class AuthProvider {
 		private readonly clientSecret: string,
 		private readonly redirectUri: string,
 		private readonly scopes: Array<AuthScopes>,
-		private token?: Token
+		private token?: Token,
 	) {
 		// Generate the Auth Header
-		this.authHeader = "Basic " + Buffer.from(`${this.clientId}:${this.clientSecret}`).toString("base64");
+		this.authHeader = 'Basic ' + Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64');
 	}
 
 	/**
@@ -41,7 +40,7 @@ export class AuthProvider {
 	 */
 	public async getToken(): Promise<Token> {
 		// Check if the token is expired
-		if (!this.token) throw new Error("User is not Authorized, please re-authenticate or set the token manually with the setToken method");
+		if (!this.token) throw new Error('User is not Authorized, please re-authenticate or set the token manually with the setToken method');
 
 		// Check if the Token is Expired and Refresh it if it is
 		if (this.token.accessTokenExpiryDate < new Date()) await this.refresh();
@@ -71,7 +70,7 @@ export class AuthProvider {
 	 */
 	public generateAuthUrl(): URL {
 		// Join the scopes into a string
-		const scopeUriString = this.scopes.join(" ");
+		const scopeUriString = this.scopes.join(' ');
 
 		// Setup the Auth URL
 		const authUrl = new URL(Endpoints.UserAuth);
@@ -80,11 +79,11 @@ export class AuthProvider {
 		const state = crypto.randomUUID();
 
 		// Set the Query Params
-		authUrl.searchParams.set("client_id", this.clientId);
-		authUrl.searchParams.set("scope", scopeUriString);
-		authUrl.searchParams.set("redirect_uri", this.redirectUri);
-		authUrl.searchParams.set("response_type", "code");
-		authUrl.searchParams.set("state", state);
+		authUrl.searchParams.set('client_id', this.clientId);
+		authUrl.searchParams.set('scope', scopeUriString);
+		authUrl.searchParams.set('redirect_uri', this.redirectUri);
+		authUrl.searchParams.set('response_type', 'code');
+		authUrl.searchParams.set('state', state);
 
 		// Return the Auth URL
 		return authUrl;
@@ -105,10 +104,10 @@ export class AuthProvider {
 
 		// Setup the Request Options
 		const requestOptions: RequestInit = {
-			method: "POST",
+			method: 'POST',
 			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/x-www-form-urlencoded",
+				Accept: 'application/json',
+				'Content-Type': 'application/x-www-form-urlencoded',
 				Authorization: this.authHeader,
 			},
 			body: requestData,
@@ -128,7 +127,7 @@ export class AuthProvider {
 
 		// Parse the response
 		const data = (await response.json().catch(() => {
-			throw new Error("Failed to parse the token response");
+			throw new Error('Failed to parse the token response');
 		})) as TokenResponse;
 
 		// Parse the token response
@@ -148,10 +147,10 @@ export class AuthProvider {
 	 */
 	public async refresh(): Promise<Token> {
 		// Check if the token is provided
-		if (!this.token) throw new Error("Token is not provided, please set the token manually with the setToken method");
+		if (!this.token) throw new Error('Token is not provided, please set the token manually with the setToken method');
 
 		// Check if the refresh token is expired
-		if (this.token.refreshTokenExpiryDate < new Date()) throw new Error("Refresh token is expired, please re-authenticate");
+		if (this.token.refreshTokenExpiryDate < new Date()) throw new Error('Refresh token is expired, please re-authenticate');
 
 		// Setup the Request Data
 		const requestData = new URLSearchParams({
@@ -161,10 +160,10 @@ export class AuthProvider {
 
 		// Setup the Request Options
 		const requestOptions: RequestInit = {
-			method: "POST",
+			method: 'POST',
 			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/x-www-form-urlencoded",
+				Accept: 'application/json',
+				'Content-Type': 'application/x-www-form-urlencoded',
 				Authorization: this.authHeader,
 			},
 			body: requestData,
@@ -174,11 +173,11 @@ export class AuthProvider {
 		const response = await fetch(Endpoints.TokenBearer, requestOptions);
 
 		// Check if the response is successful
-		if (!response.ok) throw new Error("Failed to refresh token");
+		if (!response.ok) throw new Error('Failed to refresh token');
 
 		// Parse the response
 		const data = (await response.json().catch(() => {
-			throw new Error("Failed to parse the token response");
+			throw new Error('Failed to parse the token response');
 		})) as TokenResponse;
 
 		// Parse the token response
@@ -198,7 +197,7 @@ export class AuthProvider {
 	 */
 	public async revoke(): Promise<boolean> {
 		// Check if the token is provided
-		if (!this.token) throw new Error("Token is not provided, please set the token manually with the setToken method");
+		if (!this.token) throw new Error('Token is not provided, please set the token manually with the setToken method');
 
 		// Setup the Request Data
 		const requestData = {
@@ -207,10 +206,10 @@ export class AuthProvider {
 
 		// Setup the Request Options
 		const requestOptions: RequestInit = {
-			method: "POST",
+			method: 'POST',
 			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/json",
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
 				Authorization: this.authHeader,
 			},
 			body: JSON.stringify(requestData),
@@ -235,7 +234,7 @@ export class AuthProvider {
 	 */
 	public async validateToken(): Promise<boolean> {
 		// Check if the token is provided
-		if (!this.token) throw new Error("Token is not provided, please set the token manually with the setToken method");
+		if (!this.token) throw new Error('Token is not provided, please set the token manually with the setToken method');
 
 		// Check if the token is expired
 		const tokenExpired = this.token.accessTokenExpiryDate < new Date();
@@ -244,7 +243,7 @@ export class AuthProvider {
 		const refreshTokenExpired = this.token.refreshTokenExpiryDate < new Date();
 
 		// Check if the Token and Refresh Token are expired
-		if (refreshTokenExpired) throw new Error("Token and Refresh Token are expired, please re-authenticate");
+		if (refreshTokenExpired) throw new Error('Token and Refresh Token are expired, please re-authenticate');
 
 		// Refresh the token if it is expired
 		if (tokenExpired)
@@ -262,10 +261,10 @@ export class AuthProvider {
 	 */
 	public async serializeToken(secretKey: string): Promise<string | undefined> {
 		// Check if the secret key is weak
-		if (secretKey.length < 32) throw new Error("Secret key must be at least 32 characters long");
+		if (secretKey.length < 32) throw new Error('Secret key must be at least 32 characters long');
 
 		// Check if the token is not provided
-		if (!this.token) throw new Error("Token is not provided, please set the token manually with the setToken method");
+		if (!this.token) throw new Error('Token is not provided, please set the token manually with the setToken method');
 
 		// Validate the Token
 		const isValid = await this.validateToken().catch((error: Error) => {
@@ -273,7 +272,7 @@ export class AuthProvider {
 		});
 
 		// Check if the token is not valid
-		if (!isValid) throw new Error("Token is not valid, please re-authenticate");
+		if (!isValid) throw new Error('Token is not valid, please re-authenticate');
 
 		// Generate a Random Salt
 		const salt = crypto.getRandomValues(new Uint8Array(16));
@@ -285,11 +284,11 @@ export class AuthProvider {
 		const tokenData = new TextEncoder().encode(JSON.stringify(this.token));
 
 		// Get the Crypto Key
-		const cryptoKey = await this.deriveKey(secretKey, salt, "encrypt");
+		const cryptoKey = await this.deriveKey(secretKey, salt, 'encrypt');
 
 		// Encrypt the Token Data with AES-GCM
 		const encrypted = await crypto.subtle
-			.encrypt({ name: "AES-GCM", iv: iv, tagLength: 128 }, cryptoKey, tokenData)
+			.encrypt({ name: 'AES-GCM', iv: iv, tagLength: 128 }, cryptoKey, tokenData)
 			.catch((error: Error) => {
 				// Throw an Error
 				throw new Error(`Token serialization failed: ${error.message}`);
@@ -299,10 +298,10 @@ export class AuthProvider {
 		const combined = new Uint8Array([...iv, ...salt, ...new Uint8Array(encrypted)]);
 
 		// Convert the Header to a Base64 String
-		const headerBase64 = Buffer.from(this.serializationHeader).toString("base64");
+		const headerBase64 = Buffer.from(this.serializationHeader).toString('base64');
 
 		// Convert the Combined Array to a Base64 String
-		const combinedBase64 = Buffer.from(combined).toString("base64");
+		const combinedBase64 = Buffer.from(combined).toString('base64');
 
 		// Return the Serialized Token
 		return `${headerBase64}:${combinedBase64}`;
@@ -315,22 +314,22 @@ export class AuthProvider {
 	 */
 	public async deserializeToken(serialized: string, secretKey: string): Promise<void> {
 		// Check if the Serialized String is not Valid
-		if (!serialized.includes(":")) throw new Error("Invalid serialized token");
+		if (!serialized.includes(':')) throw new Error('Invalid serialized token');
 
 		// Split the Serialized String
-		const [headerBase64, combinedBase64] = serialized.split(":");
+		const [headerBase64, combinedBase64] = serialized.split(':');
 
 		// Check if the header or combined data is not valid
-		if (!headerBase64 || !combinedBase64) throw new Error("Invalid serialized token");
+		if (!headerBase64 || !combinedBase64) throw new Error('Invalid serialized token');
 
 		// Convert the Header to a String
-		const headerString = Buffer.from(headerBase64, "base64").toString("utf-8");
+		const headerString = Buffer.from(headerBase64, 'base64').toString('utf-8');
 
 		// Check if the Header is not Valid
-		if (headerString !== this.serializationHeader) throw new Error("Invalid serialized token");
+		if (headerString !== this.serializationHeader) throw new Error('Invalid serialized token');
 
 		// Convert combined data from base64
-		const combined = Buffer.from(combinedBase64, "base64");
+		const combined = Buffer.from(combinedBase64, 'base64');
 
 		// Extract IV (16 bytes), Salt (16 bytes), and ciphertext
 		const iv = combined.subarray(0, 16);
@@ -338,10 +337,10 @@ export class AuthProvider {
 		const ciphertext = combined.subarray(32);
 
 		// Setup the Crypto Key
-		const cryptoKey = await this.deriveKey(secretKey, salt, "decrypt");
+		const cryptoKey = await this.deriveKey(secretKey, salt, 'decrypt');
 
 		// Decrypt the data
-		const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, cryptoKey, ciphertext).catch((error: Error) => {
+		const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv }, cryptoKey, ciphertext).catch((error: Error) => {
 			// Throw an Error
 			throw new Error(`Token deserialization failed: ${error.message}`);
 		});
@@ -359,7 +358,7 @@ export class AuthProvider {
 		const isValid = await this.validateToken();
 
 		// Check if the token is not valid
-		if (!isValid) throw new Error("Serialized token is invalid, please re-authenticate");
+		if (!isValid) throw new Error('Serialized token is invalid, please re-authenticate');
 	}
 
 	/**
@@ -369,23 +368,23 @@ export class AuthProvider {
 	 * @param keyUsage The key usage for the derived key
 	 * @returns {Promise<CryptoKey>} The derived key
 	 */
-	private async deriveKey(secretKey: string, salt: Uint8Array, keyUsage: "encrypt" | "decrypt"): Promise<CryptoKey> {
+	private async deriveKey(secretKey: string, salt: Uint8Array, keyUsage: 'encrypt' | 'decrypt'): Promise<CryptoKey> {
 		// Encode the Secret Key
 		const keyBuffer = new TextEncoder().encode(secretKey);
 
 		// Setup the Encryption Algorithm
-		const encryptionAlgorithm: Pbkdf2Params = { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" };
+		const encryptionAlgorithm: Pbkdf2Params = { name: 'PBKDF2', salt: salt, iterations: 100000, hash: 'SHA-256' };
 
 		// Setup the Key Material
-		const keyMaterial = await crypto.subtle.importKey("raw", keyBuffer, "PBKDF2", false, ["deriveKey"]);
+		const keyMaterial = await crypto.subtle.importKey('raw', keyBuffer, 'PBKDF2', false, ['deriveKey']);
 
 		// Derive the encryption key
 		const cryptoKey = await crypto.subtle.deriveKey(
 			encryptionAlgorithm,
 			keyMaterial,
-			{ name: "AES-GCM", length: 256 }, // Fixed algorithm specification
+			{ name: 'AES-GCM', length: 256 }, // Fixed algorithm specification
 			false,
-			[keyUsage]
+			[keyUsage],
 		);
 
 		// Return the Crypto Key
@@ -431,7 +430,7 @@ export class AuthProvider {
 		// Convert date strings back to Date objects
 		for (const [key, value] of Object.entries(restored)) {
 			// Handle date fields
-			if (typeof value === "string" && this.isDateString(value)) restored[key as keyof Token] = new Date(value) as any;
+			if (typeof value === 'string' && this.isDateString(value)) restored[key as keyof Token] = new Date(value) as any;
 		}
 
 		// Return the restored token

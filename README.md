@@ -177,6 +177,8 @@ const invoice = await apiClient.invoices.getInvoiceById('129');
 - `getInvoiceById(id: string)` - Fetch specific invoice by ID
 - `getInvoicesForDateRange(start: Date, end: Date)` - Filter invoices by date
 - `getUpdatedInvoices(since: Date)` - Get invoices modified after specified date
+- `getInvoicesByDueDate(date: Date)` - Get invoices due by specific date
+- `rawInvoiceQuery(queryBuilder: QueryBuilder)` - Execute custom queries using QueryBuilder
 
 ### Key Interfaces
 

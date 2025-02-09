@@ -1,23 +1,41 @@
 // Imports
-import { ApiClient, Environment, Query, type Invoice, type InvoiceQueryResponse } from "@/app";
-import { Endpoints } from "@/types/enums/endpoints";
-import { QueryBuilder } from "../query-builder";
+import { ApiClient } from '../api-client';
+import { Environment, Query, type Invoice, type InvoiceQueryResponse } from '../../../types/types';
+import { Endpoints } from '../../../types/enums/endpoints';
+import { QueryBuilder } from '../query-builder';
+
+// Import the Services
+import { getAllInvoices } from './services/get-all-invoices';
+import { getInvoiceById } from './services/get-invoice-by-id';
+import { getInvoicesForDateRange } from './services/get-invoices-for-date-range';
+import { getUpdatedInvoices } from './services/get-updated-invoices';
+import { getInvoicesByDueDate } from './services/get-invoices-by-due-date';
+import { rawInvoiceQuery } from './services/raw-invoice-query';
 
 /**
  * API Client
  */
 export class InvoiceAPI {
+	// The List of Invoice Services
+	public readonly getAllInvoices = getAllInvoices.bind(this);
+	public readonly getInvoiceById = getInvoiceById.bind(this);
+	public readonly getInvoicesForDateRange = getInvoicesForDateRange.bind(this);
+	public readonly getUpdatedInvoices = getUpdatedInvoices.bind(this);
+	public readonly getInvoicesByDueDate = getInvoicesByDueDate.bind(this);
+	public readonly rawInvoiceQuery = rawInvoiceQuery.bind(this);
+
 	/**
 	 * Constructor
+
 	 * @param apiClient - The API Client
 	 */
-	constructor(private readonly apiClient: ApiClient) {}
+	constructor(protected readonly apiClient: ApiClient) {}
 
 	/**
 	 * Get the Company Endpoint
 	 * @returns The Company Endpoint with the attached token realmId
 	 */
-	private async getCompanyEndpoint() {
+	protected async getCompanyEndpoint() {
 		// Get the Base Endpoint
 		const baseEndpoint =
 			this.apiClient.environment === Environment.Production ? Endpoints.ProductionCompanyApi : Endpoints.SandboxCompanyApi;
@@ -30,24 +48,13 @@ export class InvoiceAPI {
 	}
 
 	/**
-	 * Get All Invoices
+	 * Format the Response
+	 * @param response - The Response
 	 * @returns The Invoices
 	 */
-	async getAllInvoices(): Promise<Array<Invoice>> {
-		// Get the Company Endpoint
-		const companyEndpoint = await this.getCompanyEndpoint();
-
-		// Setup the New Query Builder
-		const queryBuilder = new QueryBuilder(companyEndpoint, Query.Invoice);
-
-		// Setup the URL
-		const url = queryBuilder.build();
-
-		// Get the Invoices
-		const response = await this.apiClient.runRequest(url, { method: "GET" });
-
-		// Check if the response failed
-		if (!response || response?.QueryResponse?.Invoice?.length < 1) throw new Error("Invoices not found");
+	protected formatResponse(response: any): Array<Invoice> {
+		// Check if the Response is invalid
+		if (!response || response.QueryResponse?.Invoice?.length < 1) throw new Error('Invoices not found');
 
 		// Get the Invoices
 		const queryResponse = response.QueryResponse as InvoiceQueryResponse;
@@ -57,91 +64,18 @@ export class InvoiceAPI {
 	}
 
 	/**
-	 * Get Invoices for a Date Range
-	 * @param startDate - The start date
-	 * @param endDate - The end date
-	 * @returns The Invoices
-	 */
+	 * Get the Query Builder
 
-	async getInvoicesForDateRange(startDate: Date, endDate: Date): Promise<Array<Invoice>> {
+	 * @returns The Query Builder
+	 */
+	public async getQueryBuilder(): Promise<QueryBuilder> {
 		// Get the Company Endpoint
 		const companyEndpoint = await this.getCompanyEndpoint();
 
 		// Setup the New Query Builder
 		const queryBuilder = new QueryBuilder(companyEndpoint, Query.Invoice);
 
-		// Setup the URL
-		const url = queryBuilder.whereLastUpdatedAfter(startDate).whereLastUpdatedBefore(endDate).build();
-
-		// Get the Invoices
-		const response = await this.apiClient.runRequest(url, { method: "GET" });
-
-		// Check if the Response Failed to find an Invoice
-		if (!response || response.QueryResponse?.Invoice?.length < 1) throw new Error("Invoice not found");
-
-		// Get the Invoices
-		const queryResponse = response.QueryResponse as InvoiceQueryResponse;
-
-		// Return the Invoices
-		return queryResponse.Invoice;
-	}
-
-	/**
-	 * Get Updated Invoices
-	 * @param lastUpdatedDate - The last updated date
-	 * @returns The Invoices
-	 */
-	async getUpdatedInvoices(lastUpdatedDate: Date): Promise<Array<Invoice>> {
-		// Get the Company Endpoint
-		const companyEndpoint = await this.getCompanyEndpoint();
-
-		// Setup the New Query Builder
-		const queryBuilder = new QueryBuilder(companyEndpoint, Query.Invoice);
-
-		// Setup the URL
-		const url = queryBuilder.whereLastUpdatedAfter(lastUpdatedDate).build();
-
-		// Get the Invoices
-		const response = await this.apiClient.runRequest(url, { method: "GET" });
-
-		// Check if the Response Failed to find an Invoice
-		if (!response || response.QueryResponse?.Invoice?.length < 1) throw new Error("Invoice not found");
-
-		// Get the Invoices
-		const queryResponse = response.QueryResponse as InvoiceQueryResponse;
-
-		// Return the Invoices
-		return queryResponse.Invoice;
-	}
-
-	/**
-	 * Get Invoice by ID
-	 * @param id - The ID of the invoice
-	 * @returns The Invoice
-	 */
-	async getInvoiceById(id: string): Promise<Invoice> {
-		// Get the Company Endpoint
-		const companyEndpoint = await this.getCompanyEndpoint();
-
-		// Setup the New Query Builder
-		const queryBuilder = new QueryBuilder(companyEndpoint, Query.Invoice);
-
-		// Setup the URL
-		const url = queryBuilder.whereId(id).build();
-
-		// Get the Invoice
-		const response = await this.apiClient.runRequest(url, { method: "GET" });
-
-		// Check if the Response Failed to find an Invoice
-		if (!response) throw new Error("Invoice not found");
-
-		// Get the Invoices
-		const queryResponse = response.QueryResponse as InvoiceQueryResponse;
-
-		// Check if the Response Failed to find an Invoice
-		if (queryResponse.Invoice.length < 1) throw new Error("Invoice not found");
-
-		// Return the Invoice
-		return queryResponse.Invoice[0];
+		// Return the Query Builder
+		return queryBuilder;
 	}
 }
