@@ -1,5 +1,5 @@
 // Import the Token Type
-import type { TokenType } from "../types";
+import type { TokenType } from '../types';
 
 /**
  * The Token Object

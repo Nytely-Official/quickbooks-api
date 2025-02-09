@@ -1,5 +1,5 @@
 // Imports
-import type { Invoice } from "./invoice";
+import type { Invoice } from '../types';
 
 /**
  * The Invoice Query Response

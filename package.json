@@ -2,7 +2,7 @@
 	"name": "quickbooks-api",
 	"author": "JackNytely <jacknytely@gmail.com>",
 	"license": "MIT",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"description": "A modular TypeScript SDK for seamless integration with Intuit QuickBooks APIs. Provides robust authentication handling and future-ready foundation for accounting, payments, and commerce operations.",
 	"type": "module",
 	"main": "dist/app.js",
@@ -24,7 +24,8 @@
 	],
 	"scripts": {
 		"build": "bunx tsc",
-		"test": "bun test",
+		"test": "bun test __tests__",
+		"test:live": "bun test __live-tests__",
 		"publish:package": "bun run build && bun run test && bun publish"
 	},
 	"dependencies": {},

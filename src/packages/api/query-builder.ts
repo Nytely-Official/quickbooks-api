@@ -1,5 +1,5 @@
 // Imports
-import type { Query } from "@/app";
+import type { Invoice, Query, DeepKeys } from '../../types/types';
 
 /**
  * The Query Builder
@@ -83,6 +83,47 @@ export class QueryBuilder {
 	}
 
 	/**
+	 * Where Due Date
+	 * @param date - The due date
+	 * @returns The Query Builder
+	 */
+	public whereDueDate(date: Date): this {
+		this.whereClauses.push(`DueDate = '${date.toISOString()}'`);
+		return this;
+	}
+
+	/**
+	 * Where Customer ID
+	 * @param customerId - The customer ID
+	 * @returns The Query Builder
+	 */
+	public whereCustomerId(customerId: string): this {
+		this.whereClauses.push(`CustomerRef.value = '${customerId}'`);
+		return this;
+	}
+
+	/**
+	 * Order By
+	 * @param field - The field to sort by
+	 * @param direction - Sort direction (ASC/DESC)
+	 * @returns The Query Builder
+	 */
+	public orderBy(field: DeepKeys<Invoice>, direction: 'ASC' | 'DESC' = 'ASC'): this {
+		this.urlParams.orderby = `${field} ${direction}`;
+		return this;
+	}
+
+	/**
+	 * Limit Results
+	 * @param count - Maximum number of results
+	 * @returns The Query Builder
+	 */
+	public limit(count: number): this {
+		this.urlParams.limit = count.toString();
+		return this;
+	}
+
+	/**
 	 * Build the Query
 	 * @returns The URL
 	 */
@@ -91,10 +132,13 @@ export class QueryBuilder {
 		let query = this.baseQuery.toString();
 
 		// Add Where Clauses
-		if (this.whereClauses.length > 0) query += ` where ${this.whereClauses.join(" and ")}`;
+		if (this.whereClauses.length > 0) query += ` where ${this.whereClauses.join(' and ')}`;
+
+		// Map the URL Parameters
+		const urlParams = Object.entries(this.urlParams).map(([k, v]) => `${k}=${v}`);
 
 		// Build parameters with literal spaces
-		const params = [`query=${query}`, ...Object.entries(this.urlParams).map(([k, v]) => `${k}=${v}`)].join("&");
+		const params = [`query=${query}`, ...urlParams].join('&');
 
 		// Manually construct URL string
 		return `${this.endpoint}/query?${params}`;

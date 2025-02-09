@@ -1,18 +1,18 @@
-import { ApiClient } from "../src/app";
-import { AuthProvider, Environment, AuthScopes, type InvoiceQueryResponse } from "@/app";
-import { describe, expect, it, beforeEach, afterEach } from "bun:test";
-import { mockFetch, mockInvoiceData, mockTokenData } from "./helpers";
+import { ApiClient } from '../src/app';
+import { AuthProvider, Environment, AuthScopes, type InvoiceQueryResponse } from '../src/app';
+import { describe, expect, it, beforeEach, afterEach } from 'bun:test';
+import { mockFetch, mockInvoiceData, mockTokenData } from './helpers';
 
 // Mock configuration
 const TEST_CONFIG = {
-	clientId: "test_client_id",
-	clientSecret: "test_client_secret",
-	redirectUri: "http://localhost:3000/auth-code",
+	clientId: 'test_client_id',
+	clientSecret: 'test_client_secret',
+	redirectUri: 'http://localhost:3000/auth-code',
 	scopes: [AuthScopes.Accounting],
 };
 
 // Describe the Invoice API
-describe("Invoice API", () => {
+describe('Invoice API', () => {
 	// Declare the API Client
 	let apiClient: ApiClient;
 
@@ -41,9 +41,9 @@ describe("Invoice API", () => {
 	});
 
 	// Describe the getAllInvoices Method
-	describe("getAllInvoices", () => {
+	describe('getAllInvoices', () => {
 		// Describe the getAllInvoices Method
-		it("should fetch all invoices", async () => {
+		it('should fetch all invoices', async () => {
 			// Setup the Invoice Query Response
 			const invoiceQueryResponse: { QueryResponse: InvoiceQueryResponse } = {
 				QueryResponse: {
@@ -72,9 +72,9 @@ describe("Invoice API", () => {
 	});
 
 	// Describe the getInvoiceById Method
-	describe("getInvoiceById", () => {
+	describe('getInvoiceById', () => {
 		// Describe the getInvoiceById Method
-		it("should fetch single invoice by ID", async () => {
+		it('should fetch single invoice by ID', async () => {
 			// Get the Test Invoice
 			const testInvoice = mockInvoiceData[0];
 
@@ -99,33 +99,33 @@ describe("Invoice API", () => {
 		});
 
 		// Describe the getInvoiceById Method
-		it("should throw error for invalid invoice ID", async () => {
+		it('should throw error for invalid invoice ID', async () => {
 			// Mock empty response with 400 status
 			global.fetch = mockFetch(
 				JSON.stringify({
 					QueryResponse: {},
-					fault: { error: [{ message: "Invoice not found" }] },
+					fault: { error: [{ message: 'Invoice not found' }] },
 				}),
-				400
+				400,
 			);
 
 			// Assert the Invoice
-			expect(apiClient.invoices.getInvoiceById("invalid")).rejects.toThrow("Invoice not found");
+			expect(apiClient.invoices.getInvoiceById('invalid')).rejects.toThrow('Invoice not found');
 		});
 	});
 
 	// Describe the getInvoicesForDateRange Method
-	describe("getInvoicesForDateRange", () => {
+	describe('getInvoicesForDateRange', () => {
 		// Describe the getInvoicesForDateRange Method
-		it("should fetch invoices within date range", async () => {
+		it('should fetch invoices within date range', async () => {
 			// Set the start Date
-			const startDate = new Date("2025-01-09");
+			const startDate = new Date('2025-01-09');
 
 			// Set the end Date
-			const endDate = new Date("2025-01-12");
+			const endDate = new Date('2025-01-12');
 
 			// Get the List of Invoices in that date range for the mock data
-			const invoicesInDateRange = mockInvoiceData.filter(invoice => {
+			const invoicesInDateRange = mockInvoiceData.filter((invoice) => {
 				// Get the Invoice Date
 				const invoiceDate = new Date(invoice.MetaData!.LastUpdatedTime!);
 
@@ -161,9 +161,9 @@ describe("Invoice API", () => {
 	});
 
 	// Describe the getUpdatedInvoices Method
-	describe("getUpdatedInvoices", () => {
+	describe('getUpdatedInvoices', () => {
 		// Describe the getUpdatedInvoices Method
-		it("should fetch updated invoices", async () => {
+		it('should fetch updated invoices', async () => {
 			// Setup the Invoice Query Response
 			const invoiceQueryResponse: { QueryResponse: InvoiceQueryResponse } = {
 				QueryResponse: {
@@ -178,10 +178,10 @@ describe("Invoice API", () => {
 			global.fetch = mockFetch(JSON.stringify(invoiceQueryResponse));
 
 			// Get the Last Updated Time
-			const lastUpdatedTime = new Date("2024-01-09");
+			const lastUpdatedTime = new Date('2024-01-09');
 
 			// Get the List of Invoices in that date range for the mock data
-			const invoicesInDateRange = mockInvoiceData.filter(invoice => {
+			const invoicesInDateRange = mockInvoiceData.filter((invoice) => {
 				// Check if the last updated date is invalid
 				if (!invoice.MetaData?.LastUpdatedTime) return false;
 
@@ -203,6 +203,40 @@ describe("Invoice API", () => {
 
 			// Assert the Invoices
 			expect(invoices[0].Id).toBe(invoicesInDateRange[0].Id);
+		});
+	});
+
+	// Describe the getInvoicesByDueDate Method
+	describe('getInvoicesByDueDate', () => {
+		// Describe the getInvoicesByDueDate Method
+		it('should fetch invoices by due date', async () => {
+			// Set the Test Date
+			const testDate = new Date('2024-12-23');
+
+			// Setup the Invoice Query Response
+			const invoiceQueryResponse: { QueryResponse: InvoiceQueryResponse } = {
+				QueryResponse: {
+					Invoice: mockInvoiceData.filter((invoice) => new Date(invoice.DueDate).getTime() === testDate.getTime()),
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+
+			// Mock the Fetch with proper QueryResponse structure
+			global.fetch = mockFetch(JSON.stringify(invoiceQueryResponse));
+
+			// Get the Invoices
+			const invoices = await apiClient.invoices.getInvoicesByDueDate(testDate);
+
+			// Assert the Invoices
+			expect(invoices).toBeArray();
+
+			// Assert the Invoices Length
+			expect(invoices.length).toBe(invoiceQueryResponse.QueryResponse.Invoice.length);
+
+			// Assert the Invoices
+			expect(new Date(invoices[0].DueDate).getTime()).toBe(testDate.getTime());
 		});
 	});
 });
