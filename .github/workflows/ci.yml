@@ -7,7 +7,7 @@ on:
     branches: [main, develop]
 
 jobs:
-  test:
+  Test-Local:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,4 +15,14 @@ jobs:
         with:
           bun-version: 1.2.1
       - run: bun install
-      - run: bun test
+      - run: bun run test
+
+  Test-Live:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: 1.2.1
+      - run: bun install
+      - run: bun run test:live
