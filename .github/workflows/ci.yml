@@ -19,6 +19,12 @@ jobs:
 
   Test-Live:
     runs-on: ubuntu-latest
+    env:
+      QB_CLIENT_ID: ${{ secrets.QB_CLIENT_ID }}
+      QB_CLIENT_SECRET: ${{ secrets.QB_CLIENT_SECRET }}
+      REDIRECT_URI: ${{ secrets.REDIRECT_URI }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      SERIALIZED_TOKEN: ${{ secrets.SERIALIZED_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
