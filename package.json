@@ -24,8 +24,8 @@
 	],
 	"scripts": {
 		"build": "bunx tsc",
-		"test": "bun test",
-		"test:live": "bun run __tests__/live-test.ts",
+		"test": "bun test __tests__",
+		"test:live": "bun test __live-tests__",
 		"publish:package": "bun run build && bun run test && bun publish"
 	},
 	"dependencies": {},
