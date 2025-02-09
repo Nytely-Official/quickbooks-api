@@ -1,0 +1,44 @@
+name: Live API Validation
+on:
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  validate-api:
+    runs-on: ubuntu-latest
+    env:
+      QB_CLIENT_ID: ${{ secrets.QB_CLIENT_ID }}
+      QB_CLIENT_SECRET: ${{ secrets.QB_CLIENT_SECRET }}
+      SERIALIZED_TOKEN: ${{ secrets.SERIALIZED_TOKEN }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: 1.2.1
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run API validation tests
+        run: |
+          bun run test:live | tee test-output.tap
+          echo "TEST_RESULTS<<EOF" >> $GITHUB_ENV
+          cat test-output.tap >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+        continue-on-error: true
+
+      - name: Process test results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: API Test Results
+          path: test-output.tap
+          reporter: tap
+
+      - name: Fail on test errors
+        if: contains(env.TEST_RESULTS, 'not ok')
+        run: |
+          echo "::error::One or more tests failed. Check the test results report."
+          exit 1
