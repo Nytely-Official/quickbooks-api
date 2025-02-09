@@ -1,5 +1,44 @@
 # Changelog
 
+## [0.1.2] - 2025-02-10
+
+### Features
+
+- Added new Invoice API methods:
+  - `getInvoicesByDueDate()` - Retrieve invoices by their due date
+  - `rawInvoiceQuery()` - Execute custom queries using QueryBuilder
+- Enhanced QueryBuilder with chainable methods:
+  - `orderBy()` - Sort results by specific fields
+  - `limit()` - Constrain result set size
+  - Added support for complex query construction
+
+### Infrastructure
+
+- Updated CI workflow to run tests on both main and develop branches
+- Added separate live test workflow with environment variables
+- Configured Prettier formatting rules for consistent code style
+
+### Tests
+
+- Added comprehensive live tests for AuthProvider token operations
+- Implemented live integration tests for Invoice API endpoints
+- Expanded test coverage for error scenarios and edge cases
+- Added test cleanup procedures to prevent state leakage
+
+### Code Quality
+
+- Enforced single quotes and consistent formatting across codebase
+- Improved type safety by replacing generic Function type with specific signatures
+- Fixed unhandled promise rejections in test cases
+- Added proper error handling for token state modifications
+
+### Documentation
+
+- Updated README with consistent code formatting examples
+- Added missing documentation for UserAuthResponse interface
+- Improved type definitions with DeepKeys utility type
+- Enhanced error messages and inline documentation
+
 ## [0.1.1] - 2025-02-08
 
 ### QOL
