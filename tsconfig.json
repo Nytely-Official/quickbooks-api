@@ -1,20 +1,14 @@
 {
 	"compilerOptions": {
 		// Enable latest features
-		"lib": ["ESNext", "DOM"],
 		"target": "ESNext",
 		"module": "ESNext",
-		"moduleDetection": "force",
-		"esModuleInterop": true,
+		"moduleResolution": "bundler",
 
 		// Bundler mode
-		"moduleResolution": "bundler",
-		"verbatimModuleSyntax": true,
-		"noEmit": false,
 		"outDir": "./dist",
 		"rootDir": "./src",
 		"declaration": true,
-		"sourceMap": true,
 
 		// Best practices
 		"strict": true,
@@ -26,11 +20,14 @@
 		"noUnusedParameters": true,
 		"noPropertyAccessFromIndexSignature": false,
 
-		// Setup the Paths
-		"paths": {
-			"@/*": ["./src/*"],
-			"@auth/*": ["./src/packages/auth/*"]
-		}
+		// Add these critical options
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"esModuleInterop": true
+	},
+	"tsc-alias": {
+		"resolveFullPaths": true,
+		"verbose": false
 	},
 	"include": ["./src/**/*"]
 }

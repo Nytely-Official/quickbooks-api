@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.3] - 2025-02-10
+
+### Infrastructure
+
+- Updated the Build Flow to include tsc-alias for TypeScript alias resolution (emit js extension in imports)
+
 ## [0.1.2] - 2025-02-10
 
 ### Features
