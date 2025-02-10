@@ -68,15 +68,12 @@ export class AuthProvider {
 	 * Generates the OAuth2 URL to get the auth code from the user
 	 * @returns {URL} The OAuth2 URL to get the auth code from the user
 	 */
-	public generateAuthUrl(): URL {
+	public generateAuthUrl(state: string = crypto.randomUUID()): URL {
 		// Join the scopes into a string
 		const scopeUriString = this.scopes.join(' ');
 
 		// Setup the Auth URL
 		const authUrl = new URL(Endpoints.UserAuth);
-
-		// Generate a Unique State
-		const state = crypto.randomUUID();
 
 		// Set the Query Params
 		authUrl.searchParams.set('client_id', this.clientId);

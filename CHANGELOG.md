@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.4] - 2025-02-10
+
+### Features
+
+- Added the ability to generate the Auth URL with a custom state
+
 ## [0.1.3] - 2025-02-10
 
 ### Infrastructure
