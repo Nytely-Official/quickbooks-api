@@ -128,6 +128,15 @@ export class QueryBuilder {
 	 * @returns The Search Options
 	 */
 	private buildSearchOptions(): string {
+		// Ensure the Start Position is not negative
+		if (this.searchOptions.startPosition) this.searchOptions.startPosition = Math.max(this.searchOptions.startPosition, 0);
+
+		// Ensure the Max Results is not negative
+		if (this.searchOptions.maxResults) this.searchOptions.maxResults = Math.max(this.searchOptions.maxResults, 1);
+
+		// Ensure the Max Results is not greater than 1000 (API Limit)
+		if (this.searchOptions.maxResults) this.searchOptions.maxResults = Math.min(this.searchOptions.maxResults, 1000);
+
 		// Setup the Search Options String
 		let options: Array<string> = new Array();
 
