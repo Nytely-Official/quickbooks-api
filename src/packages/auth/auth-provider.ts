@@ -68,15 +68,12 @@ export class AuthProvider {
 	 * Generates the OAuth2 URL to get the auth code from the user
 	 * @returns {URL} The OAuth2 URL to get the auth code from the user
 	 */
-	public generateAuthUrl(): URL {
+	public generateAuthUrl(state: string = crypto.randomUUID()): URL {
 		// Join the scopes into a string
 		const scopeUriString = this.scopes.join(' ');
 
 		// Setup the Auth URL
 		const authUrl = new URL(Endpoints.UserAuth);
-
-		// Generate a Unique State
-		const state = crypto.randomUUID();
 
 		// Set the Query Params
 		authUrl.searchParams.set('client_id', this.clientId);
@@ -173,7 +170,13 @@ export class AuthProvider {
 		const response = await fetch(Endpoints.TokenBearer, requestOptions);
 
 		// Check if the response is successful
-		if (!response.ok) throw new Error('Failed to refresh token');
+		if (!response.ok) {
+			// Get the error message
+			const errorMessage = await response.text().catch(() => '');
+
+			// Throw an error
+			throw new Error(`Failed to refresh token: ${errorMessage}`);
+		}
 
 		// Parse the response
 		const data = (await response.json().catch(() => {

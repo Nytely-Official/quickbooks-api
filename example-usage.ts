@@ -59,7 +59,10 @@ app.get('/auth-code', async (req: Request, res: Response) => {
 		const dueInvoices = await apiClient.invoices.getInvoicesByDueDate(new Date());
 
 		// Setup the Custom Query Builder
-		const customQueryBuilder = (await apiClient.invoices.getQueryBuilder()).orderBy('DueDate', 'DESC').limit(10);
+		const customQueryBuilder = (await apiClient.invoices.getQueryBuilder()).setSearchOptions({
+			orderBy: { field: 'DueDate', direction: 'DESC' },
+			maxResults: 10,
+		});
 
 		// Advanced query using raw query builder
 		const customQuery = await apiClient.invoices.rawInvoiceQuery(customQueryBuilder);
@@ -82,6 +85,12 @@ app.get('/auth-code', async (req: Request, res: Response) => {
 		// Example: Get updated invoices
 		const updatedInvoices = await apiClient.invoices.getUpdatedInvoices(new Date('2024-01-01'));
 
+		// Example: Get all invoices (with search options and pagination)
+		const paginatedInvoices = {
+			page1: await apiClient.invoices.getAllInvoices({ maxResults: 10, startPosition: 0, orderBy: { field: 'Id', direction: 'DESC' } }),
+			page2: await apiClient.invoices.getAllInvoices({ maxResults: 10, startPosition: 10, orderBy: { field: 'Id', direction: 'DESC' } }),
+		};
+
 		// Example: Serialize the Token
 		const serialized = await authProvider.serializeToken(process.env.SECRET_KEY!);
 
@@ -101,6 +110,7 @@ app.get('/auth-code', async (req: Request, res: Response) => {
 			foundInvoice,
 			invoicesForDateRange,
 			updatedInvoices,
+			paginatedInvoices,
 			dueInvoices,
 			customQuery,
 			revoked,

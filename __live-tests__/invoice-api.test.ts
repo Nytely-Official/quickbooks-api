@@ -45,4 +45,53 @@ describe('Live API: Invoices', async () => {
 		// Test the Invoice ID
 		expect(foundInvoice.Id).toBe(invoice.Id);
 	});
+
+	// Test retrieving 10 invoices
+	test('should retrieve 10 invoices', async () => {
+		// Get all invoices
+		const invoices = await apiClient.invoices.getAllInvoices({ maxResults: 10 });
+
+		// Test the Invoices
+		expect(invoices).toBeInstanceOf(Array);
+
+		// Test the Invoice length
+		expect(invoices.length).toBe(10);
+	});
+
+	// Test pagination
+	test('should handle pagination', async () => {
+		// Get all invoices
+		const invoicePage1 = await apiClient.invoices.getAllInvoices({ maxResults: 10, startPosition: 0 });
+		const invoicePage2 = await apiClient.invoices.getAllInvoices({ maxResults: 10, startPosition: 10 });
+
+		// Test the Invoices
+		expect(invoicePage1).toBeInstanceOf(Array);
+		expect(invoicePage2).toBeInstanceOf(Array);
+
+		// Test the Invoice length
+		expect(invoicePage1.length).toBe(10);
+		expect(invoicePage2.length).toBe(10);
+
+		// Test the Invoices are different
+		expect(invoicePage1).not.toEqual(invoicePage2);
+	});
+
+	// Should handle all Search Options
+	test('should handle all search options', async () => {
+		// Get all invoices
+		const invoices = await apiClient.invoices.getAllInvoices({
+			maxResults: 10,
+			startPosition: 0,
+			orderBy: { field: 'Id', direction: 'DESC' },
+		});
+
+		// Test the Invoices
+		expect(invoices).toBeInstanceOf(Array);
+
+		// Test the Invoice length
+		expect(invoices.length).toBe(10);
+
+		// loop through the invoices and test each id is less than the previous one
+		for (let i = 0; i < invoices.length - 1; i++) expect(Number(invoices[i].Id)).toBeGreaterThan(Number(invoices[i + 1].Id));
+	});
 });

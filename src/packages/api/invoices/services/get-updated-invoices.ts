@@ -1,5 +1,5 @@
 // Import the Query Builder
-import { type Invoice } from '../../../../types/types';
+import { InvoiceSearchOptions, type Invoice } from '../../../../types/types';
 import { InvoiceAPI } from '../invoice-api';
 
 /**
@@ -8,12 +8,22 @@ import { InvoiceAPI } from '../invoice-api';
  * @param lastUpdatedDate - The last updated date
  * @returns The Invoices
  */
-export async function getUpdatedInvoices(this: InvoiceAPI, lastUpdatedDate: Date): Promise<Array<Invoice>> {
+export async function getUpdatedInvoices(
+	this: InvoiceAPI,
+	lastUpdatedDate: Date,
+	options: InvoiceSearchOptions = {},
+): Promise<Array<Invoice>> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
+	// Setup the Last Updated Date Filter
+	queryBuilder.whereLastUpdatedAfter(lastUpdatedDate);
+
+	// Setup the Search Options
+	queryBuilder.setSearchOptions(options);
+
 	// Setup the URL
-	const url = queryBuilder.whereLastUpdatedAfter(lastUpdatedDate).build();
+	const url = queryBuilder.build();
 
 	// Get the Invoices
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
