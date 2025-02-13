@@ -161,29 +161,64 @@ const apiClient = new ApiClient(authProvider, Environment.Sandbox);
 // Get all invoices
 const allInvoices = await apiClient.invoices.getAllInvoices();
 
+// Get specific invoice by ID
+const invoice = await apiClient.invoices.getInvoiceById('129');
+
 // Get invoices within date range
 const januaryInvoices = await apiClient.invoices.getInvoicesForDateRange(new Date('2024-01-01'), new Date('2024-01-31'));
 
-// Get recently updated invoices
-const updatedInvoices = await apiClient.invoices.getUpdatedInvoices(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)); // Last 7 days
+// Get all invoices with pagination and sorting
+const paginatedInvoices = {
+  page1: await apiClient.invoices.getAllInvoices({
+    maxResults: 10,
+    startPosition: 0,
+    orderBy: { field: 'Id', direction: 'DESC' },
+  }),
+  page2: await apiClient.invoices.getAllInvoices({
+    maxResults: 10,
+    startPosition: 10,
+    orderBy: { field: 'Id', direction: 'DESC' },
+  }),
+};
 
-// Get specific invoice by ID
-const invoice = await apiClient.invoices.getInvoiceById('129');
+// Get specific invoice with additional options
+const invoice = await apiClient.invoices.getInvoiceById('129', {
+  minorVersion: '45',
+});
+
+// Advanced query with multiple options
+const recentInvoices = await apiClient.invoices.getUpdatedInvoices(new Date('2024-01-01'), {
+  maxResults: 50,
+  orderBy: { field: 'DueDate', direction: 'ASC' },
+});
 ```
 
 ### Available Invoice Methods
 
-- `getAllInvoices()` - Retrieve all accessible invoices
-- `getInvoiceById(id: string)` - Fetch specific invoice by ID
-- `getInvoicesForDateRange(start: Date, end: Date)` - Filter invoices by date
-- `getUpdatedInvoices(since: Date)` - Get invoices modified after specified date
-- `getInvoicesByDueDate(date: Date)` - Get invoices due by specific date
-- `rawInvoiceQuery(queryBuilder: QueryBuilder)` - Execute custom queries using QueryBuilder
+All methods now support optional `InvoiceSearchOptions` parameter:
+
+- `getAllInvoices(options?: InvoiceSearchOptions)` - Retrieve invoices with pagination/sorting
+- `getInvoiceById(id: string, options?: InvoiceSearchOptions)` - Fetch by ID with options
+- `getInvoicesForDateRange(start: Date, end: Date, options?: InvoiceSearchOptions)`
+- `getUpdatedInvoices(since: Date, options?: InvoiceSearchOptions)`
+- `getInvoicesByDueDate(date: Date, options?: InvoiceSearchOptions)`
 
 ### Key Interfaces
 
 ```typescript
-// Token structure
+// Search options structure
+interface InvoiceSearchOptions {
+  startPosition?: number; // Pagination offset (0-based)
+  maxResults?: number; // Page size (1-1000)
+  minorVersion?: string; // API minor version
+  orderBy?: {
+    // Sorting configuration
+    field: keyof Invoice; // Field to sort by
+    direction: 'ASC' | 'DESC';
+  };
+}
+
+// Token structure (existing)
 interface Token {
   tokenType: TokenType.Bearer;
   refreshToken: string;
@@ -199,6 +234,23 @@ interface UserAuthResponse {
   realmId: string;
   state: string;
 }
+```
+
+### Query Builder Updates
+
+The new search options system integrates with the existing QueryBuilder:
+
+```typescript
+// Create custom queries with search options
+const queryBuilder = await apiClient.invoices
+  .getQueryBuilder()
+  .setSearchOptions({
+    maxResults: 100,
+    orderBy: { field: 'TotalAmt', direction: 'DESC' },
+  })
+  .whereDueDate(new Date());
+
+const customResults = await apiClient.invoices.rawInvoiceQuery(queryBuilder);
 ```
 
 ### Available Enums

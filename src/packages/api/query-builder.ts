@@ -1,5 +1,5 @@
 // Imports
-import type { Invoice, Query, DeepKeys } from '../../types/types';
+import type { Query, InvoiceSearchOptions } from '../../types/types';
 
 /**
  * The Query Builder
@@ -11,9 +11,9 @@ export class QueryBuilder {
 	private whereClauses: Array<string> = new Array();
 
 	/**
-	 * The URL Parameters
+	 * The Search Options
 	 */
-	private urlParams: Record<string, string> = {};
+	private searchOptions: InvoiceSearchOptions = {};
 
 	/**
 	 * Constructor
@@ -73,16 +73,6 @@ export class QueryBuilder {
 	}
 
 	/**
-	 * With Minor Version
-	 * @param version - The Version
-	 * @returns The Query Builder
-	 */
-	public withMinorVersion(version: string): this {
-		this.urlParams.minorversion = version;
-		return this;
-	}
-
-	/**
 	 * Where Due Date
 	 * @param date - The due date
 	 * @returns The Query Builder
@@ -103,23 +93,12 @@ export class QueryBuilder {
 	}
 
 	/**
-	 * Order By
-	 * @param field - The field to sort by
-	 * @param direction - Sort direction (ASC/DESC)
+	 * Set the Search Options
+	 * @param options - The Search Options
 	 * @returns The Query Builder
 	 */
-	public orderBy(field: DeepKeys<Invoice>, direction: 'ASC' | 'DESC' = 'ASC'): this {
-		this.urlParams.orderby = `${field} ${direction}`;
-		return this;
-	}
-
-	/**
-	 * Limit Results
-	 * @param count - Maximum number of results
-	 * @returns The Query Builder
-	 */
-	public limit(count: number): this {
-		this.urlParams.limit = count.toString();
+	public setSearchOptions(options: InvoiceSearchOptions): this {
+		this.searchOptions = options;
 		return this;
 	}
 
@@ -127,7 +106,7 @@ export class QueryBuilder {
 	 * Build the Query
 	 * @returns The URL
 	 */
-	build(): string {
+	public build(): string {
 		// Setup the Query
 		let query = this.baseQuery.toString();
 
@@ -135,12 +114,39 @@ export class QueryBuilder {
 		if (this.whereClauses.length > 0) query += ` where ${this.whereClauses.join(' and ')}`;
 
 		// Map the URL Parameters
-		const urlParams = Object.entries(this.urlParams).map(([k, v]) => `${k}=${v}`);
+		const options = this.buildSearchOptions();
 
 		// Build parameters with literal spaces
-		const params = [`query=${query}`, ...urlParams].join('&');
+		const params = `query=${query} ${options}`;
 
 		// Manually construct URL string
 		return `${this.endpoint}/query?${params}`;
+	}
+
+	/**
+	 * Builds the Search Options (In the specific order required by the API)
+	 * @returns The Search Options
+	 */
+	private buildSearchOptions(): string {
+		// Ensure the Start Position is not negative
+		if (this.searchOptions.startPosition) this.searchOptions.startPosition = Math.max(this.searchOptions.startPosition, 0);
+
+		// Ensure the Max Results is not negative
+		if (this.searchOptions.maxResults) this.searchOptions.maxResults = Math.max(this.searchOptions.maxResults, 1);
+
+		// Ensure the Max Results is not greater than 1000 (API Limit)
+		if (this.searchOptions.maxResults) this.searchOptions.maxResults = Math.min(this.searchOptions.maxResults, 1000);
+
+		// Setup the Search Options String
+		let options: Array<string> = new Array();
+
+		// Add the Search Options
+		if (this.searchOptions.orderBy) options.push(`orderby ${this.searchOptions.orderBy.field} ${this.searchOptions.orderBy.direction}`);
+		if (this.searchOptions.startPosition) options.push(`startposition ${this.searchOptions.startPosition}`);
+		if (this.searchOptions.maxResults) options.push(`maxresults ${this.searchOptions.maxResults}`);
+		if (this.searchOptions.minorVersion) options.push(`minorversion ${this.searchOptions.minorVersion}`);
+
+		// Return the Search Options
+		return options.join(' ');
 	}
 }

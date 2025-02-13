@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.2.0] - 2025-02-11
+
+### Features
+
+- Added InvoiceSearchOptions interface for pagination, sorting, and API versioning
+- Updated all invoice methods to support optional search parameters:
+  - `maxResults` for pagination limits
+  - `startPosition` for pagination offsets
+  - `orderBy` for field-based sorting
+  - `minorVersion` for API version control
+- Enhanced QueryBuilder with integrated search options handling
+- Improved error messages for token refresh failures
+
+### Tests
+
+- Added live tests for pagination functionality
+- Implemented search options validation tests
+- Added sorting order verification tests
+- Expanded test coverage for API version parameter
+
+### Documentation
+
+- Updated README with new search options examples
+- Added QueryBuilder integration guide
+- Improved API reference documentation
+- Enhanced code examples with pagination and sorting
+
+### Code Quality
+
+- Refactored invoice service methods to use unified search options
+- Improved type safety with InvoiceSearchOptions interface
+- Standardized query builder usage across all API methods
+- Removed deprecated URL parameter handling from QueryBuilder
+
 ## [0.1.4] - 2025-02-10
 
 ### Features

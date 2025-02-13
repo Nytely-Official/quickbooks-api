@@ -170,7 +170,13 @@ export class AuthProvider {
 		const response = await fetch(Endpoints.TokenBearer, requestOptions);
 
 		// Check if the response is successful
-		if (!response.ok) throw new Error('Failed to refresh token');
+		if (!response.ok) {
+			// Get the error message
+			const errorMessage = await response.text().catch(() => '');
+
+			// Throw an error
+			throw new Error(`Failed to refresh token: ${errorMessage}`);
+		}
 
 		// Parse the response
 		const data = (await response.json().catch(() => {

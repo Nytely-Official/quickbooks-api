@@ -8,6 +8,7 @@ export { Query } from './enums/query';
 export { TokenType } from './enums/token-type';
 
 // Export the Interfaces
+export type { InvoiceSearchOptions } from './interfaces/invoice-search-options';
 export type { Invoice } from './interfaces/invoice';
 export type { QueryResponse, InvoiceQueryResponse } from './interfaces/query-response';
 export type { Token } from './interfaces/token';
