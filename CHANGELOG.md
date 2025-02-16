@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.3.0] - 2025-03-15
+
+### Features
+
+- Added Estimates Search API support (Searching, Pagination, Sorting) with query building capabilities
+- Implemented Estimate status tracking and expiration date handling
+- Added new SearchOptions interface for type-safe queries
+
+### Documentation
+
+- Updated README with Estimates API examples and usage patterns
+- Added API reference tables for Estimate methods and parameters
+- Improved search options documentation with generic type support
+
+### Tests
+
+- Added live integration tests for Estimates API endpoints
+- Implemented comprehensive unit tests for estimate query builder
+- Added mock estimate data for testing scenarios
+
+### Code Quality
+
+- Refactored QueryBuilder into base class with type-safe inheritance
+- Improved type safety with generic SearchOptions<T> interface
+- Standardized API response handling across all endpoints
+
+### Infrastructure
+
+- Added biome.json configuration for code formatting
+- Updated test helpers to support estimate data mocking
+- Improved token serialization/deserialization examples
+
 ## [0.2.0] - 2025-02-11
 
 ### Features
