@@ -2,6 +2,7 @@
 import { AuthProvider } from '../auth/auth-provider';
 import { Environment } from '../../types/types';
 import { InvoiceAPI } from './invoices/invoice-api';
+import { EstimateAPI } from './estimates/estimate-api';
 
 /**
  * API Client
@@ -13,13 +14,19 @@ export class ApiClient {
 	public invoices: InvoiceAPI;
 
 	/**
+	 * Estimates API
+	 */
+	public estimates: EstimateAPI;
+
+	/**
 	 * Constructor
 
 	 * @param authProvider - The Auth Provider
 	 */
 	constructor(public readonly authProvider: AuthProvider, public readonly environment: Environment) {
-		// Initialize the Invoices API
+		// Initialize the API's
 		this.invoices = new InvoiceAPI(this);
+		this.estimates = new EstimateAPI(this);
 	}
 
 	/**

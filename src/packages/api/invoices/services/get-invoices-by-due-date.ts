@@ -1,5 +1,5 @@
 // Import the Query Builder
-import { InvoiceSearchOptions, type Invoice } from '../../../../types/types';
+import { SearchOptions, type Invoice } from '../../../../types/types';
 import { InvoiceAPI } from '../invoice-api';
 
 /**
@@ -8,7 +8,7 @@ import { InvoiceAPI } from '../invoice-api';
  * @param dueDate - The due date to filter by
  * @returns Filtered Invoices
  */
-export async function getInvoicesByDueDate(this: InvoiceAPI, dueDate: Date, options: InvoiceSearchOptions = {}): Promise<Array<Invoice>> {
+export async function getInvoicesByDueDate(this: InvoiceAPI, dueDate: Date, options: SearchOptions<Invoice> = {}): Promise<Array<Invoice>> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 

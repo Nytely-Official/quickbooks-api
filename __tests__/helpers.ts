@@ -1,5 +1,5 @@
 // Imports
-import { mock } from "bun:test";
+import { mock } from 'bun:test';
 
 /**
  * Mocks the fetch function
@@ -11,13 +11,13 @@ export function mockFetch(responseData: BodyInit, responseStatus = 200) {
 	// Setup the Mock
 	return mock<typeof fetch>(async (_input: URL | RequestInfo, options: undefined | RequestInit) => {
 		// Check if the options are not valid
-		if (!options) throw new Error("Invalid options");
+		if (!options) throw new Error('Invalid options');
 
 		// Setup the Response Body
 		const responseBody: BodyInit = responseData;
 
 		// Setup the New Response
-		const response = new Response(responseBody, { status: responseStatus, headers: { "Content-Type": "application/json" } });
+		const response = new Response(responseBody, { status: responseStatus, headers: { 'Content-Type': 'application/json' } });
 
 		// Return the Response
 		return response;
@@ -25,6 +25,7 @@ export function mockFetch(responseData: BodyInit, responseStatus = 200) {
 }
 
 // Export the Mock Data
-export { mockAuthResponseData } from "./__mocks__/auth-response-data";
-export { mockTokenData } from "./__mocks__/token-data";
-export { mockInvoiceData } from "./__mocks__/invoice-data";
+export { mockAuthResponseData } from './__mocks__/auth-response-data';
+export { mockTokenData } from './__mocks__/token-data';
+export { mockInvoiceData } from './__mocks__/invoice-data';
+export { mockEstimateData } from './__mocks__/estimate-data';

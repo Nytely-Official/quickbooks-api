@@ -8,4 +8,4 @@ export { AuthProvider } from './packages/auth/auth-provider';
 export { ApiClient } from './packages/api/api-client';
 
 // Export the Query Builder
-export { QueryBuilder } from './packages/api/query-builder';
+export { InvoiceQueryBuilder as QueryBuilder } from './packages/api/invoices/invoice-query-builder';

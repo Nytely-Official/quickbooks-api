@@ -2,7 +2,7 @@
 import { ApiClient } from '../api-client';
 import { Environment, Query, type Invoice, type InvoiceQueryResponse } from '../../../types/types';
 import { Endpoints } from '../../../types/enums/endpoints';
-import { QueryBuilder } from '../query-builder';
+import { InvoiceQueryBuilder } from './invoice-query-builder';
 
 // Import the Services
 import { getAllInvoices } from './services/get-all-invoices';
@@ -68,12 +68,12 @@ export class InvoiceAPI {
 
 	 * @returns The Query Builder
 	 */
-	public async getQueryBuilder(): Promise<QueryBuilder> {
+	public async getQueryBuilder(): Promise<InvoiceQueryBuilder> {
 		// Get the Company Endpoint
 		const companyEndpoint = await this.getCompanyEndpoint();
 
 		// Setup the New Query Builder
-		const queryBuilder = new QueryBuilder(companyEndpoint, Query.Invoice);
+		const queryBuilder = new InvoiceQueryBuilder(companyEndpoint, Query.Invoice);
 
 		// Return the Query Builder
 		return queryBuilder;
