@@ -1,5 +1,5 @@
 // Import the Query Builder
-import { InvoiceSearchOptions, type Invoice } from '../../../../types/types';
+import { SearchOptions, type Invoice } from '../../../../types/types';
 import { InvoiceAPI } from '../invoice-api';
 
 /**
@@ -8,7 +8,7 @@ import { InvoiceAPI } from '../invoice-api';
  * @param id - The ID of the invoice
  * @returns The Invoice
  */
-export async function getInvoiceById(this: InvoiceAPI, id: string, options: InvoiceSearchOptions = {}): Promise<Invoice> {
+export async function getInvoiceById(this: InvoiceAPI, id: string, options: SearchOptions<Invoice> = {}): Promise<Invoice> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
