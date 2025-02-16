@@ -1,6 +1,6 @@
 // Import the Query Builder
 import { EstimateAPI } from '../estimate-api';
-import type { InvoiceQueryBuilder } from '../../invoices/invoice-query-builder';
+import type { EstimateQueryBuilder } from '../estimate-query-builder';
 import type { Estimate } from '../../../../types/types';
 
 /**
@@ -9,7 +9,7 @@ import type { Estimate } from '../../../../types/types';
  * @param queryBuilder - The query builder to use
  * @returns Custom query results
  */
-export async function rawEstimateQuery(this: EstimateAPI, queryBuilder: InvoiceQueryBuilder): Promise<Array<Estimate>> {
+export async function rawEstimateQuery(this: EstimateAPI, queryBuilder: EstimateQueryBuilder): Promise<Array<Estimate>> {
 	// Build the URL
 	const url = queryBuilder.build();
 

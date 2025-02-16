@@ -176,10 +176,10 @@ describe('Estimate API', () => {
 			// Setup the Estimate Query Response
 			const estimateQueryResponse: { QueryResponse: EstimateQueryResponse } = {
 				QueryResponse: {
-					Estimate: mockEstimateData,
-					maxResults: mockEstimateData.length,
+					Estimate: estimatesInDateRange,
+					maxResults: estimatesInDateRange.length,
 					startPosition: 1,
-					totalCount: mockEstimateData.length,
+					totalCount: estimatesInDateRange.length,
 				},
 			};
 
