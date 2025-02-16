@@ -1,6 +1,6 @@
 // Imports
 import express, { type Request, type Response } from 'express';
-import { AuthProvider, Environment, ApiClient, AuthScopes } from './src/app';
+import { AuthProvider, Environment, ApiClient, AuthScopes, EstimateStatus } from './src/app';
 
 // Initialize the Express App
 const app = express();
@@ -21,6 +21,31 @@ const authProvider = new AuthProvider(
 		AuthScopes.Address,
 	], // Scopes
 );
+
+// Auth endpoint to initiate OAuth flow
+app.get('/test-token', (_req: Request, res: Response) => {
+	// Initialize AuthProvider
+	const testAuthProvider = new AuthProvider(
+		process.env.QB_CLIENT_ID!,
+		process.env.QB_CLIENT_SECRET!,
+		'http://localhost:3000/generate-test-token',
+		[
+			AuthScopes.Payment,
+			AuthScopes.Accounting,
+			AuthScopes.OpenId,
+			AuthScopes.Profile,
+			AuthScopes.Email,
+			AuthScopes.Phone,
+			AuthScopes.Address,
+		], // Scopes
+	);
+
+	// Generate the Auth URL
+	const authUrl = testAuthProvider.generateAuthUrl();
+
+	// Redirect to the Auth URL
+	res.redirect(authUrl.toString());
+});
 
 // Auth endpoint to initiate OAuth flow
 app.get('/auth', (_req: Request, res: Response) => {
@@ -91,6 +116,18 @@ app.get('/auth-code', async (req: Request, res: Response) => {
 			page2: await apiClient.invoices.getAllInvoices({ maxResults: 10, startPosition: 10, orderBy: { field: 'Id', direction: 'DESC' } }),
 		};
 
+		// Example: Get all estimates
+		const estimates = await apiClient.estimates.getAllEstimates();
+
+		// Example: Get all estimates for a date range
+		const estimatesForDateRange = await apiClient.estimates.getEstimatesForDateRange(new Date('2025-01-01'), new Date('2025-01-31'));
+
+		// Example: Get updated estimates
+		const updatedEstimates = await apiClient.estimates.getUpdatedEstimates(new Date('2025-01-09'));
+
+		// Example: Get estimate by ID
+		const foundEstimate = await apiClient.estimates.getEstimateById(estimates[0].Id);
+
 		// Example: Serialize the Token
 		const serialized = await authProvider.serializeToken(process.env.SECRET_KEY!);
 
@@ -113,10 +150,59 @@ app.get('/auth-code', async (req: Request, res: Response) => {
 			paginatedInvoices,
 			dueInvoices,
 			customQuery,
+			estimates,
+			estimatesForDateRange,
+			updatedEstimates,
+			foundEstimate,
 			revoked,
 			serialized,
 			deserialized,
 		});
+	} catch (error) {
+		// Log the Error
+		console.error('Auth callback error:', error);
+
+		// Send the Error
+		res.status(500).send('Authentication failed');
+	}
+});
+
+// Callback endpoint for OAuth response
+app.get('/generate-test-token', async (req: Request, res: Response) => {
+	// Initialize AuthProvider
+	const testAuthProvider = new AuthProvider(
+		process.env.QB_CLIENT_ID!,
+		process.env.QB_CLIENT_SECRET!,
+		'http://localhost:3000/generate-test-token',
+		[
+			AuthScopes.Payment,
+			AuthScopes.Accounting,
+			AuthScopes.OpenId,
+			AuthScopes.Profile,
+			AuthScopes.Email,
+			AuthScopes.Phone,
+			AuthScopes.Address,
+		], // Scopes
+	);
+
+	try {
+		// Get the Code and Realm ID from the Request
+		const { code, realmId } = req.query;
+
+		// Check if the Code and Realm ID are present
+		if (!code || !realmId) return res.status(400).send('Missing code or realmId in callback');
+
+		// Exchange authorization code for tokens
+		await testAuthProvider.exchangeCode(code as string, realmId as string);
+
+		// Refresh the Token
+		await testAuthProvider.refresh();
+
+		// Example: Serialize the Token
+		const serialized = await testAuthProvider.serializeToken(process.env.SECRET_KEY!);
+
+		// Return the Data
+		res.send(serialized);
 	} catch (error) {
 		// Log the Error
 		console.error('Auth callback error:', error);

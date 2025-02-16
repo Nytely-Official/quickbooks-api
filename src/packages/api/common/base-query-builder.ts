@@ -1,26 +1,23 @@
 // Imports
-import type { Query, InvoiceSearchOptions } from '../../types/types';
+import { DeepKeys, Query, SearchOptions } from '../../../types/types';
 
-/**
- * The Query Builder
- */
-export class QueryBuilder {
+export abstract class BaseQueryBuilder<T> {
 	/**
 	 * The Where Clauses
 	 */
-	private whereClauses: Array<string> = new Array();
+	protected whereClauses: Array<string> = new Array();
 
 	/**
 	 * The Search Options
 	 */
-	private searchOptions: InvoiceSearchOptions = {};
+	protected searchOptions: SearchOptions<T> = {} as SearchOptions<T>;
 
 	/**
 	 * Constructor
 	 * @param endpoint - The Endpoint
 	 * @param baseQuery - The Base Query
 	 */
-	constructor(private readonly endpoint: string, private readonly baseQuery: Query) {}
+	constructor(protected readonly endpoint: string, protected readonly baseQuery: Query) {}
 
 	/**
 	 * Where ID
@@ -38,7 +35,8 @@ export class QueryBuilder {
 	 * @returns The Query Builder
 	 */
 	public whereLastUpdatedAfter(date: Date): this {
-		this.whereClauses.push(`Metadata.LastUpdatedTime > '${date.toISOString()}'`);
+		const whereProperty = 'MetaData.LastUpdatedTime';
+		this.whereClauses.push(`${whereProperty} > '${date.toISOString()}'`);
 		return this;
 	}
 
@@ -48,7 +46,8 @@ export class QueryBuilder {
 	 * @returns The Query Builder
 	 */
 	public whereLastUpdatedBefore(date: Date): this {
-		this.whereClauses.push(`Metadata.LastUpdatedTime < '${date.toISOString()}'`);
+		const whereProperty = 'MetaData.LastUpdatedTime';
+		this.whereClauses.push(`${whereProperty} < '${date.toISOString()}'`);
 		return this;
 	}
 
@@ -58,7 +57,8 @@ export class QueryBuilder {
 	 * @returns The Query Builder
 	 */
 	public whereCreatedAfter(date: Date): this {
-		this.whereClauses.push(`Metadata.CreateTime > '${date.toISOString()}'`);
+		const whereProperty = 'MetaData.CreateTime';
+		this.whereClauses.push(`${whereProperty} > '${date.toISOString()}'`);
 		return this;
 	}
 
@@ -68,27 +68,8 @@ export class QueryBuilder {
 	 * @returns The Query Builder
 	 */
 	public whereCreatedBefore(date: Date): this {
-		this.whereClauses.push(`Metadata.CreateTime < '${date.toISOString()}'`);
-		return this;
-	}
-
-	/**
-	 * Where Due Date
-	 * @param date - The due date
-	 * @returns The Query Builder
-	 */
-	public whereDueDate(date: Date): this {
-		this.whereClauses.push(`DueDate = '${date.toISOString()}'`);
-		return this;
-	}
-
-	/**
-	 * Where Customer ID
-	 * @param customerId - The customer ID
-	 * @returns The Query Builder
-	 */
-	public whereCustomerId(customerId: string): this {
-		this.whereClauses.push(`CustomerRef.value = '${customerId}'`);
+		const whereProperty = 'MetaData.CreateTime';
+		this.whereClauses.push(`${whereProperty} < '${date.toISOString()}'`);
 		return this;
 	}
 
@@ -97,7 +78,7 @@ export class QueryBuilder {
 	 * @param options - The Search Options
 	 * @returns The Query Builder
 	 */
-	public setSearchOptions(options: InvoiceSearchOptions): this {
+	public setSearchOptions(options: SearchOptions<T>): this {
 		this.searchOptions = options;
 		return this;
 	}
@@ -124,10 +105,10 @@ export class QueryBuilder {
 	}
 
 	/**
-	 * Builds the Search Options (In the specific order required by the API)
+	 * Builds the Search Options
 	 * @returns The Search Options
 	 */
-	private buildSearchOptions(): string {
+	protected buildSearchOptions(): string {
 		// Ensure the Start Position is not negative
 		if (this.searchOptions.startPosition) this.searchOptions.startPosition = Math.max(this.searchOptions.startPosition, 0);
 
@@ -148,5 +129,10 @@ export class QueryBuilder {
 
 		// Return the Search Options
 		return options.join(' ');
+	}
+
+	// Common date filter methods
+	protected addDateFilter(field: DeepKeys<T>, date: Date, operator: '>' | '<' | '='): void {
+		this.whereClauses.push(`${field} ${operator} '${date.toISOString()}'`);
 	}
 }

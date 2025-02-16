@@ -1,20 +1,20 @@
 // Import the Query Builder
-import { SearchOptions, type Invoice } from '../../../../types/types';
-import { InvoiceAPI } from '../invoice-api';
+import { SearchOptions, type Estimate } from '../../../../types/types';
+import { EstimateAPI } from '../estimate-api';
 
 /**
- * Get Invoices for a Date Range
- * @param this - The Invoice API
+ * Get Estimates for a Date Range
+ * @param this - The Estimate API
  * @param startDate - The start date
  * @param endDate - The end date
- * @returns The Invoices
+ * @returns The Estimates
  */
-export async function getInvoicesForDateRange(
-	this: InvoiceAPI,
+export async function getEstimatesForDateRange(
+	this: EstimateAPI,
 	startDate: Date,
 	endDate: Date,
-	options: SearchOptions<Invoice> = {},
-): Promise<Array<Invoice>> {
+	options: SearchOptions<Estimate> = {},
+): Promise<Array<Estimate>> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
@@ -28,12 +28,12 @@ export async function getInvoicesForDateRange(
 	// Setup the URL
 	const url = queryBuilder.build();
 
-	// Get the Invoices
+	// Get the Estimates
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const invoices = this.formatResponse(response);
+	const estimates = this.formatResponse(response);
 
-	// Return the Invoices
-	return invoices;
+	// Return the Estimates
+	return estimates;
 }

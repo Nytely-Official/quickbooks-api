@@ -14,14 +14,8 @@ foundation for accounting, payments, and commerce operations.
 ✅ Token Validation  
 ✅ Environment-Specific Endpoints (Sandbox/Production)  
 ✅ Invoice API Search Operations  
-✅ Type-Safe API Surface
-
-## Future Roadmap
-
-▶️ Accounting API Integration  
-▶️ Tax API Support  
-▶️ Webhook Management  
-▶️ Batch Processing Utilities
+✅ Type-Safe API Surface  
+✅ Estimates API Support
 
 ## Technical Highlights
 
@@ -34,12 +28,6 @@ Designed for developers building:
 - Financial automation tools
 - ERP system connectors
 - Commerce platforms
-
-## Packages
-
-| Package          | Version                                                                                                        | Description                       |
-| ---------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------- |
-| `quickbooks-api` | [![npm version](https://badge.fury.io/js/%40quickbooks-api.svg)](https://www.npmjs.com/package/quickbooks-api) | QuickBooks API SDK for TypeScript |
 
 ## Installation
 
@@ -121,19 +109,7 @@ async function revokeToken() {
 }
 ```
 
-### Available Auth Methods
-
-- `generateAuthUrl()` - Generate the authorization URL the user needs to visit
-- `exchangeCode(code: string, realmId: string)` - Exchange the authorization code for a token
-- `validateToken()` - Verify token validity and auto-refresh if needed
-- `serializeToken(secretKey: string)` - Securely encrypt and serialize token for storage
-- `deserializeToken(serialized: string, secretKey: string)` - Decrypt and restore serialized token
-- `setToken(token: Token)` - Set the token manually (if expired, it will be refreshed)
-- `getToken()` - Get the current token (if expired, it will be refreshed)
-- `refresh()` - Refreshes the stored access token
-- `revoke()` - Revokes the stored access token
-
-### Secure Token Serialization Example
+### Secure Token Serialization
 
 ```typescript
 // Validate secret key
@@ -150,14 +126,18 @@ const restoredToken = await authProvider.getToken();
 const isValid = await authProvider.validateToken();
 ```
 
-### Invoice API Example
+### API Client Setup
 
 ```typescript
 import { ApiClient, Environment } from 'quickbooks-api';
 
 // Initialize API client after authentication
 const apiClient = new ApiClient(authProvider, Environment.Sandbox);
+```
 
+### Invoice API Examples
+
+```typescript
 // Get all invoices
 const allInvoices = await apiClient.invoices.getAllInvoices();
 
@@ -193,27 +173,85 @@ const recentInvoices = await apiClient.invoices.getUpdatedInvoices(new Date('202
 });
 ```
 
-### Available Invoice Methods
+### Estimates API Examples
 
-All methods now support optional `InvoiceSearchOptions` parameter:
+```typescript
+// Estimate Operations
+const estimates = await apiClient.estimates.getAllEstimates();
+const estimate = await apiClient.estimates.getEstimateById('EST456');
+const recentEstimates = await apiClient.estimates.getUpdatedEstimates(new Date('2024-01-01'));
+```
 
-- `getAllInvoices(options?: InvoiceSearchOptions)` - Retrieve invoices with pagination/sorting
-- `getInvoiceById(id: string, options?: InvoiceSearchOptions)` - Fetch by ID with options
-- `getInvoicesForDateRange(start: Date, end: Date, options?: InvoiceSearchOptions)`
-- `getUpdatedInvoices(since: Date, options?: InvoiceSearchOptions)`
-- `getInvoicesByDueDate(date: Date, options?: InvoiceSearchOptions)`
+## API Reference
 
-### Key Interfaces
+### Authentication Methods
+
+- `generateAuthUrl()` - Generate the authorization URL the user needs to visit
+- `exchangeCode(code: string, realmId: string)` - Exchange the authorization code for a token
+- `validateToken()` - Verify token validity and auto-refresh if needed
+- `serializeToken(secretKey: string)` - Securely encrypt and serialize token for storage
+- `deserializeToken(serialized: string, secretKey: string)` - Decrypt and restore serialized token
+- `setToken(token: Token)` - Set the token manually (if expired, it will be refreshed)
+- `getToken()` - Get the current token (if expired, it will be refreshed)
+- `refresh()` - Refreshes the stored access token
+- `revoke()` - Revokes the stored access token
+
+### Invoices API
+
+| Method                      | Description              |
+| --------------------------- | ------------------------ |
+| `getAllInvoices()`          | Get all invoices         |
+| `getInvoiceById()`          | Get single invoice       |
+| `getInvoicesForDateRange()` | Filter by date range     |
+| `getUpdatedInvoices()`      | Get updated invoices     |
+| `getInvoicesByDueDate()`    | Get invoices by due date |
+| `rawInvoiceQuery()`         | Get raw invoice query    |
+
+### Estimates API
+
+| Method                       | Description              |
+| ---------------------------- | ------------------------ |
+| `getAllEstimates()`          | Get all estimates        |
+| `getEstimateById()`          | Get single estimate      |
+| `getEstimatesForDateRange()` | Filter estimates by date |
+| `getUpdatedEstimates()`      | Get updated estimates    |
+| `rawEstimateQuery()`         | Get raw estimate query   |
+
+## Advanced Usage
+
+### Query Building
+
+```typescript
+// Estimate query
+const estimateQuery = await apiClient.estimates.getQueryBuilder().whereExpirationDate(new Date('2024-12-31')).whereTxnDate(new Date());
+```
+
+### Search Options
+
+```typescript
+// Create custom queries with search options
+const queryBuilder = await apiClient.invoices
+  .getQueryBuilder()
+  .setSearchOptions({
+    maxResults: 100,
+    orderBy: { field: 'TotalAmt', direction: 'DESC' },
+  })
+  .whereDueDate(new Date());
+
+const customResults = await apiClient.invoices.rawInvoiceQuery(queryBuilder);
+```
+
+### Token Structure
 
 ```typescript
 // Search options structure
-interface InvoiceSearchOptions {
+interface SearchOptions<T> {
   startPosition?: number; // Pagination offset (0-based)
   maxResults?: number; // Page size (1-1000)
   minorVersion?: string; // API minor version
   orderBy?: {
     // Sorting configuration
-    field: keyof Invoice; // Field to sort by
+    field: keyof T; // Field to sort by
     direction: 'ASC' | 'DESC';
   };
 }
@@ -236,40 +274,7 @@ interface UserAuthResponse {
 }
 ```
 
-### Query Builder Updates
-
-The new search options system integrates with the existing QueryBuilder:
-
-```typescript
-// Create custom queries with search options
-const queryBuilder = await apiClient.invoices
-  .getQueryBuilder()
-  .setSearchOptions({
-    maxResults: 100,
-    orderBy: { field: 'TotalAmt', direction: 'DESC' },
-  })
-  .whereDueDate(new Date());
-
-const customResults = await apiClient.invoices.rawInvoiceQuery(queryBuilder);
-```
-
-### Available Enums
-
-```typescript
-// Authentication scopes
-AuthScopes.Accounting; // com.intuit.quickbooks.accounting
-AuthScopes.Payment; // com.intuit.quickbooks.payment
-AuthScopes.OpenId; // openid
-// ... other scopes
-
-// Environments
-Environment.Sandbox; // Test environment
-Environment.Production; // Live environment
-
-// Grant types (internal use)
-GrantType.AuthorizationCode; // authorization_code
-GrantType.RefreshToken; // refresh_token
-```
+## Security Considerations
 
 > **Important Considerations**
 >
@@ -284,6 +289,13 @@ GrantType.RefreshToken; // refresh_token
 >   - Regular rotation schedule
 > - Always handle token expiration dates
 > - Use HTTPS in production environments
+
+## Roadmap
+
+▶️ Accounting API Integration  
+▶️ Tax API Support  
+▶️ Webhook Management  
+▶️ Batch Processing Utilities
 
 ## Legal Disclaimer
 
