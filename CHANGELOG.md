@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.1] - 2025-03-16
+
+### Bug Fixes
+
+- Fixed token refresh race condition by clearing current token before parsing new response
+- Used existing Refresh Token after refreshing the access token to avoid overwriting the existing refresh token and expiry date
+
+### Code Quality
+
+- Refactored token parsing logic to handle edge cases more reliably
+
 ## [0.3.0] - 2025-03-15
 
 ### Features
