@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.2] - 2025-03-17
+
+### Bug Fixes
+
+- Moved the 5 minute Buffer from the Refresh Token Expiry Date Calculation to the Access Token Expiry Date Calculation to ensure the access
+  token is always up to date
+- Used newly given Refresh Token instead of existing Refresh Token after refreshing the access token to ensure the refresh token is always
+  up to date
+
 ## [0.3.1] - 2025-03-16
 
 ### Bug Fixes
