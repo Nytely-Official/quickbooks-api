@@ -404,20 +404,17 @@ export class AuthProvider {
 	 * @returns {Token} The parsed token
 	 */
 	private parseTokenResponse(response: TokenResponse, realmId: string): Token {
-		// Calculate the New Expiry Data with a 5 minute buffer
-		const newRefreshTokenExpiryDate = new Date(Date.now() + (response.x_refresh_token_expires_in - 300) * 1000);
+		// Calculate the New Expiry Data
+		const newRefreshTokenExpiryDate = new Date(Date.now() + response.x_refresh_token_expires_in * 1000);
 
-		// Calculate the Expiry Date for the Refresh Token
-		const refreshTokenExpiryDate = this.token?.refreshTokenExpiryDate || newRefreshTokenExpiryDate;
-
-		// Calculate the Expiry Date for the Access Token
-		const accessTokenExpiryDate = new Date(Date.now() + response.expires_in * 1000);
+		// Calculate the Expiry Date for the Access Token with a 5 minute buffer
+		const accessTokenExpiryDate = new Date(Date.now() + (response.expires_in - 300) * 1000);
 
 		// Parse the Token
 		const parsedToken: Token = {
-			tokenType: this.token?.tokenType || response.token_type,
-			refreshToken: this.token?.refreshToken || response.refresh_token,
-			refreshTokenExpiryDate: refreshTokenExpiryDate,
+			tokenType: response.token_type,
+			refreshToken: response.refresh_token,
+			refreshTokenExpiryDate: newRefreshTokenExpiryDate,
 			accessToken: response.access_token,
 			accessTokenExpiryDate: accessTokenExpiryDate,
 			realmId: realmId,
