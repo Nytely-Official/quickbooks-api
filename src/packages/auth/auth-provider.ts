@@ -1,5 +1,6 @@
 // Imports
 import { Endpoints, AuthScopes, GrantType, type Token, type TokenResponse } from '../../types/types';
+import { EventEmitter } from 'node:events';
 
 /**
  * The Auth Provider is responsible for handling the OAuth2 flow for the application.
@@ -11,8 +12,12 @@ export class AuthProvider {
 	/**
 	 * The Auth Header for the application
 	 */
-
 	public readonly authHeader: string;
+
+	/**
+	 * The Event Emitter for the Auth Provider
+	 */
+	private readonly eventEmitter: EventEmitter = new EventEmitter();
 
 	/**
 	 * Initialize the Auth Provider
@@ -192,6 +197,9 @@ export class AuthProvider {
 		// Update the Token
 		this.token = newToken;
 
+		// Emit the Refresh Event
+		this.eventEmitter.emit('refresh', newToken);
+
 		// Return the new token
 		return newToken;
 	}
@@ -226,6 +234,9 @@ export class AuthProvider {
 
 		// Check if the response is successful
 		if (!response.ok) throw new Error(`Failed to revoke token: invalid_token`);
+
+		// Emit the Revoke Event
+		this.eventEmitter.emit('revoke', this.token);
 
 		// Clear the Token
 		this.token = undefined;
@@ -365,6 +376,24 @@ export class AuthProvider {
 
 		// Check if the token is not valid
 		if (!isValid) throw new Error('Serialized token is invalid, please re-authenticate');
+	}
+
+	/**
+	 * Adds a callback to be called when the token is refreshed
+	 * @param callback The callback to call when the token is refreshed
+	 */
+	public async onRefresh(callback: (refreshedToken: Token) => void): Promise<void> {
+		// Add the callback to the list of callbacks
+		this.eventEmitter.on('refresh', callback);
+	}
+
+	/**
+	 * Adds a callback to be called when the token is revoked
+	 * @param callback The callback to call when the token is revoked
+	 */
+	public async onRevoke(callback: (revokedToken: Token) => void): Promise<void> {
+		// Add the callback to the list of callbacks
+		this.eventEmitter.on('revoke', callback);
 	}
 
 	/**

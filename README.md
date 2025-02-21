@@ -109,6 +109,20 @@ async function revokeToken() {
 }
 ```
 
+### Event Listeners
+
+```typescript
+// Subscribe to token refresh events
+authProvider.onRefresh((newToken) => {
+  console.log('Token refreshed:', newToken.accessToken);
+});
+
+// Subscribe to token revocation events
+authProvider.onRevoke((revokedToken) => {
+  console.log('Token revoked:', revokedToken.accessToken);
+});
+```
+
 ### Secure Token Serialization
 
 ```typescript
@@ -211,6 +225,8 @@ const recentEstimates = await apiClient.estimates.getUpdatedEstimates(new Date('
 - `getToken()` - Get the current token (if expired, it will be refreshed)
 - `refresh()` - Refreshes the stored access token
 - `revoke()` - Revokes the stored access token
+- `onRefresh(callback)` - Register callback for token refresh events
+- `onRevoke(callback)` - Register callback for token revocation events
 
 ### Invoices API
 
