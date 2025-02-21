@@ -382,7 +382,7 @@ export class AuthProvider {
 	 * Adds a callback to be called when the token is refreshed
 	 * @param callback The callback to call when the token is refreshed
 	 */
-	public async onRefresh(callback: (refreshedToken: Token) => void): Promise<void> {
+	public onRefresh(callback: (refreshedToken: Token) => void): void {
 		// Add the callback to the list of callbacks
 		this.eventEmitter.on('refresh', callback);
 	}
@@ -391,7 +391,7 @@ export class AuthProvider {
 	 * Adds a callback to be called when the token is revoked
 	 * @param callback The callback to call when the token is revoked
 	 */
-	public async onRevoke(callback: (revokedToken: Token) => void): Promise<void> {
+	public onRevoke(callback: (revokedToken: Token) => void): void {
 		// Add the callback to the list of callbacks
 		this.eventEmitter.on('revoke', callback);
 	}
