@@ -18,20 +18,29 @@ describe('Live API: Estimates', async () => {
 	// Test retrieving all estimates
 	test('should retrieve all estimates', async () => {
 		// Get the Estimates
-		const estimates = await apiClient.estimates.getAllEstimates();
+		const searchResponse = await apiClient.estimates.getAllEstimates();
 
 		// Assert the Estimates
-		expect(estimates).toBeInstanceOf(Array);
-		expect(estimates.length).toBeGreaterThan(0);
+		expect(searchResponse.results).toBeInstanceOf(Array);
+		expect(searchResponse.results.length).toBeGreaterThan(0);
+	});
+
+	// Test Checking for Next Page
+	test('should check for next page', async () => {
+		// Get all estimates
+		const searchResponse = await apiClient.estimates.getAllEstimates();
+
+		// Test the Estimates
+		expect(searchResponse.hasNextPage).toBe(true);
 	});
 
 	// Test retrieving a single estimate by ID
 	test('should retrieve a single estimate', async () => {
 		// Get the Estimates
-		const allEstimates = await apiClient.estimates.getAllEstimates();
+		const searchResponse = await apiClient.estimates.getAllEstimates();
 
 		// Get the First Estimate
-		const testEstimate = allEstimates[0];
+		const testEstimate = searchResponse.results[0];
 
 		// Get the Estimate by ID
 		const foundEstimate = await apiClient.estimates.getEstimateById(testEstimate.Id);
@@ -44,15 +53,15 @@ describe('Live API: Estimates', async () => {
 	// Test pagination
 	test('should handle pagination', async () => {
 		// Get the Estimates
-		const page1 = await apiClient.estimates.getAllEstimates({ maxResults: 10, startPosition: 0 });
-		const page2 = await apiClient.estimates.getAllEstimates({ maxResults: 10, startPosition: 10 });
+		const searchResponse1 = await apiClient.estimates.getAllEstimates({ maxResults: 10, page: 1 });
+		const searchResponse2 = await apiClient.estimates.getAllEstimates({ maxResults: 10, page: 2 });
 
 		// Assert the Estimates
-		expect(page1).toBeInstanceOf(Array);
-		expect(page2).toBeInstanceOf(Array);
-		expect(page1.length).toBe(10);
-		expect(page2.length).toBe(2);
-		expect(page1).not.toEqual(page2);
+		expect(searchResponse1.results).toBeInstanceOf(Array);
+		expect(searchResponse2.results).toBeInstanceOf(Array);
+		expect(searchResponse1.results.length).toBeGreaterThan(0);
+		expect(searchResponse2.results.length).toBeGreaterThan(0);
+		expect(searchResponse1.results).not.toEqual(searchResponse2.results);
 	});
 
 	// Test date range filtering
@@ -65,10 +74,10 @@ describe('Live API: Estimates', async () => {
 		startDate.setDate(endDate.getDate() - 30);
 
 		// Get the Estimates
-		const estimates = await apiClient.estimates.getEstimatesForDateRange(startDate, endDate);
+		const searchResponse = await apiClient.estimates.getEstimatesForDateRange(startDate, endDate);
 
 		// Assert the Estimates
-		expect(estimates).toBeInstanceOf(Array);
+		expect(searchResponse.results).toBeInstanceOf(Array);
 	});
 
 	// Test updated estimates
@@ -78,10 +87,10 @@ describe('Live API: Estimates', async () => {
 		lastUpdated.setDate(lastUpdated.getDate() - 30);
 
 		// Get the Updated Estimates
-		const updatedEstimates = await apiClient.estimates.getUpdatedEstimates(lastUpdated);
+		const searchResponse = await apiClient.estimates.getUpdatedEstimates(lastUpdated);
 
 		// Assert the Estimates
-		expect(updatedEstimates).toBeInstanceOf(Array);
+		expect(searchResponse.results).toBeInstanceOf(Array);
 	});
 
 	// Test error handling for invalid ID

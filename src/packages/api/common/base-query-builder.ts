@@ -3,14 +3,14 @@ import { DeepKeys, Query, SearchOptions } from '../../../types/types';
 
 export abstract class BaseQueryBuilder<T> {
 	/**
+	 * The Search Options
+	 */
+	public searchOptions: SearchOptions<T> = {} as SearchOptions<T>;
+
+	/**
 	 * The Where Clauses
 	 */
 	protected whereClauses: Array<string> = new Array();
-
-	/**
-	 * The Search Options
-	 */
-	protected searchOptions: SearchOptions<T> = {} as SearchOptions<T>;
 
 	/**
 	 * Constructor
@@ -109,21 +109,22 @@ export abstract class BaseQueryBuilder<T> {
 	 * @returns The Search Options
 	 */
 	protected buildSearchOptions(): string {
-		// Ensure the Start Position is not negative
-		if (this.searchOptions.startPosition) this.searchOptions.startPosition = Math.max(this.searchOptions.startPosition, 0);
-
-		// Ensure the Max Results is not negative
-		if (this.searchOptions.maxResults) this.searchOptions.maxResults = Math.max(this.searchOptions.maxResults, 1);
-
-		// Ensure the Max Results is not greater than 1000 (API Limit)
-		if (this.searchOptions.maxResults) this.searchOptions.maxResults = Math.min(this.searchOptions.maxResults, 1000);
+		// Ensure the Page is not negative
+		if (this.searchOptions.page) this.searchOptions.page = Math.max(this.searchOptions.page, 1);
 
 		// Setup the Search Options String
 		let options: Array<string> = new Array();
 
+		// Setup the Start Position
+		let startPosition = 1;
+
+		// Calculate the Start Position add 1 to account for the first item and to not get the last item from the previous page
+		if (this.searchOptions.page && this.searchOptions.maxResults)
+			startPosition = (this.searchOptions.page - 1) * this.searchOptions.maxResults + 1;
+
 		// Add the Search Options
 		if (this.searchOptions.orderBy) options.push(`orderby ${this.searchOptions.orderBy.field} ${this.searchOptions.orderBy.direction}`);
-		if (this.searchOptions.startPosition) options.push(`startposition ${this.searchOptions.startPosition}`);
+		if (this.searchOptions.page) options.push(`startposition ${startPosition}`);
 		if (this.searchOptions.maxResults) options.push(`maxresults ${this.searchOptions.maxResults}`);
 		if (this.searchOptions.minorVersion) options.push(`minorversion ${this.searchOptions.minorVersion}`);
 

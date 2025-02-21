@@ -1,7 +1,7 @@
 // Import the Query Builder
 import { EstimateAPI } from '../estimate-api';
 import type { EstimateQueryBuilder } from '../estimate-query-builder';
-import type { Estimate } from '../../../../types/types';
+import type { Estimate, SearchResponse } from '../../../../types/types';
 
 /**
  * Raw Estimate Query
@@ -9,7 +9,7 @@ import type { Estimate } from '../../../../types/types';
  * @param queryBuilder - The query builder to use
  * @returns Custom query results
  */
-export async function rawEstimateQuery(this: EstimateAPI, queryBuilder: EstimateQueryBuilder): Promise<Array<Estimate>> {
+export async function rawEstimateQuery(this: EstimateAPI, queryBuilder: EstimateQueryBuilder): Promise<SearchResponse<Estimate>> {
 	// Build the URL
 	const url = queryBuilder.build();
 
@@ -19,6 +19,12 @@ export async function rawEstimateQuery(this: EstimateAPI, queryBuilder: Estimate
 	// Format the Response
 	const estimates = this.formatResponse(response);
 
+	// Setup the Search Response
+	const searchResponse: SearchResponse<Estimate> = {
+		results: estimates,
+		hasNextPage: await this.hasNextPage(queryBuilder),
+	};
+
 	// Return the Estimates
-	return estimates;
+	return searchResponse;
 }

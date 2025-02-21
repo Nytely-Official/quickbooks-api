@@ -65,7 +65,6 @@ export class InvoiceAPI {
 
 	/**
 	 * Get the Query Builder
-
 	 * @returns The Query Builder
 	 */
 	public async getQueryBuilder(): Promise<InvoiceQueryBuilder> {
@@ -77,5 +76,39 @@ export class InvoiceAPI {
 
 		// Return the Query Builder
 		return queryBuilder;
+	}
+
+	/**
+	 * Checks if there is a next page
+	 * @param queryBuilder - The Query Builder
+	 * @returns {boolean} True if there is a next page, false otherwise
+	 */
+	protected async hasNextPage(queryBuilder: InvoiceQueryBuilder): Promise<boolean> {
+		// Check if the Auto Check Next Page is Disabled
+		if (!this.apiClient.autoCheckNextPage) return false;
+
+		// Get the Page Number
+		const page = (queryBuilder.searchOptions.page || 1) + 1;
+
+		// Update the Page Number
+		queryBuilder.searchOptions.page = page;
+
+		// Get the URL
+		const url = queryBuilder.build();
+
+		// Run the Request
+		const response = await this.apiClient.runRequest(url, { method: 'GET' }).catch((error) => {
+			// Log the error
+			console.error(`Failed to check if there is a next page: ${error}`);
+		});
+
+		// Check if the Response is invalid
+		if (!response?.QueryResponse?.Invoice) return false;
+
+		// Check if the Response is Invalid
+		if (response.QueryResponse.Invoice.length < 1) return false;
+
+		// Return True
+		return true;
 	}
 }
