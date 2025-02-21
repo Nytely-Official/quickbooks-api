@@ -1,5 +1,5 @@
 // Imports
-import { AuthProvider, AuthScopes } from '../src/app';
+import { AuthProvider, AuthScopes, type Token } from '../src/app';
 import { describe, expect, test } from 'bun:test';
 
 // Describe the Auth Provider
@@ -44,6 +44,27 @@ describe('Live Auth Provider', async () => {
 		// Test the Token
 		expect(newToken).toBeDefined();
 		expect(newToken.accessToken).not.toBe(originalToken.accessToken);
+	});
+
+	// Test token refresh event
+	test('should emit refresh event', async () => {
+		// Get the original Token
+		const originalToken = await authProvider.getToken();
+
+		// Setup the refreshed token
+		let refreshedToken: Token;
+
+		// Setup the Event Listener
+		authProvider.onRefresh((token) => {
+			refreshedToken = token;
+		});
+
+		// Refresh the Token
+		await authProvider.refresh();
+
+		// Test the Token
+		expect(refreshedToken).toBeDefined();
+		expect(refreshedToken.accessToken).not.toBe(originalToken.accessToken);
 	});
 
 	// Test token serialization

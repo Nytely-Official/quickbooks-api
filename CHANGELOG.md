@@ -1,5 +1,19 @@
 # Changelog
 
+# [0.4.1] - 2025-03-18
+
+### Features
+
+- Added event emitter for token refresh and revoke events
+- Implemented `onRefresh` and `onRevoke` callback registration methods
+
+### Documentation
+
+- Updated authentication section with event listener examples
+- Added API reference entries for new event methods
+
+---
+
 # [0.4.0] - 2025-02-21
 
 ### Features
@@ -32,6 +46,8 @@
 - Improved error handling in pagination checks
 - Enhanced type safety for numeric range constraints
 
+---
+
 ## [0.3.2] - 2025-03-17
 
 ### Bug Fixes
@@ -40,6 +56,8 @@
   token is always up to date
 - Used newly given Refresh Token instead of existing Refresh Token after refreshing the access token to ensure the refresh token is always
   up to date
+
+---
 
 ## [0.3.1] - 2025-03-16
 
@@ -51,6 +69,8 @@
 ### Code Quality
 
 - Refactored token parsing logic to handle edge cases more reliably
+
+---
 
 ## [0.3.0] - 2025-03-15
 
@@ -83,6 +103,8 @@
 - Added biome.json configuration for code formatting
 - Updated test helpers to support estimate data mocking
 - Improved token serialization/deserialization examples
+
+---
 
 ## [0.2.0] - 2025-02-11
 
@@ -118,17 +140,23 @@
 - Standardized query builder usage across all API methods
 - Removed deprecated URL parameter handling from QueryBuilder
 
+---
+
 ## [0.1.4] - 2025-02-10
 
 ### Features
 
 - Added the ability to generate the Auth URL with a custom state
 
+---
+
 ## [0.1.3] - 2025-02-10
 
 ### Infrastructure
 
 - Updated the Build Flow to include tsc-alias for TypeScript alias resolution (emit js extension in imports)
+
+---
 
 ## [0.1.2] - 2025-02-10
 
@@ -169,11 +197,15 @@
 - Improved type definitions with DeepKeys utility type
 - Enhanced error messages and inline documentation
 
+---
+
 ## [0.1.1] - 2025-02-08
 
 ### QOL
 
 - Updated the Workflow file used to publish the package to NPM
+
+---
 
 ## [0.1.0] - 2025-02-08
 
@@ -205,6 +237,8 @@
 - Included code examples for token revocation flow
 - Documented secret key requirements and best practices
 
+---
+
 ## [0.0.4] - 2025-02-07
 
 ### Features
@@ -221,7 +255,9 @@
 - Initial test framework configuration
 - Documentation scaffolding
 
-## **v0.0.3** | 2025-02-07
+---
+
+## [0.0.3] | 2025-02-07
 
 ### Features
 
@@ -229,7 +265,7 @@
 
 ---
 
-## **v0.0.2** | 2025-02-07
+## [0.0.2] | 2025-02-07
 
 ### Features
 
@@ -246,7 +282,7 @@
 
 ---
 
-## **v0.0.1** | 2025-02-06
+## [0.0.1] | 2025-02-06
 
 ### Initial Release
 
