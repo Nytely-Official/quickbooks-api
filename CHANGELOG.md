@@ -1,5 +1,37 @@
 # Changelog
 
+# [0.4.0] - 2025-02-21
+
+### Features
+
+- Added pagination support with `hasNextPage` flag in SearchResponse interface
+- Implemented automatic next page checking in API client
+- Added `page` parameter to SearchOptions for simplified pagination
+- Deprecated `startPosition` in favor of page-based pagination
+- Enhanced type safety with Range type constraints for maxResults
+- Entities that return multiple results (Example: getAllInvoices) will now return a SearchResponse object instead that contains the results
+  and a boolean value indicating if there is a next page (example: { results: [Invoice1, Invoice2], hasNextPage: true })
+
+### Bug Fixes
+
+- Fixed pagination calculation logic in BaseQueryBuilder
+- Updated test suites for new pagination interface
+- Corrected example usage to use page-based pagination
+- Fixed type definitions in SearchOptions interface
+
+### Documentation
+
+- Updated README with new pagination examples
+- Added console logging to example usage flow
+- Improved inline documentation for search options
+
+### Code Quality
+
+- Standardized SearchResponse interface across all API methods
+- Refactored query builder to expose searchOptions property
+- Improved error handling in pagination checks
+- Enhanced type safety for numeric range constraints
+
 ## [0.3.2] - 2025-03-17
 
 ### Bug Fixes

@@ -9,13 +9,15 @@ export { Query } from './enums/query';
 export { TokenType } from './enums/token-type';
 
 // Export the Interfaces
-export type { SearchOptions } from './interfaces/search-options';
+export type { Estimate } from './interfaces/estimate';
 export type { Invoice } from './interfaces/invoice';
 export type { QueryResponse, InvoiceQueryResponse, EstimateQueryResponse } from './interfaces/query-response';
-export type { Estimate } from './interfaces/estimate';
-export type { Token } from './interfaces/token';
+export type { SearchOptions } from './interfaces/search-options';
+export type { SearchResponse } from './interfaces/search-response';
 export type { TokenResponse } from './interfaces/token-response';
+export type { Token } from './interfaces/token';
 export type { UserAuthResponse } from './interfaces/user-auth-response';
 
 // Export the Types
 export type { DeepKeys } from './types/deep-keys';
+export type { Range } from './types/range';

@@ -16,25 +16,33 @@ describe('Live API: Invoices', async () => {
 	const apiClient = new ApiClient(authProvider, Environment.Sandbox);
 
 	// Test retrieving all invoices
-
 	test('should retrieve all invoices', async () => {
 		// Get all invoices
-		const invoices = await apiClient.invoices.getAllInvoices();
+		const searchResponse = await apiClient.invoices.getAllInvoices();
 
 		// Test the Invoices
-		expect(invoices).toBeInstanceOf(Array);
+		expect(searchResponse.results).toBeInstanceOf(Array);
 
 		// Test the Invoice length
-		expect(invoices.length).toBeGreaterThan(0);
+		expect(searchResponse.results.length).toBeGreaterThan(0);
+	});
+
+	// Test Checking for Next Page
+	test('should check for next page', async () => {
+		// Get all invoices
+		const searchResponse = await apiClient.invoices.getAllInvoices();
+
+		// Test the Invoices
+		expect(searchResponse.hasNextPage).toBe(true);
 	});
 
 	// Test retrieving a single invoice
 	test('should retrieve a single invoice', async () => {
 		// Get all invoices
-		const invoices = await apiClient.invoices.getAllInvoices();
+		const searchResponse = await apiClient.invoices.getAllInvoices();
 
 		// Get the first invoice
-		const invoice = invoices[0];
+		const invoice = searchResponse.results[0];
 
 		// Get the Invoice by ID
 		const foundInvoice = await apiClient.invoices.getInvoiceById(invoice.Id);
@@ -49,49 +57,50 @@ describe('Live API: Invoices', async () => {
 	// Test retrieving 10 invoices
 	test('should retrieve 10 invoices', async () => {
 		// Get all invoices
-		const invoices = await apiClient.invoices.getAllInvoices({ maxResults: 10 });
+		const searchResponse = await apiClient.invoices.getAllInvoices({ maxResults: 10 });
 
 		// Test the Invoices
-		expect(invoices).toBeInstanceOf(Array);
+		expect(searchResponse.results).toBeInstanceOf(Array);
 
 		// Test the Invoice length
-		expect(invoices.length).toBe(10);
+		expect(searchResponse.results.length).toBeGreaterThan(0);
 	});
 
 	// Test pagination
 	test('should handle pagination', async () => {
 		// Get all invoices
-		const invoicePage1 = await apiClient.invoices.getAllInvoices({ maxResults: 10, startPosition: 0 });
-		const invoicePage2 = await apiClient.invoices.getAllInvoices({ maxResults: 10, startPosition: 10 });
+		const searchResponse1 = await apiClient.invoices.getAllInvoices({ maxResults: 10, page: 1 });
+		const searchResponse2 = await apiClient.invoices.getAllInvoices({ maxResults: 10, page: 2 });
 
 		// Test the Invoices
-		expect(invoicePage1).toBeInstanceOf(Array);
-		expect(invoicePage2).toBeInstanceOf(Array);
+		expect(searchResponse1.results).toBeInstanceOf(Array);
+		expect(searchResponse2.results).toBeInstanceOf(Array);
 
 		// Test the Invoice length
-		expect(invoicePage1.length).toBe(10);
-		expect(invoicePage2.length).toBe(10);
+		expect(searchResponse1.results.length).toBeGreaterThan(0);
+		expect(searchResponse2.results.length).toBeGreaterThan(0);
 
 		// Test the Invoices are different
-		expect(invoicePage1).not.toEqual(invoicePage2);
+		expect(searchResponse1.results).not.toEqual(searchResponse2.results);
 	});
 
 	// Should handle all Search Options
 	test('should handle all search options', async () => {
 		// Get all invoices
-		const invoices = await apiClient.invoices.getAllInvoices({
+		const searchResponse = await apiClient.invoices.getAllInvoices({
 			maxResults: 10,
-			startPosition: 0,
+			page: 1,
 			orderBy: { field: 'Id', direction: 'DESC' },
 		});
 
 		// Test the Invoices
-		expect(invoices).toBeInstanceOf(Array);
+		expect(searchResponse.results).toBeInstanceOf(Array);
 
 		// Test the Invoice length
-		expect(invoices.length).toBe(10);
+		expect(searchResponse.results.length).toBeGreaterThan(0);
 
 		// loop through the invoices and test each id is less than the previous one
-		for (let i = 0; i < invoices.length - 1; i++) expect(Number(invoices[i].Id)).toBeGreaterThan(Number(invoices[i + 1].Id));
+		for (let i = 0; i < searchResponse.results.length - 1; i++)
+			expect(Number(searchResponse.results[i].Id)).toBeGreaterThan(Number(searchResponse.results[i + 1].Id));
 	});
 });

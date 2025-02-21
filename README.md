@@ -15,7 +15,7 @@ foundation for accounting, payments, and commerce operations.
 ✅ Environment-Specific Endpoints (Sandbox/Production)  
 ✅ Invoice API Search Operations  
 ✅ Type-Safe API Surface  
-✅ Estimates API Support
+✅ Estimates API Support ✅ Pagination Support
 
 ## Technical Highlights
 
@@ -141,29 +141,45 @@ const apiClient = new ApiClient(authProvider, Environment.Sandbox);
 // Get all invoices
 const allInvoices = await apiClient.invoices.getAllInvoices();
 
+// Log the First Invoice ID
+console.log(allInvoices.results[0].Id);
+
 // Get specific invoice by ID
 const invoice = await apiClient.invoices.getInvoiceById('129');
+
+// Log the Found Invoice ID
+console.log(invoice.Id);
 
 // Get invoices within date range
 const januaryInvoices = await apiClient.invoices.getInvoicesForDateRange(new Date('2024-01-01'), new Date('2024-01-31'));
 
-// Get all invoices with pagination and sorting
-const paginatedInvoices = {
-  page1: await apiClient.invoices.getAllInvoices({
+// Setup Pagination
+const paginatedInvoices: Array<Invoice> = [];
+let hasNextPage = true;
+let currentPage = 1;
+
+// Get all invoices with pagination and sorting (Automatic pagination handling)
+while (hasNextPage) {
+  // Get the next Page
+  const nextPage = await apiClient.invoices.getAllInvoices({
     maxResults: 10,
-    startPosition: 0,
+    page: currentPage + 1,
     orderBy: { field: 'Id', direction: 'DESC' },
-  }),
-  page2: await apiClient.invoices.getAllInvoices({
-    maxResults: 10,
-    startPosition: 10,
-    orderBy: { field: 'Id', direction: 'DESC' },
-  }),
-};
+  });
+
+  // Add the Invoices to the List
+  paginatedInvoices.push(...nextPage.results);
+
+  // Check if there is a next page
+  hasNextPage = nextPage.hasNextPage;
+
+  // Increment the Page Number
+  currentPage++;
+}
 
 // Get specific invoice with additional options
 const invoice = await apiClient.invoices.getInvoiceById('129', {
-  minorVersion: '45',
+  minorVersion: '75',
 });
 
 // Advanced query with multiple options
@@ -246,9 +262,9 @@ const customResults = await apiClient.invoices.rawInvoiceQuery(queryBuilder);
 ```typescript
 // Search options structure
 interface SearchOptions<T> {
-  startPosition?: number; // Pagination offset (0-based)
-  maxResults?: number; // Page size (1-1000)
-  minorVersion?: string; // API minor version
+  page?: number; // Pagination offset (1-based)
+  maxResults?: number; // Page size (1-200)
+  minorVersion?: string; // API minor version (default: 75) *All versions below 75 are deprecated and will be removed on July 31st, 2025*
   orderBy?: {
     // Sorting configuration
     field: keyof T; // Field to sort by
@@ -271,6 +287,12 @@ interface UserAuthResponse {
   code: string;
   realmId: string;
   state: string;
+}
+
+// Search Response
+interface SearchResponse<T> {
+  results: T[];
+  hasNextPage: boolean;
 }
 ```
 

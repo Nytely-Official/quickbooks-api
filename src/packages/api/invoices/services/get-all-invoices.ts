@@ -1,5 +1,5 @@
 // Imports
-import { type Invoice, type SearchOptions } from '../../../../types/types';
+import { type Invoice, type SearchOptions, type SearchResponse } from '../../../../types/types';
 import { InvoiceAPI } from '../invoice-api';
 
 /**
@@ -7,7 +7,7 @@ import { InvoiceAPI } from '../invoice-api';
  * @param this - The Invoice API
  * @returns The Invoices
  */
-export async function getAllInvoices(this: InvoiceAPI, options: SearchOptions<Invoice> = {}): Promise<Array<Invoice>> {
+export async function getAllInvoices(this: InvoiceAPI, options: SearchOptions<Invoice> = {}): Promise<SearchResponse<Invoice>> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
@@ -23,6 +23,12 @@ export async function getAllInvoices(this: InvoiceAPI, options: SearchOptions<In
 	// Format the Response
 	const invoices = this.formatResponse(response);
 
+	// Setup the Search Response
+	const searchResponse: SearchResponse<Invoice> = {
+		results: invoices,
+		hasNextPage: await this.hasNextPage(queryBuilder),
+	};
+
 	// Return the Invoices
-	return invoices;
+	return searchResponse;
 }

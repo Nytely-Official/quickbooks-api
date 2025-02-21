@@ -1,5 +1,5 @@
 // Import the Query Builder
-import { SearchOptions, type Invoice } from '../../../../types/types';
+import { SearchOptions, SearchResponse, type Invoice } from '../../../../types/types';
 import { InvoiceAPI } from '../invoice-api';
 
 /**
@@ -14,7 +14,7 @@ export async function getInvoicesForDateRange(
 	startDate: Date,
 	endDate: Date,
 	options: SearchOptions<Invoice> = {},
-): Promise<Array<Invoice>> {
+): Promise<SearchResponse<Invoice>> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
@@ -34,6 +34,12 @@ export async function getInvoicesForDateRange(
 	// Format the Response
 	const invoices = this.formatResponse(response);
 
+	// Setup the Search Response
+	const searchResponse: SearchResponse<Invoice> = {
+		results: invoices,
+		hasNextPage: await this.hasNextPage(queryBuilder),
+	};
+
 	// Return the Invoices
-	return invoices;
+	return searchResponse;
 }

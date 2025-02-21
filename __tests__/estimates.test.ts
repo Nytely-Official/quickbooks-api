@@ -59,12 +59,37 @@ describe('Estimate API', () => {
 			global.fetch = mockFetch(JSON.stringify(estimateQueryResponse));
 
 			// Get the Estimates
-			const estimates = await apiClient.estimates.getAllEstimates();
+			const searchResponse = await apiClient.estimates.getAllEstimates();
 
 			// Assert the Estimates
-			expect(estimates).toBeArray();
-			expect(estimates.length).toBe(mockEstimateData.length);
-			expect(estimates[0].Id).toBe(mockEstimateData[0].Id);
+			expect(searchResponse.results).toBeArray();
+			expect(searchResponse.results.length).toBe(mockEstimateData.length);
+			expect(searchResponse.results[0].Id).toBe(mockEstimateData[0].Id);
+		});
+	});
+
+	// Describe the hasNextPage Method
+	describe('hasNextPage', () => {
+		// Test the hasNextPage Method
+		it('should return true if there is a next page', async () => {
+			// Setup the Estimate Query Response
+			const estimateQueryResponse: { QueryResponse: EstimateQueryResponse } = {
+				QueryResponse: {
+					Estimate: mockEstimateData,
+					maxResults: mockEstimateData.length,
+					startPosition: 1,
+					totalCount: mockEstimateData.length,
+				},
+			};
+
+			// Set the Global Fetch
+			global.fetch = mockFetch(JSON.stringify(estimateQueryResponse));
+
+			// Get the Estimates
+			const searchResponse = await apiClient.estimates.getAllEstimates();
+
+			// Assert the Estimates
+			expect(searchResponse.hasNextPage).toBe(true);
 		});
 	});
 
@@ -89,10 +114,10 @@ describe('Estimate API', () => {
 			global.fetch = mockFetch(JSON.stringify(estimateQueryResponse));
 
 			// Get the Estimate
-			const estimate = await apiClient.estimates.getEstimateById(testEstimate.Id);
+			const searchResponse = await apiClient.estimates.getEstimateById(testEstimate.Id);
 
 			// Assert the Estimate
-			expect(estimate.Id).toBe(testEstimate.Id);
+			expect(searchResponse.Id).toBe(testEstimate.Id);
 		});
 
 		// Test the getEstimateById Method with an Invalid Estimate ID
@@ -145,12 +170,12 @@ describe('Estimate API', () => {
 			global.fetch = mockFetch(JSON.stringify(estimateQueryResponse));
 
 			// Get the Estimates in the Date Range
-			const estimates = await apiClient.estimates.getEstimatesForDateRange(startDate, endDate);
+			const searchResponse = await apiClient.estimates.getEstimatesForDateRange(startDate, endDate);
 
 			// Assert the Estimates
-			expect(estimates).toBeArray();
-			expect(estimates.length).toBe(estimatesInDateRange.length);
-			expect(estimates[0].Id).toBe(estimatesInDateRange[0].Id);
+			expect(searchResponse.results).toBeArray();
+			expect(searchResponse.results.length).toBe(estimatesInDateRange.length);
+			expect(searchResponse.results[0].Id).toBe(estimatesInDateRange[0].Id);
 		});
 	});
 
@@ -187,12 +212,12 @@ describe('Estimate API', () => {
 			global.fetch = mockFetch(JSON.stringify(estimateQueryResponse));
 
 			// Get the Estimates
-			const estimates = await apiClient.estimates.getUpdatedEstimates(lastUpdatedTime);
+			const searchResponse = await apiClient.estimates.getUpdatedEstimates(lastUpdatedTime);
 
 			// Assert the Estimates
-			expect(estimates).toBeArray();
-			expect(estimates.length).toBe(estimatesInDateRange.length);
-			expect(estimates[0].Id).toBe(estimatesInDateRange[0].Id);
+			expect(searchResponse.results).toBeArray();
+			expect(searchResponse.results.length).toBe(estimatesInDateRange.length);
+			expect(searchResponse.results[0].Id).toBe(estimatesInDateRange[0].Id);
 		});
 	});
 });

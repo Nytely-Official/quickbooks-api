@@ -1,5 +1,5 @@
 // Import the Query Builder
-import { SearchOptions, type Estimate } from '../../../../types/types';
+import { SearchOptions, SearchResponse, type Estimate } from '../../../../types/types';
 import { EstimateAPI } from '../estimate-api';
 
 /**
@@ -12,7 +12,7 @@ export async function getUpdatedEstimates(
 	this: EstimateAPI,
 	lastUpdatedDate: Date,
 	options: SearchOptions<Estimate> = {},
-): Promise<Array<Estimate>> {
+): Promise<SearchResponse<Estimate>> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
@@ -31,6 +31,12 @@ export async function getUpdatedEstimates(
 	// Format the Response
 	const estimates = this.formatResponse(response);
 
+	// Setup the Search Response
+	const searchResponse: SearchResponse<Estimate> = {
+		results: estimates,
+		hasNextPage: await this.hasNextPage(queryBuilder),
+	};
+
 	// Return the Estimates
-	return estimates;
+	return searchResponse;
 }

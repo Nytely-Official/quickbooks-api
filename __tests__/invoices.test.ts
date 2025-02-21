@@ -58,16 +58,41 @@ describe('Invoice API', () => {
 			global.fetch = mockFetch(JSON.stringify(invoiceQueryResponse));
 
 			// Get the Invoices
-			const invoices = await apiClient.invoices.getAllInvoices();
+			const searchResponse = await apiClient.invoices.getAllInvoices();
 
 			// Assert the Invoices
-			expect(invoices).toBeArray();
+			expect(searchResponse.results).toBeArray();
 
 			// Assert the Invoices Length
-			expect(invoices.length).toBe(mockInvoiceData.length);
+			expect(searchResponse.results.length).toBe(mockInvoiceData.length);
 
 			// Assert the Invoices
-			expect(invoices[0].Id).toBe(mockInvoiceData[0].Id);
+			expect(searchResponse.results[0].Id).toBe(mockInvoiceData[0].Id);
+		});
+	});
+
+	// Describe the hasNextPage Method
+	describe('hasNextPage', () => {
+		// Describe the hasNextPage Method
+		it('should return true if there is a next page', async () => {
+			// Setup the Invoice Query Response
+			const invoiceQueryResponse: { QueryResponse: InvoiceQueryResponse } = {
+				QueryResponse: {
+					Invoice: mockInvoiceData,
+					maxResults: mockInvoiceData.length,
+					startPosition: 1,
+					totalCount: mockInvoiceData.length,
+				},
+			};
+
+			// Mock the Fetch with proper QueryResponse structure
+			global.fetch = mockFetch(JSON.stringify(invoiceQueryResponse));
+
+			// Get the Invoices
+			const searchResponse = await apiClient.invoices.getAllInvoices();
+
+			// Assert the Invoices
+			expect(searchResponse.hasNextPage).toBe(true);
 		});
 	});
 
@@ -147,16 +172,16 @@ describe('Invoice API', () => {
 			global.fetch = mockFetch(JSON.stringify(invoiceQueryResponse));
 
 			// Get the Invoices
-			const invoices = await apiClient.invoices.getInvoicesForDateRange(startDate, endDate);
+			const searchResponse = await apiClient.invoices.getInvoicesForDateRange(startDate, endDate);
 
 			// Assert the Invoices
-			expect(invoices).toBeArray();
+			expect(searchResponse.results).toBeArray();
 
 			// Assert the Invoices Length
-			expect(invoices.length).toBe(invoicesInDateRange.length);
+			expect(searchResponse.results.length).toBe(invoicesInDateRange.length);
 
 			// Assert the Invoices
-			expect(invoices[0].Id).toBe(invoicesInDateRange[0].Id);
+			expect(searchResponse.results[0].Id).toBe(invoicesInDateRange[0].Id);
 		});
 	});
 
@@ -193,16 +218,16 @@ describe('Invoice API', () => {
 			});
 
 			// Get the Invoices
-			const invoices = await apiClient.invoices.getUpdatedInvoices(lastUpdatedTime);
+			const searchResponse = await apiClient.invoices.getUpdatedInvoices(lastUpdatedTime);
 
 			// Assert the Invoices
-			expect(invoices).toBeArray();
+			expect(searchResponse.results).toBeArray();
 
 			// Assert the Invoices Length
-			expect(invoices.length).toBe(invoicesInDateRange.length);
+			expect(searchResponse.results.length).toBe(invoicesInDateRange.length);
 
 			// Assert the Invoices
-			expect(invoices[0].Id).toBe(invoicesInDateRange[0].Id);
+			expect(searchResponse.results[0].Id).toBe(invoicesInDateRange[0].Id);
 		});
 	});
 
@@ -227,16 +252,16 @@ describe('Invoice API', () => {
 			global.fetch = mockFetch(JSON.stringify(invoiceQueryResponse));
 
 			// Get the Invoices
-			const invoices = await apiClient.invoices.getInvoicesByDueDate(testDate);
+			const searchResponse = await apiClient.invoices.getInvoicesByDueDate(testDate);
 
 			// Assert the Invoices
-			expect(invoices).toBeArray();
+			expect(searchResponse.results).toBeArray();
 
 			// Assert the Invoices Length
-			expect(invoices.length).toBe(invoiceQueryResponse.QueryResponse.Invoice.length);
+			expect(searchResponse.results.length).toBe(invoiceQueryResponse.QueryResponse.Invoice.length);
 
 			// Assert the Invoices
-			expect(new Date(invoices[0].DueDate).getTime()).toBe(testDate.getTime());
+			expect(new Date(searchResponse.results[0].DueDate).getTime()).toBe(testDate.getTime());
 		});
 	});
 });

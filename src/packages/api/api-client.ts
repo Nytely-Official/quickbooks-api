@@ -19,6 +19,11 @@ export class ApiClient {
 	public estimates: EstimateAPI;
 
 	/**
+	 * Automatically check for a next page (This creates an extra query to the API to check if there is a next page)
+	 */
+	public autoCheckNextPage: boolean = true;
+
+	/**
 	 * Constructor
 
 	 * @param authProvider - The Auth Provider
