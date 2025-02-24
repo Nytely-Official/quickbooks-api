@@ -1,11 +1,18 @@
 // Imports
-import type { Invoice } from '../types';
-import type { Estimate } from '../types';
+import type { Estimate, Customer, Invoice } from '../types';
+
 /**
  * The Invoice Query Response
  */
 export interface InvoiceQueryResponse extends QueryResponse {
 	Invoice: Array<Invoice>;
+}
+
+/**
+ * The Customer Query Response
+ */
+export interface CustomerQueryResponse extends QueryResponse {
+	Customer: Array<Customer>;
 }
 
 /**
