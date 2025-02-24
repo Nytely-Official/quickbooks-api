@@ -51,9 +51,9 @@ export class CustomerAPI {
 	 * @param response - The Response
 	 * @returns The Customers
 	 */
-	protected formatResponse(response: any): Array<Customer> {
+	protected formatResponse(response: { QueryResponse?: { Customer?: Customer[] } }): Array<Customer> {
 		// Check if the Response is invalid
-		if (!response || response.QueryResponse?.customer?.length < 1) throw new Error('Customers not found');
+		if (!response?.QueryResponse?.Customer?.length) throw new Error('Customers not found');
 
 		// Get the Customers
 		const queryResponse = response.QueryResponse as CustomerQueryResponse;
