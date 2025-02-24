@@ -55,7 +55,6 @@ describe('Live API: Estimates', async () => {
 		// Get the Estimates
 		const searchResponse1 = await apiClient.estimates.getAllEstimates({ maxResults: 10, page: 1 });
 		const searchResponse2 = await apiClient.estimates.getAllEstimates({ maxResults: 10, page: 2 });
-		console.log('Search response | ', searchResponse2);
 		// Assert the Estimates
 		expect(searchResponse1.results).toBeInstanceOf(Array);
 		expect(searchResponse2.results).toBeInstanceOf(Array);
