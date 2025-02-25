@@ -189,21 +189,8 @@ describe('Invoice API', () => {
 	describe('getUpdatedInvoices', () => {
 		// Describe the getUpdatedInvoices Method
 		it('should fetch updated invoices', async () => {
-			// Setup the Invoice Query Response
-			const invoiceQueryResponse: { QueryResponse: InvoiceQueryResponse } = {
-				QueryResponse: {
-					Invoice: mockInvoiceData,
-					maxResults: mockInvoiceData.length,
-					startPosition: 1,
-					totalCount: mockInvoiceData.length,
-				},
-			};
-
-			// Mock the Fetch with proper QueryResponse structure
-			global.fetch = mockFetch(JSON.stringify(invoiceQueryResponse));
-
 			// Get the Last Updated Time
-			const lastUpdatedTime = new Date('2024-01-09');
+			const lastUpdatedTime = new Date('2025-01-09');
 
 			// Get the List of Invoices in that date range for the mock data
 			const invoicesInDateRange = mockInvoiceData.filter((invoice) => {
@@ -216,6 +203,18 @@ describe('Invoice API', () => {
 				// Return the Invoice if it is in the date range
 				return invoiceDate >= lastUpdatedTime;
 			});
+			// Setup the Invoice Query Response
+			const invoiceQueryResponse: { QueryResponse: InvoiceQueryResponse } = {
+				QueryResponse: {
+					Invoice: invoicesInDateRange,
+					maxResults: invoicesInDateRange.length,
+					startPosition: 1,
+					totalCount: invoicesInDateRange.length,
+				},
+			};
+
+			// Mock the Fetch with proper QueryResponse structure
+			global.fetch = mockFetch(JSON.stringify(invoiceQueryResponse));
 
 			// Get the Invoices
 			const searchResponse = await apiClient.invoices.getUpdatedInvoices(lastUpdatedTime);
@@ -241,7 +240,7 @@ describe('Invoice API', () => {
 			// Setup the Invoice Query Response
 			const invoiceQueryResponse: { QueryResponse: InvoiceQueryResponse } = {
 				QueryResponse: {
-					Invoice: mockInvoiceData.filter((invoice) => new Date(invoice.DueDate).getTime() === testDate.getTime()),
+					Invoice: mockInvoiceData.filter((invoice) => invoice.DueDate && new Date(invoice.DueDate).getTime() === testDate.getTime()),
 					maxResults: 1,
 					startPosition: 1,
 					totalCount: 1,

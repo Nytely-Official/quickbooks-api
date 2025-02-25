@@ -15,6 +15,9 @@ export async function getInvoicesForDateRange(
 	endDate: Date,
 	options: SearchOptions<Invoice> = {},
 ): Promise<SearchResponse<Invoice>> {
+	// Ensure the Start Date is Before the End Date
+	if (startDate > endDate) throw new Error('Start date must be before end date');
+
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 

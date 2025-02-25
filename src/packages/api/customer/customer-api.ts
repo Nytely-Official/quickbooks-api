@@ -1,0 +1,113 @@
+// Imports
+import { ApiClient } from '../api-client';
+import { Environment, Query, type Customer, type CustomerQueryResponse } from '../../../types/types';
+import { Endpoints } from '../../../types/enums/endpoints';
+import { CustomerQueryBuilder } from './customer-query-builder';
+
+// Import the Services
+import { getAllCustomers } from './services/get-all-customers';
+import { getCustomerById } from './services/get-customer-by-id';
+import { getCustomersForDateRange } from './services/get-customers-for-date-range';
+import { getUpdatedCustomers } from './services/get-updated-customers';
+
+import { rawCustomerQuery } from './services/raw-customer-query';
+
+/**
+ * API Client
+ */
+export class CustomerAPI {
+	// The List of Customer Services
+	public readonly getAllCustomers = getAllCustomers.bind(this);
+	public readonly getCustomerById = getCustomerById.bind(this);
+	public readonly getCustomersForDateRange = getCustomersForDateRange.bind(this);
+	public readonly getUpdatedCustomers = getUpdatedCustomers.bind(this);
+	public readonly rawCustomerQuery = rawCustomerQuery.bind(this);
+
+	/**
+	 * Constructor
+
+	 * @param apiClient - The API Client
+	 */
+	constructor(protected readonly apiClient: ApiClient) {}
+
+	/**
+	 * Get the Company Endpoint
+	 * @returns The Company Endpoint with the attached token realmId
+	 */
+	protected async getCompanyEndpoint() {
+		// Get the Base Endpoint
+		const baseEndpoint =
+			this.apiClient.environment === Environment.Production ? Endpoints.ProductionCompanyApi : Endpoints.SandboxCompanyApi;
+
+		// Get the Token
+		const token = await this.apiClient.authProvider.getToken();
+
+		// Return the Company Endpoint
+		return `${baseEndpoint}/${token.realmId}`;
+	}
+
+	/**
+	 * Format the Response
+	 * @param response - The Response
+	 * @returns The Customers
+	 */
+	protected formatResponse(response: { QueryResponse?: { Customer?: Customer[] } }): Array<Customer> {
+		// Check if the Response is invalid
+		if (!response?.QueryResponse?.Customer?.length) throw new Error('Customers not found');
+
+		// Get the Customers
+		const queryResponse = response.QueryResponse as CustomerQueryResponse;
+
+		// Return the Customers
+		return queryResponse.Customer;
+	}
+
+	/**
+	 * Get the Query Builder
+	 * @returns The Query Builder
+	 */
+	public async getQueryBuilder(): Promise<CustomerQueryBuilder> {
+		// Get the Company Endpoint
+		const companyEndpoint = await this.getCompanyEndpoint();
+
+		// Setup the New Query Builder
+		const queryBuilder = new CustomerQueryBuilder(companyEndpoint, Query.Customer);
+
+		// Return the Query Builder
+		return queryBuilder;
+	}
+
+	/**
+	 * Checks if there is a next page
+	 * @param queryBuilder - The Query Builder
+	 * @returns {boolean} True if there is a next page, false otherwise
+	 */
+	protected async hasNextPage(queryBuilder: CustomerQueryBuilder): Promise<boolean> {
+		// Check if the Auto Check Next Page is Disabled
+		if (!this.apiClient.autoCheckNextPage) return false;
+
+		// Get the Page Number
+		const page = (queryBuilder.searchOptions.page || 1) + 1;
+
+		// Update the Page Number
+		queryBuilder.searchOptions.page = page;
+
+		// Get the URL
+		const url = queryBuilder.build();
+
+		// Run the Request
+		const response = await this.apiClient.runRequest(url, { method: 'GET' }).catch((error) => {
+			// Log the error
+			console.error(`Failed to check if there is a next page: ${error}`);
+		});
+
+		// Check if the Response is invalid
+		if (!response?.QueryResponse?.Customer) return false;
+
+		// Check if the Response is Invalid
+		if (response.QueryResponse.Customer.length < 1) return false;
+
+		// Return True
+		return true;
+	}
+}

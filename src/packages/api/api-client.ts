@@ -3,11 +3,16 @@ import { AuthProvider } from '../auth/auth-provider';
 import { Environment } from '../../types/types';
 import { InvoiceAPI } from './invoices/invoice-api';
 import { EstimateAPI } from './estimates/estimate-api';
+import { CustomerAPI } from './customer/customer-api';
 
 /**
  * API Client
  */
 export class ApiClient {
+	/**
+	 * Customer API
+	 */
+	public customers: CustomerAPI;
 	/**
 	 * Invoices API
 	 */
@@ -31,6 +36,7 @@ export class ApiClient {
 	constructor(public readonly authProvider: AuthProvider, public readonly environment: Environment) {
 		// Initialize the API's
 		this.invoices = new InvoiceAPI(this);
+		this.customers = new CustomerAPI(this);
 		this.estimates = new EstimateAPI(this);
 	}
 
