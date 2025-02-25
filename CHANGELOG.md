@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.4.3] - 2025-02-25
+
+### Added
+
+- Auto-refresh functionality with `enableAutoRefresh()` and `disableAutoRefresh()` methods
+- New error handling for expired tokens when auto-refresh is disabled
+- Additional test cases for token serialization/deserialization edge cases
+
+### Changed
+
+- Improved token validation logic with auto-refresh awareness
+- Updated test suite with better error case coverage
+
+### Fixed
+
+- Validation logic when both access and refresh tokens are expired
+
+---
+
 ## [0.4.2] - 2025-02-25
 
 ### Features

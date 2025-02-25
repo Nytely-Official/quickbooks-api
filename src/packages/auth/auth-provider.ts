@@ -20,6 +20,11 @@ export class AuthProvider {
 	private readonly eventEmitter: EventEmitter = new EventEmitter();
 
 	/**
+	 * Wether to automatically refresh the token when it is expired
+	 */
+	private autoRefresh: boolean = true;
+
+	/**
 	 * Initialize the Auth Provider
 	 * @param clientId The client ID for the application *Required*
 	 * @param clientSecret The client secret for the application *Required*
@@ -40,6 +45,20 @@ export class AuthProvider {
 	}
 
 	/**
+	 * Enable the Auto Refresh
+	 */
+	public enableAutoRefresh(): void {
+		this.autoRefresh = true;
+	}
+
+	/**
+	 * Disable the Auto Refresh
+	 */
+	public disableAutoRefresh(): void {
+		this.autoRefresh = false;
+	}
+
+	/**
 	 * Get the Access Token
 	 * @returns {string} The access token
 	 */
@@ -48,7 +67,7 @@ export class AuthProvider {
 		if (!this.token) throw new Error('User is not Authorized, please re-authenticate or set the token manually with the setToken method');
 
 		// Check if the Token is Expired and Refresh it if it is
-		if (this.token.accessTokenExpiryDate < new Date()) await this.refresh();
+		if (this.token.accessTokenExpiryDate < new Date() && this.autoRefresh) await this.refresh();
 
 		// Return the Token
 		return this.token;
@@ -66,7 +85,7 @@ export class AuthProvider {
 		this.token = newToken;
 
 		// Check if the Token is Expired
-		if (newToken.accessTokenExpiryDate < new Date()) await this.refresh();
+		if (newToken.accessTokenExpiryDate < new Date() && this.autoRefresh) await this.refresh();
 	}
 
 	/**
@@ -263,10 +282,13 @@ export class AuthProvider {
 		if (refreshTokenExpired) throw new Error('Token and Refresh Token are expired, please re-authenticate');
 
 		// Refresh the token if it is expired
-		if (tokenExpired)
+		if (tokenExpired && this.autoRefresh)
 			await this.refresh().catch((error: Error) => {
 				throw new Error(`Failed to refresh token: ${error.message}`);
 			});
+
+		// Check if the token is expired and auto refresh is disabled
+		if (tokenExpired && !this.autoRefresh) throw new Error('Token is expired, please refresh the token');
 
 		// Return true if the token is valid
 		return true;
