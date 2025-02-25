@@ -55,7 +55,6 @@ describe('Customer API', () => {
 				// Get the Customer Date
 				const customerDate = new Date(customer.MetaData.LastUpdatedTime);
 				// Return the Customer if it is in the date range
-				console.log(customer.Id, ' || ', customerDate > lastUpdatedTime);
 				return customerDate > lastUpdatedTime;
 			});
 
