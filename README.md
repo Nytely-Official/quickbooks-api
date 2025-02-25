@@ -13,9 +13,10 @@ foundation for accounting, payments, and commerce operations.
 ✅ Secure Token Serialization/Deserialization  
 ✅ Token Validation  
 ✅ Environment-Specific Endpoints (Sandbox/Production)  
-✅ Invoice API Search Operations  
 ✅ Type-Safe API Surface  
-✅ Estimates API Support ✅ Pagination Support
+✅ Estimates API Support  
+✅ Pagination Support  
+✅ Customer API Support
 
 ## Technical Highlights
 
@@ -249,6 +250,16 @@ const recentEstimates = await apiClient.estimates.getUpdatedEstimates(new Date('
 | `getUpdatedEstimates()`      | Get updated estimates    |
 | `rawEstimateQuery()`         | Get raw estimate query   |
 
+### Customers API
+
+| Method                       | Description            |
+| ---------------------------- | ---------------------- |
+| `getAllCustomers()`          | Get all customers      |
+| `getCustomerById()`          | Get single customer    |
+| `getCustomersForDateRange()` | Filter by date range   |
+| `getUpdatedCustomers()`      | Get updated records    |
+| `rawCustomerQuery()`         | Custom query execution |
+
 ## Advanced Usage
 
 ### Query Building
@@ -256,6 +267,16 @@ const recentEstimates = await apiClient.estimates.getUpdatedEstimates(new Date('
 ```typescript
 // Estimate query
 const estimateQuery = await apiClient.estimates.getQueryBuilder().whereExpirationDate(new Date('2024-12-31')).whereTxnDate(new Date());
+```
+
+```typescript
+// Customer query example
+const customerQuery = await apiClient.customers
+  .getQueryBuilder()
+  .whereLastUpdatedAfter(new Date('2024-01-01'))
+  .orderBy('DisplayName', 'ASC');
+
+const results = await apiClient.customers.rawCustomerQuery(customerQuery);
 ```
 
 ### Search Options
