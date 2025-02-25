@@ -4,6 +4,7 @@ import { Environment } from '../../types/types';
 import { InvoiceAPI } from './invoices/invoice-api';
 import { EstimateAPI } from './estimates/estimate-api';
 import { CustomerAPI } from './customer/customer-api';
+import { PaymentAPI } from './payment/payment-api';
 
 /**
  * API Client
@@ -24,6 +25,11 @@ export class ApiClient {
 	public estimates: EstimateAPI;
 
 	/**
+	 * Payments API
+	 */
+	public payments: PaymentAPI;
+
+	/**
 	 * Automatically check for a next page (This creates an extra query to the API to check if there is a next page)
 	 */
 	public autoCheckNextPage: boolean = true;
@@ -38,6 +44,7 @@ export class ApiClient {
 		this.invoices = new InvoiceAPI(this);
 		this.customers = new CustomerAPI(this);
 		this.estimates = new EstimateAPI(this);
+		this.payments = new PaymentAPI(this);
 	}
 
 	/**
