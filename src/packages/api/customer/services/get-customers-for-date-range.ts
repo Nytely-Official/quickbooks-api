@@ -21,6 +21,9 @@ export async function getCustomersForDateRange(
 	endDate: Date,
 	options: SearchOptions<Customer> = {},
 ): Promise<SearchResponse<Customer>> {
+	// Ensure the Start Date is Before the End Date
+	if (startDate > endDate) throw new Error('Start date must be before end date');
+
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
