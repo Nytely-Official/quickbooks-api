@@ -1,6 +1,42 @@
 # Changelog
 
-# [0.4.1] - 2025-03-18
+## [0.4.2] - 2025-02-25
+
+### Features
+
+- Added Customer API support
+- Implemented customer search methods:
+  - `getAllCustomers()`
+  - `getCustomerById()`
+  - `getCustomersForDateRange()`
+  - `getUpdatedCustomers()`
+  - `rawCustomerQuery()`
+- Added customer query builder with filtering capabilities
+
+### Tests
+
+- Added comprehensive live tests for Customer API endpoints
+- Implemented unit tests for customer query builder
+- Added mock customer data for testing scenarios
+- Enhanced pagination test coverage across all APIs
+- Improved error handling tests for invalid IDs
+
+### Code Quality
+
+- Added date validation checks in date range methods
+- Improved error messages for invalid customer IDs
+- Standardized API response handling across customer endpoints
+- Enhanced type safety for customer interface definitions
+
+### Infrastructure
+
+- Updated test runner configuration with longer timeout values
+- Added customer data mocking utilities
+- Improved test cleanup procedures
+
+---
+
+# [0.4.1] - 2025-02-21
 
 ### Features
 

@@ -63,8 +63,8 @@ describe('Live Auth Provider', async () => {
 		await authProvider.refresh();
 
 		// Test the Token
-		expect(refreshedToken).toBeDefined();
-		expect(refreshedToken.accessToken).not.toBe(originalToken.accessToken);
+		expect(refreshedToken!).toBeDefined();
+		expect(refreshedToken!.accessToken).not.toBe(originalToken.accessToken);
 	});
 
 	// Test token serialization

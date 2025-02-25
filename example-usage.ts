@@ -244,7 +244,7 @@ app.get('/auth-code', async (req: Request, res: Response) => {
 });
 
 // Callback endpoint for OAuth response
-app.get('/generate-test-token', async (req: Request, res: Response) => {
+app.get('/generate-test-token', async (req: Request, res: Response): Promise<void> => {
 	// Initialize AuthProvider
 	const testAuthProvider = new AuthProvider(
 		process.env.QB_CLIENT_ID!,
@@ -266,7 +266,10 @@ app.get('/generate-test-token', async (req: Request, res: Response) => {
 		const { code, realmId } = req.query;
 
 		// Check if the Code and Realm ID are present
-		if (!code || !realmId) return res.status(400).send('Missing code or realmId in callback');
+		if (!code || !realmId) {
+			res.status(400).send('Missing code or realmId in callback');
+			return;
+		}
 
 		// Exchange authorization code for tokens
 		await testAuthProvider.exchangeCode(code as string, realmId as string);

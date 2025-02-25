@@ -28,4 +28,5 @@ export function mockFetch(responseData: BodyInit, responseStatus = 200) {
 export { mockAuthResponseData } from './__mocks__/auth-response-data';
 export { mockTokenData } from './__mocks__/token-data';
 export { mockInvoiceData } from './__mocks__/invoice-data';
+export { mockCustomerData } from './__mocks__/customer-data';
 export { mockEstimateData } from './__mocks__/estimate-data';
