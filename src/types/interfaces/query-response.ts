@@ -1,5 +1,5 @@
 // Imports
-import type { Estimate, Customer, Invoice } from '../types';
+import type { Estimate, Customer, Invoice, Payment } from '../types';
 
 /**
  * The Invoice Query Response
@@ -13,6 +13,13 @@ export interface InvoiceQueryResponse extends QueryResponse {
  */
 export interface CustomerQueryResponse extends QueryResponse {
 	Customer: Array<Customer>;
+}
+
+/**
+ * The Payment Query Response
+ */
+export interface PaymentQueryResponse extends QueryResponse {
+	Payment: Array<Payment>;
 }
 
 /**

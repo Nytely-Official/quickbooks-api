@@ -11,8 +11,15 @@ export { TokenType } from './enums/token-type';
 // Export the Interfaces
 export type { Estimate } from './interfaces/estimate';
 export type { Invoice } from './interfaces/invoice';
+export type { Payment } from './interfaces/payment';
 export type { Customer } from './interfaces/customer';
-export type { QueryResponse, InvoiceQueryResponse, EstimateQueryResponse, CustomerQueryResponse } from './interfaces/query-response';
+export type {
+	QueryResponse,
+	InvoiceQueryResponse,
+	EstimateQueryResponse,
+	CustomerQueryResponse,
+	PaymentQueryResponse,
+} from './interfaces/query-response';
 export type { SearchOptions } from './interfaces/search-options';
 export type { SearchResponse } from './interfaces/search-response';
 export type { TokenResponse } from './interfaces/token-response';

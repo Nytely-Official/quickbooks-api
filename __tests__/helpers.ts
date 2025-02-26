@@ -30,3 +30,4 @@ export { mockTokenData } from './__mocks__/token-data';
 export { mockInvoiceData } from './__mocks__/invoice-data';
 export { mockCustomerData } from './__mocks__/customer-data';
 export { mockEstimateData } from './__mocks__/estimate-data';
+export { mockPaymentData } from './__mocks__/payment-data';
