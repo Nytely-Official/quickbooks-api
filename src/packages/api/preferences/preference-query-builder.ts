@@ -16,16 +16,6 @@ export class PreferenceQueryBuilder extends BaseQueryBuilder<Preferences> {
 	}
 
 	/**
-	 * Where Due Date
-	 * @param date - The due date
-	 * @returns The Query Builder
-	 */
-	public whereDueDate(date: Date): this {
-		this.whereClauses.push(`DueDate = '${date.toISOString()}'`);
-		return this;
-	}
-
-	/**
 	 * Where Customer ID
 	 * @param customerId - The customer ID
 	 * @returns The Query Builder
