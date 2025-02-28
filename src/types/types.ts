@@ -14,7 +14,7 @@ export type { Invoice } from './interfaces/invoice';
 export type { Payment } from './interfaces/payment';
 export type { Customer } from './interfaces/customer';
 export type { CreditMemo } from './interfaces/credit-memo';
-export type { Preferences } from './interfaces/preference';
+export type { Preferences } from './interfaces/preferences';
 export type {
 	QueryResponse,
 	InvoiceQueryResponse,
