@@ -1,4 +1,5 @@
 // Imports
+import e from 'express';
 import { AuthProvider, Environment, ApiClient, AuthScopes } from '../src/app';
 import { describe, expect, test } from 'bun:test';
 
@@ -40,18 +41,20 @@ describe('Live API: Accounts', async () => {
 	test('should retrieve a single account', async () => {
 		// Get all accounts
 		const searchResponse = await apiClient.accounts.getAllAccounts();
+		const accounts = searchResponse?.results?.slice(0, 5);
 
-		searchResponse.results.forEach(async (account, index) => {
-			if (index >= 5) return;
-			// Get the Account
-			const accountResponse = await apiClient.accounts.getAccountById(account.Id);
+		await Promise.all(
+			accounts.map(async (account) => {
+				// Get the Account
+				const accountResponse = await apiClient.accounts.getAccountById(account.Id);
 
-			// Test the Account
-			expect(accountResponse).toBeDefined();
+				// Test the Account
+				expect(accountResponse).toBeDefined();
 
-			// Test the Account ID
-			expect(accountResponse).toHaveProperty('Id');
-		});
+				// Test the Account ID
+				expect(accountResponse).toHaveProperty('Id');
+			}),
+		);
 	});
 
 	// Test retrieving accounts with limit
