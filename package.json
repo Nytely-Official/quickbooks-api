@@ -21,6 +21,7 @@
 	"scripts": {
 		"build": "bun tsc && tsc-alias",
 		"test": "bun test __tests__ --timeout 15000",
+		"test:filtered": "bun test __live-tests__ -t$1 --timeout 15000",
 		"test:live": "bun test __live-tests__ --timeout 15000",
 		"publish:package": "bun run build && bun run test && bun publish"
 	},

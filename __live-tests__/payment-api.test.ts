@@ -16,7 +16,7 @@ describe('Live API: Payments', async () => {
 	const apiClient = new ApiClient(authProvider, Environment.Sandbox);
 
 	// Test retrieving all payments
-	test('should retrieve all payments', async () => {
+	test('should retrieve all Payments', async () => {
 		// Get all payments
 		const searchResponse = await apiClient.payments.getAllPayments();
 

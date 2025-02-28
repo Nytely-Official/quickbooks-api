@@ -15,6 +15,8 @@ export type { Payment } from './interfaces/payment';
 export type { Customer } from './interfaces/customer';
 export type { Account } from './interfaces/account';
 
+export type { CreditMemo } from './interfaces/credit-memo';
+export type { Preferences } from './interfaces/preferences';
 export type {
 	QueryResponse,
 	InvoiceQueryResponse,
@@ -22,6 +24,8 @@ export type {
 	CustomerQueryResponse,
 	PaymentQueryResponse,
 	AccountQueryResponse,
+	PreferenceQueryResponse,
+	CreditMemoQueryResponse,
 } from './interfaces/query-response';
 export type { SearchOptions } from './interfaces/search-options';
 export type { SearchResponse } from './interfaces/search-response';

@@ -6,6 +6,8 @@ import { EstimateAPI } from './estimates/estimate-api';
 import { CustomerAPI } from './customer/customer-api';
 import { PaymentAPI } from './payment/payment-api';
 import { AccountAPI } from './account/account-api';
+import { PreferenceAPI } from './preferences/preference-api';
+import { CreditMemoAPI } from './credit-memo/credit-memo-api';
 
 /**
  * API Client
@@ -21,6 +23,11 @@ export class ApiClient {
 	public invoices: InvoiceAPI;
 
 	/**
+	 * Credit Memo API
+	 */
+	public creditMemos: CreditMemoAPI;
+
+	/**
 	 * Estimates API
 	 */
 	public estimates: EstimateAPI;
@@ -34,6 +41,11 @@ export class ApiClient {
 	 * Accounts API
 	 */
 	public accounts: AccountAPI;
+
+	/**
+	 * Preferences API
+	 */
+	public preferences: PreferenceAPI;
 
 	/**
 	 * Automatically check for a next page (This creates an extra query to the API to check if there is a next page)
@@ -52,6 +64,8 @@ export class ApiClient {
 		this.estimates = new EstimateAPI(this);
 		this.accounts = new AccountAPI(this);
 		this.payments = new PaymentAPI(this);
+		this.preferences = new PreferenceAPI(this);
+		this.creditMemos = new CreditMemoAPI(this);
 	}
 
 	/**
