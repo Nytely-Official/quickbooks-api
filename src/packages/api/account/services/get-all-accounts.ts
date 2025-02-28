@@ -1,5 +1,5 @@
 // Imports
-import { type Account, type SearchOptions, type SearchResponse } from '../../../../types/types';
+import type { Account, AccountOptions, SearchResponse } from '../../../../types/types';
 import { AccountAPI } from '../account-api';
 
 /**
@@ -7,12 +7,12 @@ import { AccountAPI } from '../account-api';
  * @param this - The Account API
  * @returns The Accounts
  */
-export async function getAllAccounts(this: AccountAPI, options: SearchOptions<Account> = {}): Promise<SearchResponse<Account>> {
+export async function getAllAccounts(this: AccountAPI, options: AccountOptions = {}): Promise<SearchResponse<Account>> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
-	// Setup the Search Options
-	queryBuilder.setSearchOptions(options);
+	// Setup the Search Options (if provided)
+	if (options.searchOptions) queryBuilder.setSearchOptions(options.searchOptions);
 
 	// Setup the URL
 	const url = queryBuilder.build();

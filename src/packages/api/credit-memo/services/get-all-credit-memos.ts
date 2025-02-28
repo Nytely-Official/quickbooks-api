@@ -1,5 +1,5 @@
 // Imports
-import { type CreditMemo, type SearchOptions, type SearchResponse } from '../../../../types/types';
+import type { CreditMemo, CreditMemoOptions, SearchResponse } from '../../../../types/types';
 import { CreditMemoAPI } from '../credit-memo-api';
 
 /**
@@ -7,12 +7,12 @@ import { CreditMemoAPI } from '../credit-memo-api';
  * @param this - The CreditMemo API
  * @returns The CreditMemos
  */
-export async function getAllCreditMemos(this: CreditMemoAPI, options: SearchOptions<CreditMemo> = {}): Promise<SearchResponse<CreditMemo>> {
+export async function getAllCreditMemos(this: CreditMemoAPI, options: CreditMemoOptions = {}): Promise<SearchResponse<CreditMemo>> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
-	// Setup the Search Options
-	queryBuilder.setSearchOptions(options);
+	// Setup the Search Options (if provided)
+	if (options.searchOptions) queryBuilder.setSearchOptions(options.searchOptions);
 
 	// Setup the URL
 	const url = queryBuilder.build();

@@ -8,6 +8,7 @@ import { AccountQueryBuilder } from './account-query-builder';
 import { getAllAccounts } from './services/get-all-accounts';
 import { getAccountById } from './services/get-account-by-id';
 import { getAccountsForDateRange } from './services/get-accounts-for-date-range';
+import { getAccountsCreatedForDateRange } from './services/get-accounts-created-for-date-range';
 import { getUpdatedAccounts } from './services/get-updated-accounts';
 import { rawAccountQuery } from './services/raw-account-query';
 
@@ -18,6 +19,7 @@ export class AccountAPI {
 	// The List of Account Services
 	public readonly getAllAccounts = getAllAccounts.bind(this);
 	public readonly getAccountById = getAccountById.bind(this);
+	public readonly getAccountsCreatedForDateRange = getAccountsCreatedForDateRange.bind(this);
 	public readonly getAccountsForDateRange = getAccountsForDateRange.bind(this);
 	public readonly getUpdatedAccounts = getUpdatedAccounts.bind(this);
 	public readonly rawAccountQuery = rawAccountQuery.bind(this);

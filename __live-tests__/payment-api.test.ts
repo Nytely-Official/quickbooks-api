@@ -1,5 +1,5 @@
 // Imports
-import { AuthProvider, Environment, ApiClient, AuthScopes } from '../src/app';
+import { AuthProvider, Environment, ApiClient, AuthScopes, type PaymentOptions } from '../src/app';
 import { describe, expect, test } from 'bun:test';
 
 // Describe the Payment API
@@ -56,8 +56,11 @@ describe('Live API: Payments', async () => {
 
 	// Test retrieving 10 payments
 	test('should retrieve 10 payments', async () => {
+		// Setup the Payment Options
+		const paymentOptions: PaymentOptions = { searchOptions: { maxResults: 10 } };
+
 		// Get all payments
-		const searchResponse = await apiClient.payments.getAllPayments({ maxResults: 10 });
+		const searchResponse = await apiClient.payments.getAllPayments(paymentOptions);
 
 		// Test the Payments
 		expect(searchResponse.results).toBeInstanceOf(Array);
@@ -68,9 +71,13 @@ describe('Live API: Payments', async () => {
 
 	// Test pagination
 	test('should handle pagination', async () => {
+		// Setup the Payment Options
+		const paymentOptions1: PaymentOptions = { searchOptions: { maxResults: 10, page: 1 } };
+		const paymentOptions2: PaymentOptions = { searchOptions: { maxResults: 10, page: 2 } };
+
 		// Get all payments
-		const searchResponse1 = await apiClient.payments.getAllPayments({ maxResults: 10, page: 1 });
-		const searchResponse2 = await apiClient.payments.getAllPayments({ maxResults: 10, page: 2 });
+		const searchResponse1 = await apiClient.payments.getAllPayments(paymentOptions1);
+		const searchResponse2 = await apiClient.payments.getAllPayments(paymentOptions2);
 
 		// Test the Payments
 		expect(searchResponse1.results).toBeInstanceOf(Array);
@@ -86,12 +93,17 @@ describe('Live API: Payments', async () => {
 
 	// Should handle all Search Options
 	test('should handle all search options', async () => {
+		// Setup the Payment Options
+		const paymentOptions: PaymentOptions = {
+			searchOptions: {
+				maxResults: 10,
+				page: 1,
+				orderBy: { field: 'Id', direction: 'DESC' },
+			},
+		};
+
 		// Get all payments
-		const searchResponse = await apiClient.payments.getAllPayments({
-			maxResults: 10,
-			page: 1,
-			orderBy: { field: 'Id', direction: 'DESC' },
-		});
+		const searchResponse = await apiClient.payments.getAllPayments(paymentOptions);
 
 		// Test the Payments
 		expect(searchResponse.results).toBeInstanceOf(Array);

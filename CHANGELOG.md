@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.5.0] - 2025-02-28
+
+### Added
+
+- Status filtering support for invoice API methods
+- Entity-specific option interfaces (InvoiceOptions, EstimateOptions, CustomerOptions)
+- Enhanced type safety for API method parameters
+- Additional status validation tests for invoice endpoints
+
+### Changed
+
+- Unified option handling across all API methods
+- Updated live tests to use entity-specific options
+- Improved documentation for search options and status filtering
+- Refactored query builder to support status conditions
+
+### Fixed
+
+- Type definitions for customer and estimate APIs
+- Pagination handling in documentation examples
+- Search options validation in service methods
+
+---
+
 ## [0.4.3] - 2025-02-25
 
 ### Added

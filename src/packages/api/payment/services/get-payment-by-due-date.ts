@@ -1,5 +1,5 @@
 // Import the Query Builder
-import { SearchOptions, SearchResponse, type Payment } from '../../../../types/types';
+import type { Payment, PaymentOptions, SearchResponse } from '../../../../types/types';
 import { PaymentAPI } from '../payment-api';
 
 /**
@@ -11,7 +11,7 @@ import { PaymentAPI } from '../payment-api';
 export async function getPaymentsByDueDate(
 	this: PaymentAPI,
 	dueDate: Date,
-	options: SearchOptions<Payment> = {},
+	options: PaymentOptions = {},
 ): Promise<SearchResponse<Payment>> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
@@ -19,8 +19,8 @@ export async function getPaymentsByDueDate(
 	// Setup the Due Date Filter
 	queryBuilder.whereDueDate(dueDate);
 
-	// Setup the Search Options
-	queryBuilder.setSearchOptions(options);
+	// Setup the Search Options (if provided)
+	if (options.searchOptions) queryBuilder.setSearchOptions(options.searchOptions);
 
 	// Setup the URL with due date filter
 	const url = queryBuilder.build();

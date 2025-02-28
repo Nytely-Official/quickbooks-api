@@ -1,6 +1,5 @@
 // Imports
-import e from 'express';
-import { AuthProvider, Environment, ApiClient, AuthScopes } from '../src/app';
+import { AuthProvider, Environment, ApiClient, AuthScopes, type AccountOptions } from '../src/app';
 import { describe, expect, test } from 'bun:test';
 
 // Describe the Account API
@@ -59,8 +58,11 @@ describe('Live API: Accounts', async () => {
 
 	// Test retrieving accounts with limit
 	test('should retrieve limited accounts', async () => {
+		// Setup the Account Options
+		const accountOptions: AccountOptions = { searchOptions: { maxResults: 10 } };
+
 		// Get all accounts
-		const searchResponse = await apiClient.accounts.getAllAccounts({ maxResults: 10 });
+		const searchResponse = await apiClient.accounts.getAllAccounts(accountOptions);
 
 		// Test the Accounts
 		expect(searchResponse.results).toBeInstanceOf(Array);
@@ -72,9 +74,13 @@ describe('Live API: Accounts', async () => {
 
 	// Test pagination
 	test('should handle pagination', async () => {
+		// Setup the Account Options
+		const accountOptions1: AccountOptions = { searchOptions: { maxResults: 10, page: 1 } };
+		const accountOptions2: AccountOptions = { searchOptions: { maxResults: 10, page: 2 } };
+
 		// Get all accounts
-		const searchResponse1 = await apiClient.accounts.getAllAccounts({ maxResults: 10, page: 1 });
-		const searchResponse2 = await apiClient.accounts.getAllAccounts({ maxResults: 10, page: 2 });
+		const searchResponse1 = await apiClient.accounts.getAllAccounts(accountOptions1);
+		const searchResponse2 = await apiClient.accounts.getAllAccounts(accountOptions2);
 
 		// Test the Accounts
 		expect(searchResponse1.results).toBeInstanceOf(Array);
@@ -125,12 +131,17 @@ describe('Live API: Accounts', async () => {
 
 	// Should handle all Search Options
 	test('should handle all search options', async () => {
+		// Setup the Account Options
+		const accountOptions: AccountOptions = {
+			searchOptions: {
+				maxResults: 10,
+				page: 1,
+				orderBy: { field: 'Id', direction: 'DESC' },
+			},
+		};
+
 		// Get all accounts
-		const searchResponse = await apiClient.accounts.getAllAccounts({
-			maxResults: 10,
-			page: 1,
-			orderBy: { field: 'Id', direction: 'DESC' },
-		});
+		const searchResponse = await apiClient.accounts.getAllAccounts(accountOptions);
 
 		// Test the Accounts
 		expect(searchResponse.results).toBeInstanceOf(Array);

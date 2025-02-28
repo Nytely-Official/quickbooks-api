@@ -1,5 +1,5 @@
 // Imports
-import { type Preferences, type SearchOptions, type SearchResponse } from '../../../../types/types';
+import type { Preferences, PreferenceOptions, SearchResponse } from '../../../../types/types';
 import { PreferenceAPI } from '../preference-api';
 
 /**
@@ -7,12 +7,12 @@ import { PreferenceAPI } from '../preference-api';
  * @param this - The Preference API
  * @returns The Preferences
  */
-export async function getPreferences(this: PreferenceAPI, options: SearchOptions<Preferences> = {}): Promise<SearchResponse<Preferences>> {
+export async function getPreferences(this: PreferenceAPI, options: PreferenceOptions = {}): Promise<SearchResponse<Preferences>> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
-	// Setup the Search Options
-	queryBuilder.setSearchOptions(options);
+	// Setup the Search Options (if provided)
+	if (options.searchOptions) queryBuilder.setSearchOptions(options.searchOptions);
 
 	// Setup the URL
 	const url = queryBuilder.build();

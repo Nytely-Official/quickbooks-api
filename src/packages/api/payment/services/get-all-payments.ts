@@ -1,5 +1,5 @@
 // Imports
-import { type Payment, type SearchOptions, type SearchResponse } from '../../../../types/types';
+import type { Payment, PaymentOptions, SearchResponse } from '../../../../types/types';
 import { PaymentAPI } from '../payment-api';
 
 /**
@@ -7,12 +7,12 @@ import { PaymentAPI } from '../payment-api';
  * @param this - The Payment API
  * @returns The Payments
  */
-export async function getAllPayments(this: PaymentAPI, options: SearchOptions<Payment> = {}): Promise<SearchResponse<Payment>> {
+export async function getAllPayments(this: PaymentAPI, options: PaymentOptions = {}): Promise<SearchResponse<Payment>> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
-	// Setup the Search Options
-	queryBuilder.setSearchOptions(options);
+	// Setup the Search Options (if provided)
+	if (options.searchOptions) queryBuilder.setSearchOptions(options.searchOptions);
 
 	// Setup the URL
 	const url = queryBuilder.build();

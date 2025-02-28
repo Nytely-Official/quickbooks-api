@@ -1,5 +1,5 @@
 // Import the Query Builder
-import { SearchOptions, SearchResponse, type Account } from '../../../../types/types';
+import type { Account, AccountOptions, SearchResponse } from '../../../../types/types';
 import { AccountAPI } from '../account-api';
 
 /**
@@ -13,7 +13,7 @@ export async function getAccountsForDateRange(
 	this: AccountAPI,
 	startDate: Date,
 	endDate: Date,
-	options: SearchOptions<Account> = {},
+	options: AccountOptions = {},
 ): Promise<SearchResponse<Account>> {
 	// Ensure the Start Date is Before the End Date
 	if (startDate > endDate) throw new Error('Start date must be before end date');
@@ -25,8 +25,8 @@ export async function getAccountsForDateRange(
 	queryBuilder.whereLastUpdatedAfter(startDate);
 	queryBuilder.whereLastUpdatedBefore(endDate);
 
-	// Setup the Search Options
-	queryBuilder.setSearchOptions(options);
+	// Setup the Search Options (if provided)
+	if (options.searchOptions) queryBuilder.setSearchOptions(options.searchOptions);
 
 	// Setup the URL
 	const url = queryBuilder.build();

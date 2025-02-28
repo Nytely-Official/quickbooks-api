@@ -1,5 +1,5 @@
 // Import the Query Builder
-import { SearchOptions, type Account } from '../../../../types/types';
+import type { Account, AccountOptions } from '../../../../types/types';
 import { AccountAPI } from '../account-api';
 
 /**
@@ -8,15 +8,15 @@ import { AccountAPI } from '../account-api';
  * @param id - The ID of the account
  * @returns The Account
  */
-export async function getAccountById(this: AccountAPI, id: string, options: SearchOptions<Account> = {}): Promise<Account> {
+export async function getAccountById(this: AccountAPI, id: string, options: AccountOptions = {}): Promise<Account> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
 	// Setup ID Filter
 	queryBuilder.whereId(id);
 
-	// Setup the Search Options
-	queryBuilder.setSearchOptions(options);
+	// Setup the Search Options (if provided)
+	if (options.searchOptions) queryBuilder.setSearchOptions(options.searchOptions);
 
 	// Setup the URL
 	const url = queryBuilder.build();

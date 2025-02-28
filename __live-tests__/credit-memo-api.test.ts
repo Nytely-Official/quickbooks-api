@@ -1,5 +1,5 @@
 // Imports
-import { AuthProvider, Environment, ApiClient, AuthScopes } from '../src/app';
+import { AuthProvider, Environment, ApiClient, AuthScopes, type CreditMemoOptions } from '../src/app';
 import { describe, expect, test } from 'bun:test';
 
 // Describe the CreditMemo API
@@ -52,8 +52,14 @@ describe('Live API: CreditMemos', async () => {
 	// #FIX Test pagination only 1 item in test account so this test will fail
 	// test('should handle pagination', async () => {
 	// 	// Get the CreditMemos
-	// 	const searchResponse1 = await apiClient.creditMemos.getAllCreditMemos({ maxResults: 10, page: 1 });
-	// 	const searchResponse2 = await apiClient.creditMemos.getAllCreditMemos({ maxResults: 10, page: 2 });
+	// 	// Setup the CreditMemo Options
+	// 	const creditMemoOptions1: CreditMemoOptions = { searchOptions: { maxResults: 10, page: 1 } };
+	// 	const creditMemoOptions2: CreditMemoOptions = { searchOptions: { maxResults: 10, page: 2 } };
+
+	// 	// Get the CreditMemos
+	// 	const searchResponse1 = await apiClient.creditMemos.getAllCreditMemos(creditMemoOptions1);
+	// 	const searchResponse2 = await apiClient.creditMemos.getAllCreditMemos(creditMemoOptions2);
+
 	// 	// Assert the CreditMemos
 	// 	expect(searchResponse1.results).toBeInstanceOf(Array);
 	// 	expect(searchResponse2.results).toBeInstanceOf(Array);

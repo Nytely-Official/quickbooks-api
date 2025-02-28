@@ -34,4 +34,20 @@ export class InvoiceQueryBuilder extends BaseQueryBuilder<Invoice> {
 		this.whereClauses.push(`CustomerRef.value = '${customerId}'`);
 		return this;
 	}
+
+	/**
+	 * Where Status
+	 * @param status - The status
+	 * @returns The Query Builder
+	 */
+	public whereStatus(status: 'paid' | 'unpaid'): this {
+		// Setup the Operator
+		const operator = status === 'paid' ? '=' : '>';
+
+		// Add the Where Clause
+		this.whereClauses.push(`Balance ${operator} '0'`);
+
+		// Return the Query Builder
+		return this;
+	}
 }

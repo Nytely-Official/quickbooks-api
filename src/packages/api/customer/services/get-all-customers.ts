@@ -1,5 +1,5 @@
 // Imports
-import { type Customer, type SearchOptions, type SearchResponse } from '../../../../types/types';
+import type { Customer, CustomerOptions, SearchResponse } from '../../../../types/types';
 import { CustomerAPI } from '../customer-api';
 
 /**
@@ -10,12 +10,12 @@ import { CustomerAPI } from '../customer-api';
  * @param options - Optional search criteria and configurations for retrieving customers.
  * @returns A promise that resolves to a search response with customer data and pagination details.
  */
-export async function getAllCustomers(this: CustomerAPI, options: SearchOptions<Customer> = {}): Promise<SearchResponse<Customer>> {
+export async function getAllCustomers(this: CustomerAPI, options: CustomerOptions = {}): Promise<SearchResponse<Customer>> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
-	// Setup the Search Options
-	queryBuilder.setSearchOptions(options);
+	// Setup the Search Options (if provided)
+	if (options.searchOptions) queryBuilder.setSearchOptions(options.searchOptions);
 
 	// Setup the URL
 	const url = queryBuilder.build();

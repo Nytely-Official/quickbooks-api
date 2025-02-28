@@ -1,5 +1,5 @@
 // Import the Query Builder
-import { SearchOptions, SearchResponse, type Payment } from '../../../../types/types';
+import type { Payment, PaymentOptions, SearchResponse } from '../../../../types/types';
 import { PaymentAPI } from '../payment-api';
 
 /**
@@ -13,7 +13,7 @@ export async function getPaymentsForDateRange(
 	this: PaymentAPI,
 	startDate: Date,
 	endDate: Date,
-	options: SearchOptions<Payment> = {},
+	options: PaymentOptions = {},
 ): Promise<SearchResponse<Payment>> {
 	// Ensure the Start Date is Before the End Date
 	if (startDate > endDate) throw new Error('Start date must be before end date');
@@ -25,8 +25,8 @@ export async function getPaymentsForDateRange(
 	queryBuilder.whereLastUpdatedAfter(startDate);
 	queryBuilder.whereLastUpdatedBefore(endDate);
 
-	// Setup the Search Options
-	queryBuilder.setSearchOptions(options);
+	// Setup the Search Options (if provided)
+	if (options.searchOptions) queryBuilder.setSearchOptions(options.searchOptions);
 
 	// Setup the URL
 	const url = queryBuilder.build();

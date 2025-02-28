@@ -1,5 +1,5 @@
 // Import the Query Builder
-import { SearchOptions, SearchResponse, type Customer } from '../../../../types/types';
+import type { Customer, CustomerOptions, SearchResponse } from '../../../../types/types';
 import { CustomerAPI } from '../customer-api';
 
 /**
@@ -17,7 +17,7 @@ import { CustomerAPI } from '../customer-api';
 export async function getUpdatedCustomers(
 	this: CustomerAPI,
 	lastUpdatedDate: Date,
-	options: SearchOptions<Customer> = {},
+	options: CustomerOptions = {},
 ): Promise<SearchResponse<Customer>> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
@@ -25,8 +25,8 @@ export async function getUpdatedCustomers(
 	// Setup the Last Updated Date Filter
 	queryBuilder.whereLastUpdatedAfter(lastUpdatedDate);
 
-	// Setup the Search Options
-	queryBuilder.setSearchOptions(options);
+	// Setup the Search Options (if provided)
+	if (options.searchOptions) queryBuilder.setSearchOptions(options.searchOptions);
 
 	// Setup the URL
 	const url = queryBuilder.build();

@@ -1,5 +1,5 @@
 // Import the Query Builder
-import { SearchOptions, type CreditMemo } from '../../../../types/types';
+import type { CreditMemo, CreditMemoOptions } from '../../../../types/types';
 import { CreditMemoAPI } from '../credit-memo-api';
 
 /**
@@ -8,15 +8,15 @@ import { CreditMemoAPI } from '../credit-memo-api';
  * @param id - The ID of the creditmemo
  * @returns The CreditMemo
  */
-export async function getCreditMemoById(this: CreditMemoAPI, id: string, options: SearchOptions<CreditMemo> = {}): Promise<CreditMemo> {
+export async function getCreditMemoById(this: CreditMemoAPI, id: string, options: CreditMemoOptions = {}): Promise<CreditMemo> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
 	// Setup ID Filter
 	queryBuilder.whereId(id);
 
-	// Setup the Search Options
-	queryBuilder.setSearchOptions(options);
+	// Setup the Search Options (if provided)
+	if (options.searchOptions) queryBuilder.setSearchOptions(options.searchOptions);
 
 	// Setup the URL
 	const url = queryBuilder.build();
