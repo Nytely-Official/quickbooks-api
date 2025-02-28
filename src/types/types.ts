@@ -13,6 +13,8 @@ export type { Estimate } from './interfaces/estimate';
 export type { Invoice } from './interfaces/invoice';
 export type { Payment } from './interfaces/payment';
 export type { Customer } from './interfaces/customer';
+export type { Account } from './interfaces/account';
+
 export type { CreditMemo } from './interfaces/credit-memo';
 export type { Preferences } from './interfaces/preferences';
 export type {
@@ -21,6 +23,7 @@ export type {
 	EstimateQueryResponse,
 	CustomerQueryResponse,
 	PaymentQueryResponse,
+	AccountQueryResponse,
 	PreferenceQueryResponse,
 	CreditMemoQueryResponse,
 } from './interfaces/query-response';

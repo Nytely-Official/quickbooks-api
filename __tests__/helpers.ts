@@ -33,3 +33,4 @@ export { mockEstimateData } from './__mocks__/estimate-data';
 export { mockPreferenceData } from './__mocks__/preference-data';
 export { mockCreditMemoData } from './__mocks__/credit-memo-data';
 export { mockPaymentData } from './__mocks__/payment-data';
+export { mockAccountData } from './__mocks__/account-data';
