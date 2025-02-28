@@ -1,5 +1,5 @@
 // Imports
-import { SearchOptions, SearchResponse, type Estimate } from '../../../../types/types';
+import type { Estimate, EstimateOptions, SearchResponse } from '../../../../types/types';
 import { EstimateAPI } from '../estimate-api';
 
 /**
@@ -7,12 +7,12 @@ import { EstimateAPI } from '../estimate-api';
  * @param this - The Estimate API
  * @returns The Estimates
  */
-export async function getAllEstimates(this: EstimateAPI, options: SearchOptions<Estimate> = {}): Promise<SearchResponse<Estimate>> {
+export async function getAllEstimates(this: EstimateAPI, options: EstimateOptions = {}): Promise<SearchResponse<Estimate>> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
-	// Setup the Search Options
-	queryBuilder.setSearchOptions(options);
+	// Setup the Search Options (if provided)
+	if (options.searchOptions) queryBuilder.setSearchOptions(options.searchOptions);
 
 	// Setup the URL
 	const url = queryBuilder.build();

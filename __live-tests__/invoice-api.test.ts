@@ -1,5 +1,5 @@
 // Imports
-import { AuthProvider, Environment, ApiClient, AuthScopes } from '../src/app';
+import { AuthProvider, Environment, ApiClient, AuthScopes, InvoiceOptions, InvoiceStatus, Invoice } from '../src/app';
 import { describe, expect, test } from 'bun:test';
 
 // Describe the Invoice API
@@ -56,8 +56,11 @@ describe('Live API: Invoices', async () => {
 
 	// Test retrieving 10 invoices
 	test('should retrieve 10 invoices', async () => {
+		// Setup the Invoice Options
+		const invoiceOptions: InvoiceOptions = { searchOptions: { maxResults: 10 } };
+
 		// Get all invoices
-		const searchResponse = await apiClient.invoices.getAllInvoices({ maxResults: 10 });
+		const searchResponse = await apiClient.invoices.getAllInvoices(invoiceOptions);
 
 		// Test the Invoices
 		expect(searchResponse.results).toBeInstanceOf(Array);
@@ -66,11 +69,51 @@ describe('Live API: Invoices', async () => {
 		expect(searchResponse.results.length).toBeGreaterThan(0);
 	});
 
+	// Test retrieving Invoices by Status
+	test('should retrieve Invoices by Status', async () => {
+		// Setup the Invoice Options
+		const invoiceOptionsPaid: InvoiceOptions = { searchOptions: { maxResults: 10 }, status: InvoiceStatus.Paid };
+		const invoiceOptionsUnpaid: InvoiceOptions = { searchOptions: { maxResults: 10 }, status: InvoiceStatus.Unpaid };
+
+		// Get all invoices
+		const searchResponsePaid = await apiClient.invoices.getAllInvoices(invoiceOptionsPaid);
+		const searchResponseUnpaid = await apiClient.invoices.getAllInvoices(invoiceOptionsUnpaid);
+
+		// Test the Invoices
+		expect(searchResponsePaid.results).toBeInstanceOf(Array);
+		expect(searchResponseUnpaid.results).toBeInstanceOf(Array);
+
+		// Test the Invoice length
+		expect(searchResponsePaid.results.length).toBeGreaterThan(0);
+		expect(searchResponseUnpaid.results.length).toBeGreaterThan(0);
+
+		// Test the Invoices are different
+		expect(searchResponsePaid.results).not.toEqual(searchResponseUnpaid.results);
+
+		// Test the Invoices are paid
+		await Promise.all(
+			searchResponsePaid.results.map(async (invoice: Invoice) => {
+				expect(invoice.Balance).toBe(0);
+			}),
+		);
+
+		// Test the Invoices are unpaid
+		await Promise.all(
+			searchResponseUnpaid.results.map(async (invoice: Invoice) => {
+				expect(invoice.Balance).toBeGreaterThan(0);
+			}),
+		);
+	});
+
 	// Test pagination
 	test('should handle pagination', async () => {
+		// Setup the Invoice Options
+		const invoiceOptions1: InvoiceOptions = { searchOptions: { maxResults: 10, page: 1 } };
+		const invoiceOptions2: InvoiceOptions = { searchOptions: { maxResults: 10, page: 2 } };
+
 		// Get all invoices
-		const searchResponse1 = await apiClient.invoices.getAllInvoices({ maxResults: 10, page: 1 });
-		const searchResponse2 = await apiClient.invoices.getAllInvoices({ maxResults: 10, page: 2 });
+		const searchResponse1 = await apiClient.invoices.getAllInvoices(invoiceOptions1);
+		const searchResponse2 = await apiClient.invoices.getAllInvoices(invoiceOptions2);
 
 		// Test the Invoices
 		expect(searchResponse1.results).toBeInstanceOf(Array);
@@ -86,12 +129,17 @@ describe('Live API: Invoices', async () => {
 
 	// Should handle all Search Options
 	test('should handle all search options', async () => {
+		// Setup the Invoice Options
+		const invoiceOptions: InvoiceOptions = {
+			searchOptions: {
+				maxResults: 10,
+				page: 1,
+				orderBy: { field: 'Id', direction: 'DESC' },
+			},
+		};
+
 		// Get all invoices
-		const searchResponse = await apiClient.invoices.getAllInvoices({
-			maxResults: 10,
-			page: 1,
-			orderBy: { field: 'Id', direction: 'DESC' },
-		});
+		const searchResponse = await apiClient.invoices.getAllInvoices(invoiceOptions);
 
 		// Test the Invoices
 		expect(searchResponse.results).toBeInstanceOf(Array);

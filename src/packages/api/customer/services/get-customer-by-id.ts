@@ -1,5 +1,5 @@
 // Import the Query Builder
-import { SearchOptions, type Customer } from '../../../../types/types';
+import type { Customer, CustomerOptions } from '../../../../types/types';
 import { CustomerAPI } from '../customer-api';
 
 /**
@@ -16,15 +16,15 @@ import { CustomerAPI } from '../customer-api';
  *
  * @throws {Error} If no customer is found for the provided ID.
  */
-export async function getCustomerById(this: CustomerAPI, id: string, options: SearchOptions<Customer> = {}): Promise<Customer> {
+export async function getCustomerById(this: CustomerAPI, id: string, options: CustomerOptions = {}): Promise<Customer> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
 	// Setup ID Filter
 	queryBuilder.whereId(id);
 
-	// Setup the Search Options
-	queryBuilder.setSearchOptions(options);
+	// Setup the Search Options (if provided)
+	if (options.searchOptions) queryBuilder.setSearchOptions(options.searchOptions);
 
 	// Setup the URL
 	const url = queryBuilder.build();

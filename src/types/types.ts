@@ -5,6 +5,7 @@ export { Endpoints } from './enums/endpoints';
 export { Environment } from './enums/environment';
 export { EstimateStatus } from './enums/estimate-status';
 export { GrantType } from './enums/grant-type';
+export { InvoiceStatus } from './enums/invoice-status';
 export { Query } from './enums/query';
 export { TokenType } from './enums/token-type';
 
@@ -12,6 +13,7 @@ export { TokenType } from './enums/token-type';
 export type { Estimate } from './interfaces/estimate';
 export type { Invoice } from './interfaces/invoice';
 export type { Customer } from './interfaces/customer';
+export type { InvoiceOptions, EstimateOptions, CustomerOptions } from './interfaces/options';
 export type { QueryResponse, InvoiceQueryResponse, EstimateQueryResponse, CustomerQueryResponse } from './interfaces/query-response';
 export type { SearchOptions } from './interfaces/search-options';
 export type { SearchResponse } from './interfaces/search-response';

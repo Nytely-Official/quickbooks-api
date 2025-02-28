@@ -1,5 +1,5 @@
 // Import the Query Builder
-import { SearchOptions, SearchResponse, type Estimate } from '../../../../types/types';
+import type { Estimate, EstimateOptions, SearchResponse } from '../../../../types/types';
 import { EstimateAPI } from '../estimate-api';
 
 /**
@@ -13,7 +13,7 @@ export async function getEstimatesForDateRange(
 	this: EstimateAPI,
 	startDate: Date,
 	endDate: Date,
-	options: SearchOptions<Estimate> = {},
+	options: EstimateOptions = {},
 ): Promise<SearchResponse<Estimate>> {
 	// Ensure the Start Date is Before the End Date
 	if (startDate > endDate) throw new Error('Start date must be before end date');
@@ -25,8 +25,8 @@ export async function getEstimatesForDateRange(
 	queryBuilder.whereLastUpdatedAfter(startDate);
 	queryBuilder.whereLastUpdatedBefore(endDate);
 
-	// Setup the Search Options
-	queryBuilder.setSearchOptions(options);
+	// Setup the Search Options (if provided)
+	if (options.searchOptions) queryBuilder.setSearchOptions(options.searchOptions);
 
 	// Setup the URL
 	const url = queryBuilder.build();

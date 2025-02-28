@@ -1,5 +1,5 @@
 // Imports
-import { AuthProvider, Environment, ApiClient, AuthScopes } from '../src/app';
+import { AuthProvider, Environment, ApiClient, AuthScopes, InvoiceOptions, CustomerOptions } from '../src/app';
 import { describe, expect, test } from 'bun:test';
 
 // Describe the Customer API
@@ -56,8 +56,10 @@ describe('Live API: Customers', async () => {
 
 	// Test retrieving 10 customers
 	test('should retrieve 10 customers', async () => {
+		// Setup the Customer Options
+		const customerOptions: CustomerOptions = { searchOptions: { maxResults: 10 } };
 		// Get all customers
-		const searchResponse = await apiClient.customers.getAllCustomers({ maxResults: 10 });
+		const searchResponse = await apiClient.customers.getAllCustomers(customerOptions);
 
 		// Test the Customers
 		expect(searchResponse.results).toBeInstanceOf(Array);
@@ -68,9 +70,13 @@ describe('Live API: Customers', async () => {
 
 	// Test pagination
 	test('should handle pagination', async () => {
+		// Setup the Customer Options
+		const customerOptions1: CustomerOptions = { searchOptions: { maxResults: 10, page: 1 } };
+		const customerOptions2: CustomerOptions = { searchOptions: { maxResults: 10, page: 2 } };
+
 		// Get all customers
-		const searchResponse1 = await apiClient.customers.getAllCustomers({ maxResults: 10, page: 1 });
-		const searchResponse2 = await apiClient.customers.getAllCustomers({ maxResults: 10, page: 2 });
+		const searchResponse1 = await apiClient.customers.getAllCustomers(customerOptions1);
+		const searchResponse2 = await apiClient.customers.getAllCustomers(customerOptions2);
 
 		// Test the Customers
 		expect(searchResponse1.results).toBeInstanceOf(Array);
@@ -86,12 +92,16 @@ describe('Live API: Customers', async () => {
 
 	// Should handle all Search Options
 	test('should handle all search options', async () => {
+		// Setup the Customer Options
+		const customerOptions: CustomerOptions = {
+			searchOptions: {
+				maxResults: 10,
+				page: 1,
+				orderBy: { field: 'Id', direction: 'DESC' },
+			},
+		};
 		// Get all customers
-		const searchResponse = await apiClient.customers.getAllCustomers({
-			maxResults: 10,
-			page: 1,
-			orderBy: { field: 'Id', direction: 'DESC' },
-		});
+		const searchResponse = await apiClient.customers.getAllCustomers(customerOptions);
 
 		// Test the Customers
 		expect(searchResponse.results).toBeInstanceOf(Array);

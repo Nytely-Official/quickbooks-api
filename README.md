@@ -177,9 +177,11 @@ let currentPage = 1;
 while (hasNextPage) {
   // Get the next Page
   const nextPage = await apiClient.invoices.getAllInvoices({
-    maxResults: 10,
-    page: currentPage + 1,
-    orderBy: { field: 'Id', direction: 'DESC' },
+    searchOptions: {
+      maxResults: 10,
+      page: currentPage + 1,
+      orderBy: { field: 'Id', direction: 'DESC' },
+    },
   });
 
   // Add the Invoices to the List
@@ -194,13 +196,18 @@ while (hasNextPage) {
 
 // Get specific invoice with additional options
 const invoice = await apiClient.invoices.getInvoiceById('129', {
-  minorVersion: '75',
+  searchOptions: {
+    minorVersion: '75',
+  },
 });
 
 // Advanced query with multiple options
 const recentInvoices = await apiClient.invoices.getUpdatedInvoices(new Date('2024-01-01'), {
-  maxResults: 50,
-  orderBy: { field: 'DueDate', direction: 'ASC' },
+  searchOptions: {
+    maxResults: 50,
+    orderBy: { field: 'DueDate', direction: 'ASC' },
+  },
+  status: InvoiceStatus.paid,
 });
 ```
 

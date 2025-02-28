@@ -1,5 +1,5 @@
 // Import the Query Builder
-import { SearchOptions, type Estimate } from '../../../../types/types';
+import type { Estimate, EstimateOptions } from '../../../../types/types';
 import { EstimateAPI } from '../estimate-api';
 
 /**
@@ -8,15 +8,15 @@ import { EstimateAPI } from '../estimate-api';
  * @param id - The ID of the estimate
  * @returns The Estimate
  */
-export async function getEstimateById(this: EstimateAPI, id: string, options: SearchOptions<Estimate> = {}): Promise<Estimate> {
+export async function getEstimateById(this: EstimateAPI, id: string, options: EstimateOptions = {}): Promise<Estimate> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
 	// Setup ID Filter
 	queryBuilder.whereId(id);
 
-	// Setup the Search Options
-	queryBuilder.setSearchOptions(options);
+	// Setup the Search Options (if provided)
+	if (options.searchOptions) queryBuilder.setSearchOptions(options.searchOptions);
 
 	// Setup the URL
 	const url = queryBuilder.build();

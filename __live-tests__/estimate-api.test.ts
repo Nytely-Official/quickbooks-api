@@ -1,5 +1,5 @@
 // Imports
-import { AuthProvider, Environment, ApiClient, AuthScopes } from '../src/app';
+import { AuthProvider, Environment, ApiClient, AuthScopes, EstimateOptions } from '../src/app';
 import { describe, expect, test } from 'bun:test';
 
 // Describe the Estimate API
@@ -52,9 +52,14 @@ describe('Live API: Estimates', async () => {
 
 	// Test pagination
 	test('should handle pagination', async () => {
+		// Setup the Estimate Options
+		const estimateOptions1: EstimateOptions = { searchOptions: { maxResults: 10, page: 1 } };
+		const estimateOptions2: EstimateOptions = { searchOptions: { maxResults: 10, page: 2 } };
+
 		// Get the Estimates
-		const searchResponse1 = await apiClient.estimates.getAllEstimates({ maxResults: 10, page: 1 });
-		const searchResponse2 = await apiClient.estimates.getAllEstimates({ maxResults: 10, page: 2 });
+		const searchResponse1 = await apiClient.estimates.getAllEstimates(estimateOptions1);
+		const searchResponse2 = await apiClient.estimates.getAllEstimates(estimateOptions2);
+
 		// Assert the Estimates
 		expect(searchResponse1.results).toBeInstanceOf(Array);
 		expect(searchResponse2.results).toBeInstanceOf(Array);

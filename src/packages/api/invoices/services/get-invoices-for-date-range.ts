@@ -1,5 +1,5 @@
 // Import the Query Builder
-import { SearchOptions, SearchResponse, type Invoice } from '../../../../types/types';
+import type { Invoice, InvoiceOptions, SearchResponse } from '../../../../types/types';
 import { InvoiceAPI } from '../invoice-api';
 
 /**
@@ -13,7 +13,7 @@ export async function getInvoicesForDateRange(
 	this: InvoiceAPI,
 	startDate: Date,
 	endDate: Date,
-	options: SearchOptions<Invoice> = {},
+	options: InvoiceOptions = {},
 ): Promise<SearchResponse<Invoice>> {
 	// Ensure the Start Date is Before the End Date
 	if (startDate > endDate) throw new Error('Start date must be before end date');
@@ -25,8 +25,11 @@ export async function getInvoicesForDateRange(
 	queryBuilder.whereLastUpdatedAfter(startDate);
 	queryBuilder.whereLastUpdatedBefore(endDate);
 
-	// Setup the Search Options
-	queryBuilder.setSearchOptions(options);
+	// Filter by Status (if provided)
+	if (options.status) queryBuilder.whereStatus(options.status);
+
+	// Setup the Search Options (if provided)
+	if (options.searchOptions) queryBuilder.setSearchOptions(options.searchOptions);
 
 	// Setup the URL
 	const url = queryBuilder.build();
