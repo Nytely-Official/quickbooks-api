@@ -5,6 +5,7 @@ import { InvoiceAPI } from './invoices/invoice-api';
 import { EstimateAPI } from './estimates/estimate-api';
 import { CustomerAPI } from './customer/customer-api';
 import { PaymentAPI } from './payment/payment-api';
+import { AccountAPI } from './account/account-api';
 
 /**
  * API Client
@@ -30,6 +31,11 @@ export class ApiClient {
 	public payments: PaymentAPI;
 
 	/**
+	 * Accounts API
+	 */
+	public accounts: AccountAPI;
+
+	/**
 	 * Automatically check for a next page (This creates an extra query to the API to check if there is a next page)
 	 */
 	public autoCheckNextPage: boolean = true;
@@ -44,6 +50,7 @@ export class ApiClient {
 		this.invoices = new InvoiceAPI(this);
 		this.customers = new CustomerAPI(this);
 		this.estimates = new EstimateAPI(this);
+		this.accounts = new AccountAPI(this);
 		this.payments = new PaymentAPI(this);
 	}
 
@@ -78,7 +85,6 @@ export class ApiClient {
 			// Throw an Error
 			throw new Error(`Failed to run request: ${errorMessage}`);
 		}
-
 		// Check if the response is an Object and if it is, parse it as JSON
 		const responseData = response.headers.get('Content-Type')?.includes('application/json') ? await response.json() : null;
 

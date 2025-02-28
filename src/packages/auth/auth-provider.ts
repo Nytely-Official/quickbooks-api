@@ -77,7 +77,7 @@ export class AuthProvider {
 	 * Set the Token
 	 * @param token The token to set
 	 */
-	public async setToken(newToken: Token): Promise<void> {
+	public async setToken(newToken: Token | null): Promise<void> {
 		// Check if the Token is not provided and clear the token
 		if (!newToken) return (this.token = undefined);
 

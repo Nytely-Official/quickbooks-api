@@ -13,12 +13,15 @@ export type { Estimate } from './interfaces/estimate';
 export type { Invoice } from './interfaces/invoice';
 export type { Payment } from './interfaces/payment';
 export type { Customer } from './interfaces/customer';
+export type { Account } from './interfaces/account';
+
 export type {
 	QueryResponse,
 	InvoiceQueryResponse,
 	EstimateQueryResponse,
 	CustomerQueryResponse,
 	PaymentQueryResponse,
+	AccountQueryResponse,
 } from './interfaces/query-response';
 export type { SearchOptions } from './interfaces/search-options';
 export type { SearchResponse } from './interfaces/search-response';

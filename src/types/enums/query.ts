@@ -8,4 +8,5 @@ export enum Query {
 	Payment = 'select * from payment',
 	CreditMemo = 'select * from creditmemo',
 	Preferences = 'select * from Preferences',
+	Account = 'select * from account',
 }

@@ -1,0 +1,142 @@
+// Imports
+import { AuthProvider, Environment, ApiClient, AuthScopes } from '../src/app';
+import { describe, expect, test } from 'bun:test';
+
+// Describe the Account API
+describe('Live API: Accounts', async () => {
+	// Initialize the Auth Provider
+	const authProvider = new AuthProvider(process.env.QB_CLIENT_ID!, process.env.QB_CLIENT_SECRET!, process.env.REDIRECT_URI!, [
+		AuthScopes.Accounting,
+	]);
+
+	// Deserialize the Token
+	await authProvider.deserializeToken(process.env.SERIALIZED_TOKEN!, process.env.SECRET_KEY!);
+
+	// Setup the API Client
+	const apiClient = new ApiClient(authProvider, Environment.Sandbox);
+
+	// Test retrieving all accounts
+	test('should retrieve all accounts', async () => {
+		// Get all accounts
+		const searchResponse = await apiClient.accounts.getAllAccounts();
+
+		// Test the Accounts
+		expect(searchResponse.results).toBeInstanceOf(Array);
+
+		// Test the Account length
+		expect(searchResponse.results.length).toBeGreaterThan(0);
+	});
+
+	// Test Checking for Next Page
+	test('should check for next page', async () => {
+		// Get all accounts
+		const searchResponse = await apiClient.accounts.getAllAccounts();
+
+		// Test the Accounts
+		expect(searchResponse.hasNextPage).toBe(true);
+	});
+
+	// Test retrieving a single account
+	test('should retrieve a single account', async () => {
+		// Get all accounts
+		const searchResponse = await apiClient.accounts.getAllAccounts();
+
+		searchResponse.results.forEach(async (account, index) => {
+			if (index >= 5) return;
+			// Get the Account
+			const accountResponse = await apiClient.accounts.getAccountById(account.Id);
+
+			// Test the Account
+			expect(accountResponse).toBeDefined();
+
+			// Test the Account ID
+			expect(accountResponse).toHaveProperty('Id');
+		});
+	});
+
+	// Test retrieving accounts with limit
+	test('should retrieve limited accounts', async () => {
+		// Get all accounts
+		const searchResponse = await apiClient.accounts.getAllAccounts({ maxResults: 10 });
+
+		// Test the Accounts
+		expect(searchResponse.results).toBeInstanceOf(Array);
+
+		// Test the Account length
+		expect(searchResponse.results.length).toBeGreaterThan(0);
+		expect(searchResponse.results.length).toBeLessThanOrEqual(10);
+	});
+
+	// Test pagination
+	test('should handle pagination', async () => {
+		// Get all accounts
+		const searchResponse1 = await apiClient.accounts.getAllAccounts({ maxResults: 10, page: 1 });
+		const searchResponse2 = await apiClient.accounts.getAllAccounts({ maxResults: 10, page: 2 });
+
+		// Test the Accounts
+		expect(searchResponse1.results).toBeInstanceOf(Array);
+		expect(searchResponse2.results).toBeInstanceOf(Array);
+
+		// Test the Account length
+		expect(searchResponse1.results.length).toBeGreaterThan(0);
+		expect(searchResponse2.results.length).toBeGreaterThan(0);
+
+		// Test the Accounts are different
+		expect(searchResponse1.results).not.toEqual(searchResponse2.results);
+	});
+
+	// Test date range filtering
+	test('should retrieve accounts within date range', async () => {
+		// Get the End Date
+		const endDate = new Date();
+
+		// Get the Start Date
+		const startDate = new Date();
+		startDate.setDate(endDate.getDate() - 30);
+
+		// Get the Accounts
+		const searchResponse = await apiClient.accounts.getAccountsForDateRange(startDate, endDate);
+
+		// Assert the Accounts
+		expect(searchResponse.results).toBeInstanceOf(Array);
+	});
+
+	// Test updated accounts
+	test('should retrieve updated accounts', async () => {
+		// Get the End Date
+		const lastUpdated = new Date();
+		lastUpdated.setDate(lastUpdated.getDate() - 30);
+
+		// Get the Updated Accounts
+		const searchResponse = await apiClient.accounts.getUpdatedAccounts(lastUpdated);
+
+		// Assert the Accounts
+		expect(searchResponse.results).toBeInstanceOf(Array);
+	});
+
+	// Test error handling for invalid ID
+	test('should throw error for invalid account ID', async () => {
+		// Assert the Error
+		expect(apiClient.accounts.getAccountById('invalid')).rejects.toThrow();
+	});
+
+	// Should handle all Search Options
+	test('should handle all search options', async () => {
+		// Get all accounts
+		const searchResponse = await apiClient.accounts.getAllAccounts({
+			maxResults: 10,
+			page: 1,
+			orderBy: { field: 'Id', direction: 'DESC' },
+		});
+
+		// Test the Accounts
+		expect(searchResponse.results).toBeInstanceOf(Array);
+
+		// Test the Account length
+		expect(searchResponse.results.length).toBeGreaterThan(0);
+
+		// loop through the accounts and test each id is less than the previous one
+		for (let i = 0; i < searchResponse.results.length - 1; i++)
+			expect(Number(searchResponse.results[i].Id)).toBeGreaterThan(Number(searchResponse.results[i + 1].Id));
+	});
+});
