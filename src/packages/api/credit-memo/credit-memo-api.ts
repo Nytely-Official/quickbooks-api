@@ -9,7 +9,6 @@ import { getAllCreditMemos } from './services/get-all-credit-memos';
 import { getCreditMemoById } from './services/get-credit-memo-by-id';
 import { getCreditMemosForDateRange } from './services/get-credit-memos-for-date-range';
 import { getUpdatedCreditMemos } from './services/get-updated-credit-memos';
-import { getCreditMemosByDueDate } from './services/get-credit-memo-by-due-date';
 import { rawCreditMemoQuery } from './services/raw-credit-memo-query';
 
 /**
@@ -21,7 +20,6 @@ export class CreditMemoAPI {
 	public readonly getCreditMemoById = getCreditMemoById.bind(this);
 	public readonly getCreditMemosForDateRange = getCreditMemosForDateRange.bind(this);
 	public readonly getUpdatedCreditMemos = getUpdatedCreditMemos.bind(this);
-	public readonly getCreditMemosByDueDate = getCreditMemosByDueDate.bind(this);
 	public readonly rawCreditMemoQuery = rawCreditMemoQuery.bind(this);
 
 	/**
