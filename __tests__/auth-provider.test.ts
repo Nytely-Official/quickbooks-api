@@ -381,7 +381,7 @@ describe('AuthProvider', () => {
 			const tamperedData = Buffer.from('tampered_data').toString('base64');
 
 			// Tamper the Data
-			const tampered = serialized.replace(/:.*/g, `${tamperedData}:`);
+			const tampered = serialized!.replace(/:.*/g, `${tamperedData}:`);
 
 			// Deserialize the Token
 			expect(authProvider.deserializeToken(tampered, TEST_CONFIG.secretKey)).rejects.toThrow('Invalid serialized token');
@@ -405,7 +405,7 @@ describe('AuthProvider', () => {
 			const tamperedHeader = Buffer.from('tampered_header').toString('base64');
 
 			// Tamper the Header
-			const tampered = serialized.replace(/.*:/g, `${tamperedHeader}:`);
+			const tampered = serialized!.replace(/.*:/g, `${tamperedHeader}:`);
 
 			// Deserialize the Token
 			expect(authProvider.deserializeToken(tampered, TEST_CONFIG.secretKey)).rejects.toThrow('Invalid serialized token');
