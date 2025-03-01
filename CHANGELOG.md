@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.5.1] - 2025-03-01
+
+### Features
+
+- Added Account API with full CRUD support
+- Added Credit Memo API with full CRUD support
+- Added Payment API with full CRUD support
+- Added Preference API with full CRUD support
+- Added comprehensive live tests for Account, Credit Memo, Payment, and Preference APIs
+- Enhanced test suite with mock data for Account, Credit Memo, Payment, and Preference entities
+
+### Code Quality
+
+- Improved type definitions for Account, Credit Memo, Payment, and Preference entities
+- Standardized API response handling across Account, Credit Memo, Payment, and Preference endpoints
+
+---
+
 ## [0.5.0] - 2025-02-28
 
 ### Added

@@ -1,6 +1,6 @@
 // Imports
 import express, { type Request, type Response } from 'express';
-import { AuthProvider, Environment, ApiClient, AuthScopes, EstimateStatus, Invoice } from './src/app';
+import { AuthProvider, Environment, ApiClient, AuthScopes, EstimateStatus, Invoice, InvoiceOptions, InvoiceStatus } from './src/app';
 
 // Initialize the Express App
 const app = express();
@@ -148,12 +148,16 @@ app.get('/auth-code', async (req: Request, res: Response) => {
 
 		// Example: Get all invoices (with search options and pagination)
 		while (hasNextPage) {
+			// 	Setup the Invoice
+			const invoiceOptions: InvoiceOptions = {
+				searchOptions: {
+					maxResults: 10,
+					page: page,
+					orderBy: { field: 'Id', direction: 'DESC' },
+				},
+			};
 			// Get the Invoices
-			const searchResponse = await apiClient.invoices.getAllInvoices({
-				maxResults: 10,
-				page: page,
-				orderBy: { field: 'Id', direction: 'DESC' },
-			});
+			const searchResponse = await apiClient.invoices.getAllInvoices(invoiceOptions);
 
 			// Add the Invoices to the List
 			paginatedInvoices.push(...searchResponse.results);
@@ -167,6 +171,9 @@ app.get('/auth-code', async (req: Request, res: Response) => {
 			// Increment the Page Number
 			page++;
 		}
+
+		// Get the list of Paid Invoice
+		const paidInvoices = await apiClient.invoices.getAllInvoices({ status: InvoiceStatus.Paid });
 
 		// Example: Get all estimates
 		const estimates = await apiClient.estimates.getAllEstimates();
@@ -219,6 +226,7 @@ app.get('/auth-code', async (req: Request, res: Response) => {
 		// Return the Data
 		res.json({
 			invoices,
+			paidInvoices,
 			firstInvoice,
 			foundInvoice,
 			invoicesForDateRange,
