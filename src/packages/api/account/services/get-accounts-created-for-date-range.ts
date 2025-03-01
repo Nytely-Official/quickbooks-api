@@ -23,7 +23,7 @@ export async function getAccountsCreatedForDateRange(
 
 	// Setup the Date Range Filters
 	queryBuilder.whereCreatedAfter(startDate);
-	queryBuilder.whereCreatedAfter(endDate);
+	queryBuilder.whereCreatedBefore(endDate);
 
 	// Setup the Search Options (if provided)
 	if (options.searchOptions) queryBuilder.setSearchOptions(options.searchOptions);
