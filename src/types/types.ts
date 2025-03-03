@@ -14,6 +14,7 @@ export type { Estimate } from './interfaces/estimate';
 export type { Invoice } from './interfaces/invoice';
 export type { Payment } from './interfaces/payment';
 export type { Customer } from './interfaces/customer';
+export type { Bill } from './interfaces/bill';
 export type {
 	InvoiceOptions,
 	EstimateOptions,
@@ -22,6 +23,7 @@ export type {
 	AccountOptions,
 	CreditMemoOptions,
 	PreferenceOptions,
+	BillOptions,
 } from './interfaces/options';
 export type { Account } from './interfaces/account';
 export type { CreditMemo } from './interfaces/credit-memo';
@@ -35,6 +37,7 @@ export type {
 	AccountQueryResponse,
 	PreferenceQueryResponse,
 	CreditMemoQueryResponse,
+	BillQueryResponse,
 } from './interfaces/query-response';
 export type { SearchOptions } from './interfaces/search-options';
 export type { SearchResponse } from './interfaces/search-response';
