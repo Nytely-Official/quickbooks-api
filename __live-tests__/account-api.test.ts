@@ -153,4 +153,37 @@ describe('Live API: Accounts', async () => {
 		for (let i = 0; i < searchResponse.results.length - 1; i++)
 			expect(Number(searchResponse.results[i].Id)).toBeGreaterThan(Number(searchResponse.results[i + 1].Id));
 	});
+
+	// Test retrieving updated accounts
+	test('should retrieve updated accounts', async () => {
+		// Get the Last Updated Time
+		const lastUpdatedTime = new Date('2012-01-08');
+
+		// Get the Accounts
+		const searchResponse = await apiClient.accounts.getUpdatedAccounts(lastUpdatedTime);
+
+		// Test the Accounts
+		expect(searchResponse.results).toBeInstanceOf(Array);
+
+		// Test the Account length
+		expect(searchResponse.results.length).toBeGreaterThan(0);
+	});
+
+	// Test returning an empty array if no accounts are updated
+	test('should return an empty array if no accounts are updated', async () => {
+		// Setup the Future Date
+		const futureDate = new Date();
+
+		// Set the New Full Year
+		futureDate.setFullYear(futureDate.getFullYear() + 20);
+
+		// Get the Accounts
+		const searchResponse = await apiClient.accounts.getUpdatedAccounts(futureDate);
+
+		// Assert the Customers
+		expect(searchResponse.results).toBeArray();
+
+		// Assert the Customers Length
+		expect(searchResponse.results.length).toBe(0);
+	});
 });

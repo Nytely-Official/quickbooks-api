@@ -251,6 +251,27 @@ describe('Account API', () => {
 			expect(searchResponse.results.length).toBe(updatedAccounts.length);
 			expect(searchResponse.results[0].Id).toBe(updatedAccounts[0].Id);
 		});
+
+		// Describe the getUpdatedCustomers Method
+		it('should return an empty array if no customers are updated', async () => {
+			// Setup the Account Query Response
+			const accountQueryResponse: { QueryResponse: {}; time: string } = {
+				QueryResponse: {},
+				time: '2025-03-04T05:46:36.933-08:00',
+			};
+
+			// Mock the Fetch with proper QueryResponse structure
+			global.fetch = mockFetch(JSON.stringify(accountQueryResponse));
+
+			// Get the Accounts
+			const searchResponse = await apiClient.accounts.getUpdatedAccounts(new Date(new Date().getTime() + 68400000));
+
+			// Assert the Accounts
+			expect(searchResponse.results).toBeArray();
+
+			// Assert the Accounts Length
+			expect(searchResponse.results.length).toBe(0);
+		});
 	});
 
 	// Describe the rawAccountQuery Method

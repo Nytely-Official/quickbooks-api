@@ -8,7 +8,7 @@ import { CreditMemoAPI } from '../credit-memo-api';
  * @param id - The ID of the creditmemo
  * @returns The CreditMemo
  */
-export async function getCreditMemoById(this: CreditMemoAPI, id: string, options: CreditMemoOptions = {}): Promise<CreditMemo> {
+export async function getCreditMemoById(this: CreditMemoAPI, id: string, options: CreditMemoOptions = {}): Promise<CreditMemo | null> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
@@ -25,7 +25,7 @@ export async function getCreditMemoById(this: CreditMemoAPI, id: string, options
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Check if the Response Failed to find an CreditMemo
-	if (!response) throw new Error('CreditMemo not found');
+	if (!response) return null;
 
 	// Format the Response
 	const creditmemos = this.formatResponse(response);

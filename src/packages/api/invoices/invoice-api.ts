@@ -53,8 +53,11 @@ export class InvoiceAPI {
 	 * @returns The Invoices
 	 */
 	protected formatResponse(response: any): Array<Invoice> {
-		// Check if the Response is invalid
-		if (!response || response.QueryResponse?.Invoice?.length < 1) throw new Error('Invoices not found');
+		// Check if the Response is Invalid
+		if (!response?.QueryResponse) throw new Error('Invalid Response');
+
+		// Check if the Invoice is Not set and Initialize an Empty Array
+		if (!response.QueryResponse.Invoice) response.QueryResponse.Invoice = new Array<Invoice>();
 
 		// Get the Invoices
 		const queryResponse = response.QueryResponse as InvoiceQueryResponse;

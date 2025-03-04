@@ -51,8 +51,12 @@ export class CreditMemoAPI {
 	 * @returns The CreditMemos
 	 */
 	protected formatResponse(response: any): Array<CreditMemo> {
-		// Check if the Response is invalid
-		if (!response || response.QueryResponse?.CreditMemo?.length < 1) throw new Error('CreditMemos not found');
+		// Check if the Response is Invalid
+		if (!response?.QueryResponse) throw new Error('Invalid Response');
+
+		// Check if the CreditMemo is Not set and Initialize an Empty Array
+		if (!response.QueryResponse.CreditMemo) response.QueryResponse.CreditMemo = new Array<CreditMemo>();
+
 		// Get the CreditMemos
 		const queryResponse = response.QueryResponse as CreditMemoQueryResponse;
 

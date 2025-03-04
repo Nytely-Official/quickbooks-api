@@ -8,7 +8,7 @@ import { EstimateAPI } from '../estimate-api';
  * @param id - The ID of the estimate
  * @returns The Estimate
  */
-export async function getEstimateById(this: EstimateAPI, id: string, options: EstimateOptions = {}): Promise<Estimate> {
+export async function getEstimateById(this: EstimateAPI, id: string, options: EstimateOptions = {}): Promise<Estimate | null> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
@@ -25,7 +25,7 @@ export async function getEstimateById(this: EstimateAPI, id: string, options: Es
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Check if the Response Failed to find an Estimate
-	if (!response) throw new Error('Estimate not found');
+	if (!response) return null;
 
 	// Format the Response
 	const estimates = this.formatResponse(response);

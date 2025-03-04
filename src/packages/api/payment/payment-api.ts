@@ -53,8 +53,11 @@ export class PaymentAPI {
 	 * @returns The Payments
 	 */
 	protected formatResponse(response: any): Array<Payment> {
-		// Check if the Response is invalid
-		if (!response || response.QueryResponse?.Payment?.length < 1) throw new Error('Payments not found');
+		// Check if the Response is Invalid
+		if (!response?.QueryResponse) throw new Error('Invalid Response');
+
+		// Check if the Payment is Not set and Initialize an Empty Array
+		if (!response.QueryResponse.Payment) response.QueryResponse.Payment = new Array<Payment>();
 
 		// Get the Payments
 		const queryResponse = response.QueryResponse as PaymentQueryResponse;

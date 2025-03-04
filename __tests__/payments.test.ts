@@ -226,5 +226,26 @@ describe('Payment API', () => {
 			// Assert the Payments
 			expect(searchResponse.results[0].Id).toBe(paymentsInDateRange[0].Id);
 		});
+
+		// Describe the getUpdatedPayments Method
+		it('should return an empty array if no payments are updated', async () => {
+			// Setup the Payment Query Response
+			const paymentQueryResponse: { QueryResponse: {}; time: string } = {
+				QueryResponse: {},
+				time: '2025-03-04T05:46:36.933-08:00',
+			};
+
+			// Mock the Fetch with proper QueryResponse structure
+			global.fetch = mockFetch(JSON.stringify(paymentQueryResponse));
+
+			// Get the Payments
+			const searchResponse = await apiClient.payments.getUpdatedPayments(new Date(new Date().getTime() + 68400000));
+
+			// Assert the Payments
+			expect(searchResponse.results).toBeArray();
+
+			// Assert the Payments Length
+			expect(searchResponse.results.length).toBe(0);
+		});
 	});
 });

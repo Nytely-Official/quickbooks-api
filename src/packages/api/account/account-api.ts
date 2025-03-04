@@ -53,8 +53,11 @@ export class AccountAPI {
 	 * @returns The Accounts
 	 */
 	protected formatResponse(response: any): Array<Account> {
-		// Check if the Response is invalid
-		if (!response || response.QueryResponse?.Account?.length < 1) throw new Error('Accounts not found');
+		// Check if the Response is Invalid
+		if (!response?.QueryResponse) throw new Error('Invalid Response');
+
+		// Check if the Account is Not set and Initialize an Empty Array
+		if (!response.QueryResponse.Account) response.QueryResponse.Account = new Array<Account>();
 
 		// Get the Accounts
 		const queryResponse = response.QueryResponse as AccountQueryResponse;

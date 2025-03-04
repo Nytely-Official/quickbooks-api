@@ -19,6 +19,7 @@ describe('Live API: Preferences', async () => {
 	test('should retrieve all preferences', async () => {
 		// Get all preferences
 		const searchResponse = await apiClient.preferences.getPreferences();
+
 		// Test the Preferences
 		expect(searchResponse.results).toBeInstanceOf(Array);
 
@@ -30,6 +31,7 @@ describe('Live API: Preferences', async () => {
 	test('should check for next page', async () => {
 		// Get all preferences
 		const searchResponse = await apiClient.preferences.getPreferences();
+
 		// Test the Preferences
 		expect(searchResponse.hasNextPage).toBeDefined();
 	});

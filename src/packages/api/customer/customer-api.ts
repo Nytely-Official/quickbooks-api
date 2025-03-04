@@ -52,8 +52,11 @@ export class CustomerAPI {
 	 * @returns The Customers
 	 */
 	protected formatResponse(response: { QueryResponse?: { Customer?: Customer[] } }): Array<Customer> {
-		// Check if the Response is invalid
-		if (!response?.QueryResponse?.Customer?.length) throw new Error('Customers not found');
+		// Check if the Response is Invalid
+		if (!response?.QueryResponse) throw new Error('Invalid Response');
+
+		// Check if the Customer is Not set and Initialize an Empty Array
+		if (!response.QueryResponse.Customer) response.QueryResponse.Customer = new Array<Customer>();
 
 		// Get the Customers
 		const queryResponse = response.QueryResponse as CustomerQueryResponse;

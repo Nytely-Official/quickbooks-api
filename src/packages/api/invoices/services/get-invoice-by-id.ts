@@ -8,7 +8,7 @@ import { InvoiceAPI } from '../invoice-api';
  * @param id - The ID of the invoice
  * @returns The Invoice
  */
-export async function getInvoiceById(this: InvoiceAPI, id: string, options: InvoiceOptions = {}): Promise<Invoice> {
+export async function getInvoiceById(this: InvoiceAPI, id: string, options: InvoiceOptions = {}): Promise<Invoice | null> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
@@ -28,7 +28,7 @@ export async function getInvoiceById(this: InvoiceAPI, id: string, options: Invo
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Check if the Response Failed to find an Invoice
-	if (!response) throw new Error('Invoice not found');
+	if (!response) return null;
 
 	// Format the Response
 	const invoices = this.formatResponse(response);
