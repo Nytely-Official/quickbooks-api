@@ -45,8 +45,12 @@ export class PreferenceAPI {
 	 * @returns The Preferences
 	 */
 	protected formatResponse(response: any): Array<Preferences> {
-		// Check if the Response is invalid
-		if (!response || response.QueryResponse?.Preferences?.length < 1) throw new Error('Preferences not found');
+		// Check if the Response is Invalid
+		if (!response?.QueryResponse) throw new Error('Invalid Response');
+
+		// Check if the Preferences is Not set and Initialize an Empty Array
+		if (!response.QueryResponse.Preferences) response.QueryResponse.Preferences = new Array<Preferences>();
+
 		// Get the Preferences
 		const queryResponse = response.QueryResponse as PreferenceQueryResponse;
 

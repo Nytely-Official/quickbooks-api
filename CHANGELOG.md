@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.5.2] - 2025-03-05
+
+### Features
+
+- Enhanced live tests for getUpdated methods across all API endpoints
+- Added empty array validation tests for update methods in Accounts, Credit Memos, Customers, Estimates, Invoices and Payments
+
+### Bug Fixes
+
+- Improved response validation in all API formatResponse methods
+- Fixed empty array handling when QueryResponse exists but contains no results
+- Standardized error handling for invalid API responses across all entities
+
+### Tests
+
+- Added comprehensive test cases for empty update scenarios
+- Improved date handling consistency in update method tests
+- Added validation for proper empty array returns when no updates exist
+
+---
+
 ## [0.5.1] - 2025-03-01
 
 ### Features

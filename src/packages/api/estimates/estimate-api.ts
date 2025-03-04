@@ -51,8 +51,11 @@ export class EstimateAPI {
 	 * @returns The Estimates
 	 */
 	protected formatResponse(response: any): Array<Estimate> {
-		// Check if the Response is invalid
-		if (!response || response.QueryResponse?.Estimate?.length < 1) throw new Error('Estimates not found');
+		// Check if the Response is Invalid
+		if (!response?.QueryResponse) throw new Error('Invalid Response');
+
+		// Check if the Estimate is Not set and Initialize an Empty Array
+		if (!response.QueryResponse.Estimate) response.QueryResponse.Estimate = new Array<Estimate>();
 
 		// Get the Estimates
 		const queryResponse = response.QueryResponse as EstimateQueryResponse;

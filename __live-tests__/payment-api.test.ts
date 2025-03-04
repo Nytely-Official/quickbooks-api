@@ -115,4 +115,52 @@ describe('Live API: Payments', async () => {
 		for (let i = 0; i < searchResponse.results.length - 1; i++)
 			expect(Number(searchResponse.results[i].Id)).toBeGreaterThan(Number(searchResponse.results[i + 1].Id));
 	});
+
+	// Test retrieving updated payments
+	test('should retrieve updated payments', async () => {
+		// Get the End Date
+		const lastUpdated = new Date();
+
+		// Set the Date to 30 days ago
+		lastUpdated.setDate(lastUpdated.getDate() - 30);
+
+		// Get the Updated Payments
+		const searchResponse = await apiClient.payments.getUpdatedPayments(lastUpdated);
+
+		// Assert the Payments
+		expect(searchResponse.results).toBeInstanceOf(Array);
+	});
+
+	// Test retrieving updated payments
+	test('should retrieve updated payments', async () => {
+		// Get the Last Updated Time
+		const lastUpdatedTime = new Date('2012-01-08');
+
+		// Get the Payments
+		const searchResponse = await apiClient.payments.getUpdatedPayments(lastUpdatedTime);
+
+		// Test the Payments
+		expect(searchResponse.results).toBeInstanceOf(Array);
+
+		// Test the Payment length
+		expect(searchResponse.results.length).toBeGreaterThan(0);
+	});
+
+	// Test returning an empty array if no payments are updated
+	test('should return an empty array if no payments are updated', async () => {
+		// Setup the Future Date
+		const futureDate = new Date();
+
+		// Set the New Full Year
+		futureDate.setFullYear(futureDate.getFullYear() + 20);
+
+		// Get the Payments
+		const searchResponse = await apiClient.payments.getUpdatedPayments(futureDate);
+
+		// Assert the Payments
+		expect(searchResponse.results).toBeArray();
+
+		// Assert the Payments Length
+		expect(searchResponse.results.length).toBe(0);
+	});
 });
