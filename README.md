@@ -28,9 +28,9 @@ foundation for accounting, payments, and commerce operations.
 ## Installation
 
 ```bash
-bun add quickbooks-api-client
+bun add quickbooks-api
 # or
-npm install quickbooks-api-client
+npm install quickbooks-api
 ```
 
 ---
@@ -40,7 +40,7 @@ npm install quickbooks-api-client
 ### 1. Initialize the Auth Provider
 
 ```typescript
-import { AuthProvider, Environment, AuthScopes } from 'quickbooks-api-client';
+import { AuthProvider, Environment, AuthScopes } from 'quickbooks-api';
 
 const authProvider = new AuthProvider('YOUR_CLIENT_ID', 'YOUR_CLIENT_SECRET', 'YOUR_REDIRECT_URI', [
   AuthScopes.Accounting,
@@ -58,7 +58,7 @@ const authUrl = authProvider.generateAuthUrl();
 ### 3. Handle the Callback
 
 ```typescript
-import type { UserAuthResponse } from 'quickbooks-api-client';
+import type { UserAuthResponse } from 'quickbooks-api';
 
 async function handleCallback(query: UserAuthResponse) {
   try {
@@ -73,7 +73,7 @@ async function handleCallback(query: UserAuthResponse) {
 ### 4. Initialize the API Client
 
 ```typescript
-import { ApiClient, Environment } from 'quickbooks-api-client';
+import { ApiClient, Environment } from 'quickbooks-api';
 
 const apiClient = new ApiClient(authProvider, Environment.Sandbox);
 ```
@@ -81,7 +81,7 @@ const apiClient = new ApiClient(authProvider, Environment.Sandbox);
 ### 5. Make API Calls (with Invoice Options)
 
 ```typescript
-import { ApiClient, Environment, InvoiceStatus, InvoiceOptions } from 'quickbooks-api-client';
+import { ApiClient, Environment, InvoiceStatus, InvoiceOptions } from 'quickbooks-api';
 
 // Example: Get all invoices (with search options and pagination)
 let hasNextPage = true;

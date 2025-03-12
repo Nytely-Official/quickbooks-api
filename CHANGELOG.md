@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.6.1] - 2025-03-06
+
+### Bug Fixes
+
+- Token Validity Check within the Auth Provider was causing some issues for clients who want to deserialize a token that has an expired
+  access token, therefore, the validity checks within the deserialize and serialize methods was removed to prevent these issues
+- Fixed wrong install command in the Readme File
+
+---
+
 ## [0.6.0] - 2025-03-05
 
 ### Features

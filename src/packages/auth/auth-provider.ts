@@ -305,14 +305,6 @@ export class AuthProvider {
 		// Check if the token is not provided
 		if (!this.token) throw new Error('Token is not provided, please set the token manually with the setToken method');
 
-		// Validate the Token
-		const isValid = await this.validateToken().catch((error: Error) => {
-			throw new Error(`Failed to validate token: ${error.message}`);
-		});
-
-		// Check if the token is not valid
-		if (!isValid) throw new Error('Token is not valid, please re-authenticate');
-
 		// Generate a Random Salt
 		const salt = crypto.getRandomValues(new Uint8Array(16));
 
@@ -392,12 +384,6 @@ export class AuthProvider {
 
 		// Update the Token
 		this.token = this.restoreTokenTypes(parsed);
-
-		// Validate the Token
-		const isValid = await this.validateToken();
-
-		// Check if the token is not valid
-		if (!isValid) throw new Error('Serialized token is invalid, please re-authenticate');
 	}
 
 	/**
