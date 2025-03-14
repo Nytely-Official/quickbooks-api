@@ -24,6 +24,7 @@ export type {
 	PreferenceOptions,
 } from './interfaces/options';
 export type { Account } from './interfaces/account';
+export type { CompanyInfo } from './interfaces/company';
 export type { CreditMemo } from './interfaces/credit-memo';
 export type { Preferences } from './interfaces/preferences';
 export type {
@@ -35,6 +36,7 @@ export type {
 	AccountQueryResponse,
 	PreferenceQueryResponse,
 	CreditMemoQueryResponse,
+	CompanyInfoQueryResponse,
 } from './interfaces/query-response';
 export type { SearchOptions } from './interfaces/search-options';
 export type { SearchResponse } from './interfaces/search-response';

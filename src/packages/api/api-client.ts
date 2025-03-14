@@ -8,6 +8,7 @@ import { PaymentAPI } from './payment/payment-api';
 import { AccountAPI } from './account/account-api';
 import { PreferenceAPI } from './preferences/preference-api';
 import { CreditMemoAPI } from './credit-memo/credit-memo-api';
+import { CompanyInfoAPI } from './company-info/company-info-api';
 
 /**
  * API Client
@@ -48,6 +49,11 @@ export class ApiClient {
 	public preferences: PreferenceAPI;
 
 	/**
+	 * Company Info API
+	 */
+	public companyInfo: CompanyInfoAPI;
+
+	/**
 	 * Automatically check for a next page (This creates an extra query to the API to check if there is a next page)
 	 */
 	public autoCheckNextPage: boolean = true;
@@ -66,6 +72,7 @@ export class ApiClient {
 		this.payments = new PaymentAPI(this);
 		this.preferences = new PreferenceAPI(this);
 		this.creditMemos = new CreditMemoAPI(this);
+		this.companyInfo = new CompanyInfoAPI(this);
 	}
 
 	/**
