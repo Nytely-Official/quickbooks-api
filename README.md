@@ -16,6 +16,7 @@ foundation for accounting, payments, and commerce operations.
   - Customers
   - Payments
   - Accounts
+  - CompanyInfo
   - Preferences
   - Credit Memos
 - **Type-Safe API:** Full TypeScript declarations for all requests and responses.
