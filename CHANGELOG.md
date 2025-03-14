@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.6.2] - 2025-03-14
+
+### Features
+
+- Added Billing API
+- Added Company API
+
+### Tests
+
+- Added comprehensive test cases for the New Billing and Company API
+
+---
+
 ## [0.6.1] - 2025-03-06
 
 ### Bug Fixes
