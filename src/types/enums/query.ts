@@ -10,4 +10,5 @@ export enum Query {
 	Preferences = 'select * from Preferences',
 	Account = 'select * from account',
 	CompanyInfo = 'select * from companyinfo',
+	Bill = 'select * from Bill',
 }
