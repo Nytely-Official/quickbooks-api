@@ -17,6 +17,7 @@ foundation for accounting, payments, and commerce operations.
   - Payments
   - Accounts
   - CompanyInfo
+  - Bills
   - Preferences
   - Credit Memos
 - **Type-Safe API:** Full TypeScript declarations for all requests and responses.
@@ -141,6 +142,8 @@ The `ApiClient` provides access to the following APIs:
 - `apiClient.accounts`: Accounts API
 - `apiClient.preferences`: Preferences API
 - `apiClient.creditMemos`: Credit Memos API
+- `apiClient.companyInfo`: Company Info API
+- `apiClient.bills`: Bills API
 
 Refer to the individual API documentation for available methods and options.
 

@@ -1,6 +1,7 @@
 // Import the Search Options
 import {
 	Account,
+	Bill,
 	CompanyInfo,
 	CreditMemo,
 	Customer,
@@ -37,6 +38,9 @@ export interface CompanyInfoOptions extends Options<CompanyInfo> {}
 
 // Setup the Preference Options
 export interface PreferenceOptions extends Options<Preferences> {}
+
+// Setup the Bill Options
+export interface BillOptions extends Options<Bill> {}
 
 // Export the Options
 export interface Options<T> {

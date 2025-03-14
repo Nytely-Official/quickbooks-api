@@ -1,5 +1,5 @@
 // Imports
-import type { Estimate, Customer, Invoice, Payment, Account, CreditMemo, Preferences, CompanyInfo } from '../types';
+import type { Estimate, Customer, Invoice, Payment, Account, CreditMemo, Preferences, CompanyInfo, Bill } from '../types';
 
 /**
  * The Invoice Query Response
@@ -54,6 +54,13 @@ export interface CompanyInfoQueryResponse extends QueryResponse {
  */
 export interface EstimateQueryResponse extends QueryResponse {
 	Estimate: Array<Estimate>;
+}
+
+/**
+ * The Bill Query Response
+ */
+export interface BillQueryResponse extends QueryResponse {
+	Bill: Array<Bill>;
 }
 
 /**
