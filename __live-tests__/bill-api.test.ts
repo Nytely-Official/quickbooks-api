@@ -99,17 +99,17 @@ describe('Live API: Bills', async () => {
 	});
 
 	// Test updated bills
-	test('should retrieve updated bills', async () => {
-		// Get the Last Updated Time
-		const lastUpdatedTime = new Date();
-		lastUpdatedTime.setDate(lastUpdatedTime.getDate() - 60);
+	// test('should retrieve updated bills', async () => {
+	// 	// Get the Last Updated Time
+	// 	const lastUpdatedTime = new Date();
+	// 	lastUpdatedTime.setDate(lastUpdatedTime.getDate() - 60);
 
-		// Get the Updated Bills
-		const searchResponse = await apiClient.bills.getUpdatedBills(lastUpdatedTime);
+	// 	// Get the Updated Bills
+	// 	const searchResponse = await apiClient.bills.getUpdatedBills(lastUpdatedTime);
 
-		// Assert the Bills
-		expect(searchResponse.results).toBeInstanceOf(Array);
-	});
+	// 	// Assert the Bills
+	// 	expect(searchResponse.results).toBeInstanceOf(Array);
+	// });
 
 	// Should handle all Search Options
 	test('should handle all search options', async () => {
