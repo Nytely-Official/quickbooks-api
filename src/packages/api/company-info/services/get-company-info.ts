@@ -1,5 +1,6 @@
 // Imports
-import type { CompanyInfo, SearchOptions } from '../../../../types/types';
+import { CompanyInfoOptions } from '../../../../types/interfaces/options';
+import type { CompanyInfo } from '../../../../types/types';
 import { CompanyInfoAPI } from '../company-info-api';
 
 /**
@@ -8,12 +9,12 @@ import { CompanyInfoAPI } from '../company-info-api';
  * @param options - The Search Options
  * @returns The Company Info
  */
-export async function getCompanyInfo(this: CompanyInfoAPI, options: SearchOptions = {}): Promise<CompanyInfo> {
+export async function getCompanyInfo(this: CompanyInfoAPI, options: CompanyInfoOptions = {}): Promise<CompanyInfo> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
 	// Setup the Search Options (if provided)
-	if (options) queryBuilder.setSearchOptions(options);
+	if (options.searchOptions) queryBuilder.setSearchOptions(options.searchOptions);
 
 	// Setup the URL
 	const url = queryBuilder.build();
@@ -26,4 +27,4 @@ export async function getCompanyInfo(this: CompanyInfoAPI, options: SearchOption
 
 	// Return the Company Info
 	return companyInfo;
-} 
+}
