@@ -8,7 +8,7 @@ import { AccountAPI } from '../account-api';
  * @param id - The ID of the account
  * @returns The Account
  */
-export async function getAccountById(this: AccountAPI, id: string, options: AccountOptions = {}): Promise<Account> {
+export async function getAccountById(this: AccountAPI, id: string, options: AccountOptions = {}): Promise<Account | null> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
@@ -24,7 +24,7 @@ export async function getAccountById(this: AccountAPI, id: string, options: Acco
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Check if the Response Failed to find an Account
-	if (!response) throw new Error('Account not found');
+	if (!response) return null;
 
 	// Format the Response
 	const accounts = this.formatResponse(response);

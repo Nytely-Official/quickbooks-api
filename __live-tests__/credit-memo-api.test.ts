@@ -88,8 +88,7 @@ describe('Live API: CreditMemos', async () => {
 	// Test updated creditMemos
 	test('should retrieve updated creditMemos', async () => {
 		// Get the End Date
-		const lastUpdated = new Date();
-		lastUpdated.setDate(lastUpdated.getDate() - 60);
+		const lastUpdated = new Date('2012-01-08');
 
 		// Get the Updated CreditMemos
 		const searchResponse = await apiClient.creditMemos.getUpdatedCreditMemos(lastUpdated);
@@ -102,5 +101,23 @@ describe('Live API: CreditMemos', async () => {
 	test('should throw error for invalid creditMemo ID', async () => {
 		// Assert the Error
 		expect(apiClient.creditMemos.getCreditMemoById('invalid')).rejects.toThrow();
+	});
+
+	// Test returning an empty array if no creditMemos are updated
+	test('should return an empty array if no creditMemos are updated', async () => {
+		// Setup the Future Date
+		const futureDate = new Date();
+
+		// Set the New Full Year
+		futureDate.setFullYear(futureDate.getFullYear() + 20);
+
+		// Get the CreditMemos
+		const searchResponse = await apiClient.creditMemos.getUpdatedCreditMemos(futureDate);
+
+		// Assert the CreditMemos
+		expect(searchResponse.results).toBeArray();
+
+		// Assert the CreditMemos Length
+		expect(searchResponse.results.length).toBe(0);
 	});
 });

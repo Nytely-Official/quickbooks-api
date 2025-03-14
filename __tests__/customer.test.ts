@@ -238,5 +238,26 @@ describe('Customer API', () => {
 			// Assert the Customers
 			expect(searchResponse.results[0].Id).toBe(customersInDateRange[0].Id);
 		});
+
+		// Describe the getUpdatedCustomers Method
+		it('should return an empty array if no customers are updated', async () => {
+			// Setup the Customer Query Response
+			const customerQueryResponse: { QueryResponse: {}; time: string } = {
+				QueryResponse: {},
+				time: '2025-03-04T05:46:36.933-08:00',
+			};
+
+			// Mock the Fetch with proper QueryResponse structure
+			global.fetch = mockFetch(JSON.stringify(customerQueryResponse));
+
+			// Get the Customers
+			const searchResponse = await apiClient.customers.getUpdatedCustomers(new Date(new Date().getTime() + 68400000));
+
+			// Assert the Customers
+			expect(searchResponse.results).toBeArray();
+
+			// Assert the Customers Length
+			expect(searchResponse.results.length).toBe(0);
+		});
 	});
 });

@@ -228,6 +228,27 @@ describe('Invoice API', () => {
 			// Assert the Invoices
 			expect(searchResponse.results[0].Id).toBe(invoicesInDateRange[0].Id);
 		});
+
+		// Describe the getUpdatedInvoices Method
+		it('should return an empty array if no invoices are updated', async () => {
+			// Setup the Invoice Query Response
+			const invoiceQueryResponse: { QueryResponse: {}; time: string } = {
+				QueryResponse: {},
+				time: '2025-03-04T05:46:36.933-08:00',
+			};
+
+			// Mock the Fetch with proper QueryResponse structure
+			global.fetch = mockFetch(JSON.stringify(invoiceQueryResponse));
+
+			// Get the Invoices
+			const searchResponse = await apiClient.invoices.getUpdatedInvoices(new Date(new Date().getTime() + 68400000));
+
+			// Assert the Invoices
+			expect(searchResponse.results).toBeArray();
+
+			// Assert the Invoices Length
+			expect(searchResponse.results.length).toBe(0);
+		});
 	});
 
 	// Describe the getInvoicesByDueDate Method

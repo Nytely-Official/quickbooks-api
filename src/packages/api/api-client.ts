@@ -8,6 +8,7 @@ import { PaymentAPI } from './payment/payment-api';
 import { AccountAPI } from './account/account-api';
 import { PreferenceAPI } from './preferences/preference-api';
 import { CreditMemoAPI } from './credit-memo/credit-memo-api';
+import { CompanyInfoAPI } from './company-info/company-info-api';
 import { BillAPI } from './bill/bill-api';
 
 /**
@@ -49,6 +50,11 @@ export class ApiClient {
 	public preferences: PreferenceAPI;
 
 	/**
+	 * Company Info API
+	 */
+	public companyInfo: CompanyInfoAPI;
+
+	/**
 	 * Bills API
 	 */
 	public bills: BillAPI;
@@ -72,6 +78,7 @@ export class ApiClient {
 		this.payments = new PaymentAPI(this);
 		this.preferences = new PreferenceAPI(this);
 		this.creditMemos = new CreditMemoAPI(this);
+		this.companyInfo = new CompanyInfoAPI(this);
 		this.bills = new BillAPI(this);
 	}
 

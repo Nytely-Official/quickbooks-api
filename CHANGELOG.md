@@ -1,5 +1,48 @@
 # Changelog
 
+## [0.6.1] - 2025-03-06
+
+### Bug Fixes
+
+- Token Validity Check within the Auth Provider was causing some issues for clients who want to deserialize a token that has an expired
+  access token, therefore, the validity checks within the deserialize and serialize methods was removed to prevent these issues
+- Fixed wrong install command in the Readme File
+
+---
+
+## [0.6.0] - 2025-03-05
+
+### Features
+
+- Enhanced live tests for getUpdated methods across all API endpoints
+- Added empty array validation tests for update methods in Accounts, Credit Memos, Customers, Estimates, Invoices and Payments
+- Improved error handling for entity lookup methods to return null instead of throwing errors
+
+### Bug Fixes
+
+- Improved response validation in all API formatResponse methods
+- Fixed empty array handling when QueryResponse exists but contains no results
+- Standardized error handling for invalid API responses across all entities
+
+### Tests
+
+- Added comprehensive test cases for empty update scenarios
+- Improved date handling consistency in update method tests
+- Added validation for proper empty array returns when no updates exist
+
+### Breaking Changes
+
+- `get*ById` methods now return `null` instead of throwing errors when entities are not found:
+  - getAccountById
+  - getCreditMemoById
+  - getCustomerById
+  - getEstimateById
+  - getInvoiceById
+  - getPaymentById
+- Clients must now check for null return values instead of catching 'not found' errors
+
+---
+
 ## [0.5.1] - 2025-03-01
 
 ### Features

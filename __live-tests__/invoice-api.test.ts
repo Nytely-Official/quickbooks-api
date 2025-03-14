@@ -151,4 +151,37 @@ describe('Live API: Invoices', async () => {
 		for (let i = 0; i < searchResponse.results.length - 1; i++)
 			expect(Number(searchResponse.results[i].Id)).toBeGreaterThan(Number(searchResponse.results[i + 1].Id));
 	});
+
+	// Test retrieving updated invoices
+	test('should retrieve updated invoices', async () => {
+		// Get the Last Updated Time
+		const lastUpdatedTime = new Date('2012-01-08');
+
+		// Get the Invoices
+		const searchResponse = await apiClient.invoices.getUpdatedInvoices(lastUpdatedTime);
+
+		// Test the Invoices
+		expect(searchResponse.results).toBeInstanceOf(Array);
+
+		// Test the Invoice length
+		expect(searchResponse.results.length).toBeGreaterThan(0);
+	});
+
+	// Test returning an empty array if no invoices are updated
+	test('should return an empty array if no invoices are updated', async () => {
+		// Setup the Future Date
+		const futureDate = new Date();
+
+		// Set the New Full Year
+		futureDate.setFullYear(futureDate.getFullYear() + 20);
+
+		// Get the Invoices
+		const searchResponse = await apiClient.invoices.getUpdatedInvoices(futureDate);
+
+		// Assert the Invoices
+		expect(searchResponse.results).toBeArray();
+
+		// Assert the Invoices Length
+		expect(searchResponse.results.length).toBe(0);
+	});
 });

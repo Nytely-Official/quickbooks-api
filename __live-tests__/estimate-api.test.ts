@@ -87,8 +87,7 @@ describe('Live API: Estimates', async () => {
 	// Test updated estimates
 	test('should retrieve updated estimates', async () => {
 		// Get the End Date
-		const lastUpdated = new Date();
-		lastUpdated.setDate(lastUpdated.getDate() - 30);
+		const lastUpdated = new Date('2012-01-08');
 
 		// Get the Updated Estimates
 		const searchResponse = await apiClient.estimates.getUpdatedEstimates(lastUpdated);
@@ -101,5 +100,23 @@ describe('Live API: Estimates', async () => {
 	test('should throw error for invalid estimate ID', async () => {
 		// Assert the Error
 		expect(apiClient.estimates.getEstimateById('invalid')).rejects.toThrow();
+	});
+
+	// Test returning an empty array if no estimates are updated
+	test('should return an empty array if no estimates are updated', async () => {
+		// Setup the Future Date
+		const futureDate = new Date();
+
+		// Set the New Full Year
+		futureDate.setFullYear(futureDate.getFullYear() + 20);
+
+		// Get the Estimates
+		const searchResponse = await apiClient.estimates.getUpdatedEstimates(futureDate);
+
+		// Assert the Estimates
+		expect(searchResponse.results).toBeArray();
+
+		// Assert the Estimates Length
+		expect(searchResponse.results.length).toBe(0);
 	});
 });

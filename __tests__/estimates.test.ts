@@ -219,5 +219,26 @@ describe('Estimate API', () => {
 			expect(searchResponse.results.length).toBe(estimatesInDateRange.length);
 			expect(searchResponse.results[0].Id).toBe(estimatesInDateRange[0].Id);
 		});
+
+		// Describe the getUpdatedEstimates Method
+		it('should return an empty array if no estimates are updated', async () => {
+			// Setup the Estimate Query Response
+			const estimateQueryResponse: { QueryResponse: {}; time: string } = {
+				QueryResponse: {},
+				time: '2025-03-04T05:46:36.933-08:00',
+			};
+
+			// Mock the Fetch with proper QueryResponse structure
+			global.fetch = mockFetch(JSON.stringify(estimateQueryResponse));
+
+			// Get the Estimates
+			const searchResponse = await apiClient.estimates.getUpdatedEstimates(new Date(new Date().getTime() + 68400000));
+
+			// Assert the Estimates
+			expect(searchResponse.results).toBeArray();
+
+			// Assert the Estimates Length
+			expect(searchResponse.results.length).toBe(0);
+		});
 	});
 });

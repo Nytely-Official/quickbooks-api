@@ -16,7 +16,7 @@ import { CustomerAPI } from '../customer-api';
  *
  * @throws {Error} If no customer is found for the provided ID.
  */
-export async function getCustomerById(this: CustomerAPI, id: string, options: CustomerOptions = {}): Promise<Customer> {
+export async function getCustomerById(this: CustomerAPI, id: string, options: CustomerOptions = {}): Promise<Customer | null> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
@@ -33,7 +33,7 @@ export async function getCustomerById(this: CustomerAPI, id: string, options: Cu
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Check if the Response Failed to find an Customer
-	if (!response) throw new Error('Customer not found');
+	if (!response) return null;
 
 	// Format the Response
 	const customers = this.formatResponse(response);

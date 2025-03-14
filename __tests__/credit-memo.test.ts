@@ -226,5 +226,26 @@ describe('CreditMemo API', () => {
 			// Assert the CreditMemos
 			expect(searchResponse.results[0].Id).toBe(creditMemosInDateRange[0].Id);
 		});
+
+		// Describe the getUpdatedCreditMemos Method
+		it('should return an empty array if no credit memos are updated', async () => {
+			// Setup the CreditMemo Query Response
+			const creditMemoQueryResponse: { QueryResponse: {}; time: string } = {
+				QueryResponse: {},
+				time: '2025-03-04T05:46:36.933-08:00',
+			};
+
+			// Mock the Fetch with proper QueryResponse structure
+			global.fetch = mockFetch(JSON.stringify(creditMemoQueryResponse));
+
+			// Get the CreditMemos
+			const searchResponse = await apiClient.creditMemos.getUpdatedCreditMemos(new Date(new Date().getTime() + 68400000));
+
+			// Assert the CreditMemos
+			expect(searchResponse.results).toBeArray();
+
+			// Assert the CreditMemos Length
+			expect(searchResponse.results.length).toBe(0);
+		});
 	});
 });
