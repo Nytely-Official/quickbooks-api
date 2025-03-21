@@ -1,5 +1,17 @@
 // Import the Search Options
-import { Account, Bill, CreditMemo, Customer, Estimate, Invoice, InvoiceStatus, Payment, Preferences, SearchOptions } from '../types';
+import {
+	Account,
+	Bill,
+	CompanyInfo,
+	CreditMemo,
+	Customer,
+	Estimate,
+	Invoice,
+	InvoiceStatus,
+	Payment,
+	Preferences,
+	SearchOptions,
+} from '../types';
 
 // Setup the Invoice Options
 export interface InvoiceOptions extends Options<Invoice> {
@@ -20,6 +32,9 @@ export interface AccountOptions extends Options<Account> {}
 
 // Setup the Credit Memo Options
 export interface CreditMemoOptions extends Options<CreditMemo> {}
+
+// Setup the Company Info Options
+export interface CompanyInfoOptions extends Options<CompanyInfo> {}
 
 // Setup the Preference Options
 export interface PreferenceOptions extends Options<Preferences> {}
