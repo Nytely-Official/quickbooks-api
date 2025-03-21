@@ -1,5 +1,5 @@
 // Imports
-import type { Customer, Query } from '../../../types/types';
+import { type Customer, type Query, CustomerFilters } from '../../../types/types';
 import { BaseQueryBuilder } from '../common/base-query-builder';
 
 /**
@@ -21,7 +21,7 @@ export class CustomerQueryBuilder extends BaseQueryBuilder<Customer> {
 	 * @returns The Query Builder
 	 */
 	public whereCustomerId(customerId: string): this {
-		this.whereClauses.push(`Customer.Id = '${customerId}'`);
+		this.whereClauses.push(`${CustomerFilters.Id} = '${customerId}'`);
 		return this;
 	}
 }

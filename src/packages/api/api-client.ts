@@ -113,6 +113,7 @@ export class ApiClient {
 			// Throw an Error
 			throw new Error(`Failed to run request: ${errorMessage}`);
 		}
+
 		// Check if the response is an Object and if it is, parse it as JSON
 		const responseData = response.headers.get('Content-Type')?.includes('application/json') ? await response.json() : null;
 

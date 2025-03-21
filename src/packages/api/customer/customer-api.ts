@@ -11,6 +11,7 @@ import { getCustomersForDateRange } from './services/get-customers-for-date-rang
 import { getUpdatedCustomers } from './services/get-updated-customers';
 
 import { rawCustomerQuery } from './services/raw-customer-query';
+import path from 'path';
 
 /**
  * API Client
@@ -63,6 +64,18 @@ export class CustomerAPI {
 
 		// Return the Customers
 		return queryResponse.Customer;
+	}
+
+	// Returns the Customer URL
+	public async getUrl() {
+		// Setup the URL
+		const url = new URL(await this.getCompanyEndpoint());
+
+		// Set the Customer Endpoint
+		url.pathname = path.join(url.pathname, 'customer');
+
+		// Return the URL
+		return url;
 	}
 
 	/**
