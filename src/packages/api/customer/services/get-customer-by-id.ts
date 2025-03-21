@@ -1,6 +1,8 @@
 // Import the Query Builder
-import type { Customer, CustomerOptions } from '../../../../types/types';
+import { Customer } from '../../../../types/classes/customer';
+import type { CustomerOptions } from '../../../../types/types';
 import { CustomerAPI } from '../customer-api';
+import { plainToClass } from 'class-transformer';
 
 /**
  * Retrieves a customer by their ID from the Customer API.
@@ -38,6 +40,12 @@ export async function getCustomerById(this: CustomerAPI, id: string, options: Cu
 	// Format the Response
 	const customers = this.formatResponse(response);
 
+	// Convert the Customer to a Class
+	const customer = customers[0] ? plainToClass(Customer, customers[0]) : null;
+
+	// Check if the Customer is valid and set the API Client
+	if (customer) customer.setApiClient(this.apiClient);
+
 	// Return the Customer
-	return customers[0];
+	return customer;
 }

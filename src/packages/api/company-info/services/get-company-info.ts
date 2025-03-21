@@ -8,7 +8,7 @@ import { CompanyInfoAPI } from '../company-info-api';
  * @param options - The Search Options
  * @returns The Company Info
  */
-export async function getCompanyInfo(this: CompanyInfoAPI, options: SearchOptions = {}): Promise<CompanyInfo> {
+export async function getCompanyInfo(this: CompanyInfoAPI, options: SearchOptions<CompanyInfo> = {}): Promise<CompanyInfo> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
@@ -26,4 +26,4 @@ export async function getCompanyInfo(this: CompanyInfoAPI, options: SearchOption
 
 	// Return the Company Info
 	return companyInfo;
-} 
+}
