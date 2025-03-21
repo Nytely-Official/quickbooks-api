@@ -1,5 +1,40 @@
 # Changelog
 
+## [0.7.0] - 2025-03-21
+
+### Features
+
+- Started the Major Move from Interface Based Entities to Class Based Enties for better Management
+- Added class-transformer dependency for object-class transformation
+- Implemented Customer class instance methods with API client binding
+- Added `getUrl()` method to CustomerAPI for endpoint URL retrieval
+- Enhanced type exports for Customer-related interfaces
+- Added save() method demonstration to example usage flow
+
+### Code Quality
+
+- Migrated Customer interface to class-based implementation
+- Improved type safety in CompanyInfoAPI search options
+- Removed redundant Customer interface file
+- Standardized CustomerFilter usage in query builder
+
+### Bug Fixes
+
+- Fixed CustomerQueryBuilder ID filter to use proper enum value
+- Improved response handling in API client request runner
+
+### Documentation
+
+- Updated example usage with customer modification flow
+- Enhanced type definitions with proper class exports
+
+### Breaking Changes
+
+- `getCustomerById()` now returns Customer class instances instead of plain objects:
+  - Requires using `plainToClass` for object transformation
+  - Enables new `save()` method on Customer instances
+- Removed legacy Customer interface in favor of class-based implementation
+
 ## [0.6.2] - 2025-03-14
 
 ### Features

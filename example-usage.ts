@@ -83,6 +83,21 @@ app.get('/auth-code', async (req: Request, res: Response) => {
 		// Initialize API Client with the authenticated provider
 		const apiClient = new ApiClient(authProvider, Environment.Sandbox);
 
+		// Find a Customer by ID
+		const foundCustomer = await apiClient.customers.getCustomerById('1');
+
+		// Log the progress
+		console.log(`Got found customer ${foundCustomer?.BillAddr?.PostalCode}`);
+
+		// Change the Customer Name
+		foundCustomer.BillAddr.PostalCode = '94326';
+
+		// Save the Customer
+		await foundCustomer.save();
+
+		// Log the progress
+		console.log(`Reloaded customer ${foundCustomer?.BillAddr?.PostalCode}`);
+
 		// Example: Get invoices using the authenticated client
 		const invoices = await apiClient.invoices.getAllInvoices();
 
@@ -151,7 +166,7 @@ app.get('/auth-code', async (req: Request, res: Response) => {
 			// 	Setup the Invoice
 			const invoiceOptions: InvoiceOptions = {
 				searchOptions: {
-					maxResults: 10,
+					maxResults: 100,
 					page: page,
 					orderBy: { field: 'Id', direction: 'DESC' },
 				},
