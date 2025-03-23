@@ -1,5 +1,6 @@
 // Import the Query Builder
-import type { Invoice, InvoiceOptions, SearchResponse } from '../../../../types/types';
+import { plainToClass } from 'class-transformer';
+import { Invoice, type InvoiceOptions, type SearchResponse } from '../../../../types/types';
 import { InvoiceAPI } from '../invoice-api';
 
 /**
@@ -40,9 +41,12 @@ export async function getInvoicesForDateRange(
 	// Format the Response
 	const invoices = this.formatResponse(response);
 
+	// Map the Invoices to Classes
+	const mappedInvoices = invoices.map((invoice) => plainToClass(Invoice, invoice));
+
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Invoice> = {
-		results: invoices,
+		results: mappedInvoices,
 		hasNextPage: await this.hasNextPage(queryBuilder),
 	};
 

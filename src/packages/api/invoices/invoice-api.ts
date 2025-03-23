@@ -3,6 +3,7 @@ import { ApiClient } from '../api-client';
 import { Environment, Query, type Invoice, type InvoiceQueryResponse } from '../../../types/types';
 import { Endpoints } from '../../../types/enums/endpoints';
 import { InvoiceQueryBuilder } from './invoice-query-builder';
+import path from 'path';
 
 // Import the Services
 import { getAllInvoices } from './services/get-all-invoices';
@@ -45,6 +46,18 @@ export class InvoiceAPI {
 
 		// Return the Company Endpoint
 		return `${baseEndpoint}/${token.realmId}`;
+	}
+
+	// Returns the Invoice URL
+	public async getUrl() {
+		// Setup the URL
+		const url = new URL(await this.getCompanyEndpoint());
+
+		// Set the Invoice Endpoint
+		url.pathname = path.join(url.pathname, 'invoice');
+
+		// Return the URL
+		return url;
 	}
 
 	/**

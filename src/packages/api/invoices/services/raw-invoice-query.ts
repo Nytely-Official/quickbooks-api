@@ -1,7 +1,8 @@
 // Import the Query Builder
 import { InvoiceAPI } from '../invoice-api';
 import type { InvoiceQueryBuilder } from '../invoice-query-builder';
-import type { Invoice, SearchResponse } from '../../../../types/types';
+import { Invoice, type SearchResponse } from '../../../../types/types';
+import { plainToClass } from 'class-transformer';
 
 /**
  * Raw Invoice Query
@@ -19,9 +20,12 @@ export async function rawInvoiceQuery(this: InvoiceAPI, queryBuilder: InvoiceQue
 	// Format the Response
 	const invoices = this.formatResponse(response);
 
+	// Map the Invoices to Classes
+	const mappedInvoices = invoices.map((invoice) => plainToClass(Invoice, invoice));
+
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Invoice> = {
-		results: invoices,
+		results: mappedInvoices,
 		hasNextPage: await this.hasNextPage(queryBuilder),
 	};
 

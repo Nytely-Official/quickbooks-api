@@ -1,5 +1,6 @@
 // Import the Query Builder
-import type { Invoice, InvoiceOptions } from '../../../../types/types';
+import { plainToClass } from 'class-transformer';
+import { Invoice, InvoiceOptions } from '../../../../types/types';
 import { InvoiceAPI } from '../invoice-api';
 
 /**
@@ -33,6 +34,12 @@ export async function getInvoiceById(this: InvoiceAPI, id: string, options: Invo
 	// Format the Response
 	const invoices = this.formatResponse(response);
 
+	// Convert the Invoice to a Class
+	const invoice = invoices[0] ? plainToClass(Invoice, invoices[0]) : null;
+
+	// Check if the Invoice is valid and set the API Client
+	if (invoice) invoice.setApiClient(this.apiClient);
+
 	// Return the Invoice
-	return invoices[0];
+	return invoice;
 }

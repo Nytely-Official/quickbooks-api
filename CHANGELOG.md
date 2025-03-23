@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.7.1] - 2025-03-23
+
+### Features
+
+- Added InvoiceFilters enum for type-safe invoice queries
+- Implemented class transformation for Invoice API responses
+- Added getUrl() method to InvoiceAPI for endpoint URL construction
+
+### Code Quality
+
+- Migrated Invoice interface to class-based implementation
+- Standardized filter usage in InvoiceQueryBuilder with enum values
+- Improved type safety in invoice query builder methods
+
+### Bug Fixes
+
+- Fixed invoice instance API client binding in getInvoiceById
+
+### Breaking Changes
+
+- All invoice API methods now return Invoice class instances instead of plain objects
+  - Requires using `plainToClass` for object transformation
+  - Enables new instance methods on Invoice objects
+
 ## [0.7.0] - 2025-03-21
 
 ### Features

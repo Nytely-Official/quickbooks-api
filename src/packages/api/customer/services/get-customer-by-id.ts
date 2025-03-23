@@ -1,6 +1,5 @@
 // Import the Query Builder
-import { Customer } from '../../../../types/classes/customer';
-import type { CustomerOptions } from '../../../../types/types';
+import { type CustomerOptions, Customer } from '../../../../types/types';
 import { CustomerAPI } from '../customer-api';
 import { plainToClass } from 'class-transformer';
 
