@@ -1,5 +1,6 @@
 // Import the Query Builder
-import type { Customer, CustomerOptions, SearchResponse } from '../../../../types/types';
+import { plainToClass } from 'class-transformer';
+import { Customer, type CustomerOptions, type SearchResponse } from '../../../../types/types';
 import { CustomerAPI } from '../customer-api';
 
 /**
@@ -41,11 +42,14 @@ export async function getCustomersForDateRange(
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const customer = this.formatResponse(response);
+	const customers = this.formatResponse(response);
+
+	// Map the Customers to Classes
+	const mappedCustomers = customers.map((customer) => plainToClass(Customer, customer));
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Customer> = {
-		results: customer,
+		results: mappedCustomers,
 		hasNextPage: await this.hasNextPage(queryBuilder),
 	};
 
