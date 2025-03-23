@@ -1,7 +1,8 @@
 // Import the Query Builder
 import { CustomerAPI } from '../customer-api';
 import type { CustomerQueryBuilder } from '../customer-query-builder';
-import type { Customer, SearchResponse } from '../../../../types/types';
+import { Customer, type SearchResponse } from '../../../../types/types';
+import { plainToClass } from 'class-transformer';
 
 /**
  * Executes a custom customer query using the specified query builder.
@@ -23,9 +24,12 @@ export async function rawCustomerQuery(this: CustomerAPI, queryBuilder: Customer
 	// Format the Response
 	const customers = this.formatResponse(response);
 
+	// Map the Customers to Classes
+	const mappedCustomers = customers.map((customer) => plainToClass(Customer, customer));
+
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Customer> = {
-		results: customers,
+		results: mappedCustomers,
 		hasNextPage: await this.hasNextPage(queryBuilder),
 	};
 

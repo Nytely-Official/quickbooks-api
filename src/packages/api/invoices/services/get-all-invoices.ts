@@ -1,7 +1,7 @@
 // Imports
-import type { Invoice, SearchResponse, InvoiceOptions } from '../../../../types/types';
+import { Invoice, type SearchResponse, type InvoiceOptions } from '../../../../types/types';
 import { InvoiceAPI } from '../invoice-api';
-
+import { plainToClass } from 'class-transformer';
 /**
  * Get All Invoices
  * @param this - The Invoice API
@@ -26,9 +26,12 @@ export async function getAllInvoices(this: InvoiceAPI, options: InvoiceOptions =
 	// Format the Response
 	const invoices = this.formatResponse(response);
 
+	// Map the Invoices to Classes
+	const mappedInvoices = invoices.map((invoice) => plainToClass(Invoice, invoice));
+
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Invoice> = {
-		results: invoices,
+		results: mappedInvoices,
 		hasNextPage: await this.hasNextPage(queryBuilder),
 	};
 

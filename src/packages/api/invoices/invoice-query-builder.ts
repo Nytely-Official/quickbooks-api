@@ -1,5 +1,5 @@
 // Imports
-import type { Invoice, Query } from '../../../types/types';
+import { type Invoice, type Query, InvoiceFilters } from '../../../types/types';
 import { BaseQueryBuilder } from '../common/base-query-builder';
 
 /**
@@ -21,7 +21,7 @@ export class InvoiceQueryBuilder extends BaseQueryBuilder<Invoice> {
 	 * @returns The Query Builder
 	 */
 	public whereDueDate(date: Date): this {
-		this.whereClauses.push(`DueDate = '${date.toISOString()}'`);
+		this.whereClauses.push(`${InvoiceFilters.DueDate} = '${date.toISOString()}'`);
 		return this;
 	}
 
@@ -31,7 +31,7 @@ export class InvoiceQueryBuilder extends BaseQueryBuilder<Invoice> {
 	 * @returns The Query Builder
 	 */
 	public whereCustomerId(customerId: string): this {
-		this.whereClauses.push(`CustomerRef.value = '${customerId}'`);
+		this.whereClauses.push(`${InvoiceFilters.CustomerRef}.value = '${customerId}'`);
 		return this;
 	}
 
@@ -45,7 +45,7 @@ export class InvoiceQueryBuilder extends BaseQueryBuilder<Invoice> {
 		const operator = status === 'paid' ? '=' : '>';
 
 		// Add the Where Clause
-		this.whereClauses.push(`Balance ${operator} '0'`);
+		this.whereClauses.push(`${InvoiceFilters.Balance} ${operator} '0'`);
 
 		// Return the Query Builder
 		return this;
