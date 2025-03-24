@@ -3,10 +3,19 @@
  */
 export type DeepKeys<T> = T extends object
 	? {
-			[K in keyof T]-?: K extends string
-				? T[K] extends Date | Array<unknown> | Function
-					? K
-					: `${K}${DeepKeys<T[K]> extends never ? '' : `.${DeepKeys<T[K]>}`}`
-				: never;
-	  }[keyof T]
+		[K in keyof T]-?: K extends string
+		? T[K] extends Date | Array<unknown> | Function
+		? K
+		: `${K}${DeepKeys<T[K]> extends never ? '' : `.${DeepKeys<T[K]>}`}`
+		: never;
+	}[keyof T]
+	: never;
+
+export type DeepKeysType<T, Path extends string> =
+	Path extends `${infer K}.${infer Rest}`
+	? K extends keyof T
+	? DeepKeysType<T[K], Rest>
+	: never
+	: Path extends keyof T
+	? T[Path]
 	: never;

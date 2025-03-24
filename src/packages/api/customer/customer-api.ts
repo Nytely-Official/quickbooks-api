@@ -1,35 +1,67 @@
 // Imports
 import { ApiClient } from '../api-client';
-import { Environment, Query, type Customer, type CustomerQueryResponse } from '../../../types/types';
+import { Environment, type CustomerQueryResponse } from '../../../types/types';
+import { Customer, CustomerFilters, CustomerSortables } from './customer';
 import { Endpoints } from '../../../types/enums/endpoints';
-import { CustomerQueryBuilder } from './customer-query-builder';
-
-// Import the Services
-import { getAllCustomers } from './services/get-all-customers';
-import { getCustomerById } from './services/get-customer-by-id';
-import { getCustomersForDateRange } from './services/get-customers-for-date-range';
-import { getUpdatedCustomers } from './services/get-updated-customers';
-
-import { rawCustomerQuery } from './services/raw-customer-query';
-import path from 'path';
+import { QueryBuilder, QueryParams } from '../common/query-builder';
 
 /**
  * API Client
  */
 export class CustomerAPI {
-	// The List of Customer Services
-	public readonly getAllCustomers = getAllCustomers.bind(this);
-	public readonly getCustomerById = getCustomerById.bind(this);
-	public readonly getCustomersForDateRange = getCustomersForDateRange.bind(this);
-	public readonly getUpdatedCustomers = getUpdatedCustomers.bind(this);
-	public readonly rawCustomerQuery = rawCustomerQuery.bind(this);
-
 	/**
 	 * Constructor
-
 	 * @param apiClient - The API Client
 	 */
-	constructor(protected readonly apiClient: ApiClient) {}
+	constructor(protected readonly apiClient: ApiClient) { }
+
+	/**
+	 * The Query Builder
+	 */
+	public query = new QueryBuilder<Customer, CustomerFilters, CustomerSortables>(this.executeQuery.bind(this));
+
+	/**
+	 * Execute the Query
+	 * @param params - The Query Parameters from the Query Builder
+	 * @returns The Query Response
+	 */
+	protected async executeQuery(params: QueryParams) {
+		// Get the URL
+		const url = [
+			await this.getCompanyEndpoint() + '/query?query=select * from Customer',
+		]
+
+		// Add the Filters
+		if (params.filters.length > 0) {
+			url.push(`where ${params.filters.map(filter => `${filter.key} ${filter.value}`).join(' and ')}`)
+		}
+
+		// Add the Order By
+		if (params.orderBy) {
+			url.push(`orderby ${params.orderBy.key} ${params.orderBy.direction}`)
+		}
+
+		// Add the Limit
+		if (params.limit) {
+			url.push(`maxresults ${params.limit}`)
+		}
+
+		// Join the URL
+		const queryUrl = url.join(' ');
+
+		// Run the Request
+		const response = await this.apiClient.runRequest(encodeURI(queryUrl), { method: 'GET' });
+
+		// Format the Response
+		let customers = this.formatResponse(response);
+
+		// Remap the Response - (if supplied)
+		if (params.remap) {
+			customers = this.remapResponse(customers, params.remap);
+		}
+
+		return customers;
+	}
 
 	/**
 	 * Get the Company Endpoint
@@ -52,7 +84,7 @@ export class CustomerAPI {
 	 * @param response - The Response
 	 * @returns The Customers
 	 */
-	protected formatResponse(response: { QueryResponse?: { Customer?: Customer[] } }): Array<Customer> {
+	protected formatResponse(response: { QueryResponse?: CustomerQueryResponse }): Array<Customer> {
 		// Check if the Response is Invalid
 		if (!response?.QueryResponse) throw new Error('Invalid Response');
 
@@ -60,70 +92,43 @@ export class CustomerAPI {
 		if (!response.QueryResponse.Customer) response.QueryResponse.Customer = new Array<Customer>();
 
 		// Get the Customers
-		const queryResponse = response.QueryResponse as CustomerQueryResponse;
+		const queryResponse = response.QueryResponse as unknown as CustomerQueryResponse;
 
 		// Return the Customers
 		return queryResponse.Customer;
 	}
 
-	// Returns the Customer URL
-	public async getUrl() {
-		// Setup the URL
-		const url = new URL(await this.getCompanyEndpoint());
-
-		// Set the Customer Endpoint
-		url.pathname = path.join(url.pathname, 'customer');
-
-		// Return the URL
-		return url;
-	}
-
 	/**
-	 * Get the Query Builder
-	 * @returns The Query Builder
+	 * Remap the Data
+	 * @param data - The initial data
+	 * @param remap - The Remap
+	 * @returns The Remapped Data
 	 */
-	public async getQueryBuilder(): Promise<CustomerQueryBuilder> {
-		// Get the Company Endpoint
-		const companyEndpoint = await this.getCompanyEndpoint();
+	protected remapResponse<T = any>(data: Customer[], remap: Record<string, string>) {
+		return data.map((item) => {
+			const result: Record<string, any> = {};
 
-		// Setup the New Query Builder
-		const queryBuilder = new CustomerQueryBuilder(companyEndpoint, Query.Customer);
+			// Process each field in the remap object
+			for (const [targetKey, sourcePath] of Object.entries(remap)) {
+				// Check if we need to access a nested property
+				if (sourcePath.includes('.')) {
+					// Split the path into parts
+					const [parentKey, childKey] = sourcePath.split('.');
 
-		// Return the Query Builder
-		return queryBuilder;
+					// Access the nested property safely
+					if ((item as Record<string, any>)[parentKey] && (item as Record<string, any>)[parentKey][childKey] !== undefined) {
+						result[targetKey] = (item as Record<string, any>)[parentKey][childKey];
+					}
+				} else {
+					// Direct property access
+					if ((item as Record<string, any>)[sourcePath] !== undefined) {
+						result[targetKey] = (item as Record<string, any>)[sourcePath];
+					}
+				}
+			}
+
+			return result;
+		}) as T[];
 	}
 
-	/**
-	 * Checks if there is a next page
-	 * @param queryBuilder - The Query Builder
-	 * @returns {boolean} True if there is a next page, false otherwise
-	 */
-	protected async hasNextPage(queryBuilder: CustomerQueryBuilder): Promise<boolean> {
-		// Check if the Auto Check Next Page is Disabled
-		if (!this.apiClient.autoCheckNextPage) return false;
-
-		// Get the Page Number
-		const page = (queryBuilder.searchOptions.page || 1) + 1;
-
-		// Update the Page Number
-		queryBuilder.searchOptions.page = page;
-
-		// Get the URL
-		const url = queryBuilder.build();
-
-		// Run the Request
-		const response = await this.apiClient.runRequest(url, { method: 'GET' }).catch((error) => {
-			// Log the error
-			console.error(`Failed to check if there is a next page: ${error}`);
-		});
-
-		// Check if the Response is invalid
-		if (!response?.QueryResponse?.Customer) return false;
-
-		// Check if the Response is Invalid
-		if (response.QueryResponse.Customer.length < 1) return false;
-
-		// Return True
-		return true;
-	}
 }

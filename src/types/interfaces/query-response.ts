@@ -1,5 +1,6 @@
 // Imports
-import type { Estimate, Customer, Invoice, Payment, Account, CreditMemo, Preferences, CompanyInfo, Bill } from '../types';
+import { Customer } from '../../packages/api/customer/customer';
+import type { Estimate, Invoice, Payment, Account, CreditMemo, Preferences, CompanyInfo, Bill } from '../types';
 
 /**
  * The Invoice Query Response
@@ -18,7 +19,7 @@ export interface CreditMemoQueryResponse extends QueryResponse {
  * The Customer Query Response
  */
 export interface CustomerQueryResponse extends QueryResponse {
-	Customer: Array<Customer>;
+	Customer: Array<Omit<Customer, 'apiClient'>>;
 }
 
 /**

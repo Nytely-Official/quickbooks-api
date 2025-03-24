@@ -84,5 +84,5 @@ export type { UserAuthResponse } from './interfaces/user-auth-response';
 export type { WebsiteAddress } from './interfaces/website-address';
 
 // Export the Types
-export type { DeepKeys } from './types/deep-keys';
+export type { DeepKeys, DeepKeysType } from './types/deep-keys';
 export type { Range } from './types/range';
