@@ -32,3 +32,4 @@ export async function rawInvoiceQuery(this: InvoiceAPI, queryBuilder: InvoiceQue
 	// Return the Invoices
 	return searchResponse;
 }
+

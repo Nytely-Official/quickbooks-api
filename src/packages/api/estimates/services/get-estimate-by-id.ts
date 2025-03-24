@@ -1,6 +1,7 @@
 // Import the Query Builder
-import type { Estimate, EstimateOptions } from '../../../../types/types';
+import { Estimate, EstimateOptions } from '../../../../types/types';
 import { EstimateAPI } from '../estimate-api';
+import { plainToClass } from 'class-transformer';
 
 /**
  * Get Estimate by ID
@@ -30,6 +31,12 @@ export async function getEstimateById(this: EstimateAPI, id: string, options: Es
 	// Format the Response
 	const estimates = this.formatResponse(response);
 
+	// Convert the Estimate to a Class
+	const estimate = estimates[0] ? plainToClass(Estimate, estimates[0]) : null;
+
+	// Check if the Estimate is valid and set the API Client
+	if (estimate) estimate.setApiClient(this.apiClient);
+
 	// Return the Estimate
-	return estimates[0];
+	return estimate;
 }

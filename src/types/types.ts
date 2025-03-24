@@ -1,6 +1,7 @@
 // Export the Classes
 export { Customer } from './classes/customer';
 export { Invoice } from './classes/invoice';
+export { Estimate } from './classes/estimate';
 
 // Export the Enums
 export { APIUrls } from './enums/api-urls';
@@ -14,12 +15,14 @@ export { Environment } from './enums/environment';
 export { EstimateStatus } from './enums/estimate-status';
 export { CustomerFilters } from './enums/filters';
 export { InvoiceFilters } from './enums/filters';
+export { EstimateFilters } from './enums/filters';
 export { GlobalTaxCalculation } from './enums/global-tax-calculation';
 export { GrantType } from './enums/grant-type';
 export { InvoiceStatus } from './enums/invoice-status';
 export { PrintStatus } from './enums/print-status';
 export { Query } from './enums/query';
 export { TokenType } from './enums/token-type';
+export { TxnStatus } from './enums/txn-status';
 
 // Export the Interfaces
 export type { BaseLine } from './interfaces/base-line';
@@ -30,7 +33,6 @@ export type { DescriptionLineDetail } from './interfaces/description-line-detail
 export type { DescriptionOnlyLine } from './interfaces/description-only-line';
 export type { DiscountLineDetail } from './interfaces/discount-line-detail';
 export type { DiscountLine } from './interfaces/discount-line';
-export type { Estimate } from './interfaces/estimate';
 export type { GroupLineDetail } from './interfaces/group-line-detail';
 export type { GroupLine } from './interfaces/group-line';
 export type { LineDetail } from './interfaces/line-detail';

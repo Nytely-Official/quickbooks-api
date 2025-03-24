@@ -1,8 +1,8 @@
 // Import the Query Builder
 import { EstimateAPI } from '../estimate-api';
 import type { EstimateQueryBuilder } from '../estimate-query-builder';
-import type { Estimate, SearchResponse } from '../../../../types/types';
-
+import { Estimate, SearchResponse } from '../../../../types/types';
+import { plainToClass } from 'class-transformer';
 /**
  * Raw Estimate Query
  * @param this - The Estimate API
@@ -19,9 +19,12 @@ export async function rawEstimateQuery(this: EstimateAPI, queryBuilder: Estimate
 	// Format the Response
 	const estimates = this.formatResponse(response);
 
+	// Map the Estimates to Classes
+	const mappedEstimates = estimates.map((estimate) => plainToClass(Estimate, estimate));
+
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Estimate> = {
-		results: estimates,
+		results: mappedEstimates,
 		hasNextPage: await this.hasNextPage(queryBuilder),
 	};
 

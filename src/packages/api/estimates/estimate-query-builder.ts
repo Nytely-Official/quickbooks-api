@@ -1,5 +1,5 @@
 // Imports
-import type { Query, Estimate, DeepKeys } from '../../../types/types';
+import { type Query, type Estimate, EstimateFilters } from '../../../types/types';
 import { BaseQueryBuilder } from '../common/base-query-builder';
 
 /**
@@ -21,8 +21,7 @@ export class EstimateQueryBuilder extends BaseQueryBuilder<Estimate> {
 	 * @returns The Query Builder
 	 */
 	public whereCustomerId(customerId: string): this {
-		const whereProperty: DeepKeys<Estimate> = 'CustomerRef.value';
-		this.whereClauses.push(`${whereProperty} = '${customerId}'`);
+		this.whereClauses.push(`${EstimateFilters.Id} = '${customerId}'`);
 		return this;
 	}
 
@@ -32,8 +31,7 @@ export class EstimateQueryBuilder extends BaseQueryBuilder<Estimate> {
 	 * @returns The Query Builder
 	 */
 	public whereTxnDate(date: Date): this {
-		const whereProperty: DeepKeys<Estimate> = 'TxnDate';
-		this.whereClauses.push(`${whereProperty} = '${date.toISOString()}'`);
+		this.whereClauses.push(`${EstimateFilters.TxnDate} = '${date.toISOString()}'`);
 		return this;
 	}
 
@@ -43,8 +41,7 @@ export class EstimateQueryBuilder extends BaseQueryBuilder<Estimate> {
 	 * @returns The Query Builder
 	 */
 	public whereAcceptedDate(date: Date): this {
-		const whereProperty: DeepKeys<Estimate> = 'AcceptedDate';
-		this.whereClauses.push(`${whereProperty} = '${date.toISOString()}'`);
+		this.whereClauses.push(`${EstimateFilters.AcceptedDate} = '${date.toISOString()}'`);
 		return this;
 	}
 
@@ -54,8 +51,7 @@ export class EstimateQueryBuilder extends BaseQueryBuilder<Estimate> {
 	 * @returns The Query Builder
 	 */
 	public whereExpirationDate(date: Date): this {
-		const whereProperty: DeepKeys<Estimate> = 'ExpirationDate';
-		this.whereClauses.push(`${whereProperty} = '${date.toISOString()}'`);
+		this.whereClauses.push(`${EstimateFilters.ExpirationDate} = '${date.toISOString()}'`);
 		return this;
 	}
 }

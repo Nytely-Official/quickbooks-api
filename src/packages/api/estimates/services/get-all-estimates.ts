@@ -1,6 +1,7 @@
 // Imports
-import type { Estimate, EstimateOptions, SearchResponse } from '../../../../types/types';
+import { Estimate, EstimateOptions, SearchResponse } from '../../../../types/types';
 import { EstimateAPI } from '../estimate-api';
+import { plainToClass } from 'class-transformer';
 
 /**
  * Get All Estimates
@@ -23,9 +24,12 @@ export async function getAllEstimates(this: EstimateAPI, options: EstimateOption
 	// Format the Response
 	const estimates = this.formatResponse(response);
 
+	// Map the Estimates to Classes
+	const mappedEstimates = estimates.map((estimate) => plainToClass(Estimate, estimate));
+
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Estimate> = {
-		results: estimates,
+		results: mappedEstimates,
 		hasNextPage: await this.hasNextPage(queryBuilder),
 	};
 

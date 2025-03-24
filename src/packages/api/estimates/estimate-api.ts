@@ -3,6 +3,7 @@ import { ApiClient } from '../api-client';
 import { Environment, Query, type Estimate, type EstimateQueryResponse } from '../../../types/types';
 import { Endpoints } from '../../../types/enums/endpoints';
 import { EstimateQueryBuilder } from './estimate-query-builder';
+import * as path from 'path';
 
 // Import the Services
 import { getAllEstimates } from './services/get-all-estimates';
@@ -27,7 +28,7 @@ export class EstimateAPI {
 
 	 * @param apiClient - The API Client
 	 */
-	constructor(protected readonly apiClient: ApiClient) {}
+	constructor(protected readonly apiClient: ApiClient) { }
 
 	/**
 	 * Get the Company Endpoint
@@ -43,6 +44,18 @@ export class EstimateAPI {
 
 		// Return the Company Endpoint
 		return `${baseEndpoint}/${token.realmId}`;
+	}
+
+	// Returns the Estimate URL
+	public async getUrl() {
+		// Setup the URL
+		const url = new URL(await this.getCompanyEndpoint());
+
+		// Set the Invoice Endpoint
+		url.pathname = path.join(url.pathname, 'estimate');
+
+		// Return the URL
+		return url;
 	}
 
 	/**
