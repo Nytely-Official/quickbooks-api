@@ -416,7 +416,7 @@ export class AuthProvider {
 		const keyBuffer = new TextEncoder().encode(secretKey);
 
 		// Setup the Encryption Algorithm
-		const encryptionAlgorithm: Pbkdf2Params = { name: 'PBKDF2', salt: salt, iterations: 100000, hash: 'SHA-256' };
+		const encryptionAlgorithm: Pbkdf2Params = { name: 'PBKDF2', salt: salt as BufferSource, iterations: 100000, hash: 'SHA-256' };
 
 		// Setup the Key Material
 		const keyMaterial = await crypto.subtle.importKey('raw', keyBuffer, 'PBKDF2', false, ['deriveKey']);
