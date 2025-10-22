@@ -15,14 +15,13 @@ export class CreditMemoQueryBuilder extends BaseQueryBuilder<CreditMemo> {
 		super(endpoint, baseQuery);
 	}
 
-
 	/**
 	 * Where Customer ID
 	 * @param customerId - The customer ID
 	 * @returns The Query Builder
 	 */
 	public whereCustomerId(customerId: string): this {
-		this.whereClauses.push(`CustomerRef.value = '${customerId}'`);
+		this.whereClauses.push(`CustomerRef = '${customerId}'`);
 		return this;
 	}
 }

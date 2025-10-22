@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.7.2] - 2025-10-22
+
+### Bug Fixes
+
+- Fixed CustomerRef filter syntax in query builders across multiple APIs:
+  - AccountQueryBuilder: Changed `CustomerRef.value = '${customerId}'` to `CustomerRef = '${customerId}'`
+  - CreditMemoQueryBuilder: Updated CustomerRef filter syntax for proper QuickBooks API compatibility
+  - InvoiceQueryBuilder: Fixed CustomerRef filter to use correct syntax
+  - PaymentQueryBuilder: Corrected CustomerRef filter implementation
+  - PreferenceQueryBuilder: Updated CustomerRef filter syntax
+- Fixed salt type casting in AuthProvider encryption algorithm to use `BufferSource` type
+
+### Tests
+
+- Extended bill API test date range from 120 days to 730 days for better test coverage
+- Added new invoice test case for retrieving invoices by customer ID
+- Enhanced invoice API test coverage with customer-specific filtering validation
+
+### Dependencies
+
+- Updated Express from v4.21.2 to v5.1.0
+- Updated TypeScript from v5.7.3 to v5.9.3
+- Updated @types/express from v5.0.0 to v5.0.3
+- Updated tsc-alias from v1.8.10 to v1.8.16
+- Updated @types/bun from v1.2.2 to v1.3.0
+- Updated various Express-related dependencies to support Express v5
+
+### Code Quality
+
+- Improved type safety in authentication provider encryption methods
+- Enhanced test coverage for customer-specific invoice queries
+- Standardized CustomerRef filter usage across all query builders
+
 ## [0.7.1] - 2025-03-23
 
 ### Features
@@ -21,8 +54,8 @@
 ### Breaking Changes
 
 - All invoice API methods now return Invoice class instances instead of plain objects
-  - Requires using `plainToClass` for object transformation
-  - Enables new instance methods on Invoice objects
+- Requires using `plainToClass` for object transformation
+- Enables new instance methods on Invoice objects
 
 ## [0.7.0] - 2025-03-21
 

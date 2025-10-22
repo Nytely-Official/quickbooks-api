@@ -1,5 +1,5 @@
 // Imports
-import { AuthProvider, Environment, ApiClient, AuthScopes, InvoiceOptions, InvoiceStatus, Invoice } from '../src/app';
+import { AuthProvider, Environment, ApiClient, AuthScopes, InvoiceOptions, InvoiceStatus, Invoice, CustomerOptions } from '../src/app';
 import { describe, expect, test } from 'bun:test';
 
 // Describe the Invoice API
@@ -103,6 +103,40 @@ describe('Live API: Invoices', async () => {
 				expect(invoice.Balance).toBeGreaterThan(0);
 			}),
 		);
+	});
+
+	// Test retrieving Invoices by Status
+	test('should retrieve Invoices by Customer ID', async () => {
+		// Setup the Customer Options
+		const customerOptions: CustomerOptions = { searchOptions: { maxResults: 1 } };
+
+		// Setup the Invoice Options
+		const invoiceOptions: InvoiceOptions = { searchOptions: { maxResults: 10 } };
+
+		// Get the Customer
+		const customerResponse = await apiClient.customers.getAllCustomers(customerOptions);
+
+		// Setup the Invoice Query Builder
+		const invoiceQueryBuilder = await apiClient.invoices.getQueryBuilder();
+
+		// Add the Customer ID Filter
+		invoiceQueryBuilder.whereCustomerId(customerResponse.results[0].Id);
+
+		// Add the Search Options
+		invoiceQueryBuilder.setSearchOptions(invoiceOptions.searchOptions);
+
+		// Make the Request
+		const invoiceResponse = await apiClient.invoices.rawInvoiceQuery(invoiceQueryBuilder);
+
+		// Test the Invoices
+		expect(customerResponse.results).toBeInstanceOf(Array);
+		expect(invoiceResponse.results).toBeInstanceOf(Array);
+
+		// Test the Invoice length
+		expect(invoiceResponse.results.length).toBeGreaterThan(0);
+
+		// Test the Invoices are for the Customer
+		expect(invoiceResponse.results.every((invoice: Invoice) => invoice.CustomerRef.value === customerResponse.results[0].Id)).toBe(true);
 	});
 
 	// Test pagination
