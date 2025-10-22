@@ -1,5 +1,5 @@
 // Imports
-import { AuthProvider, Environment, ApiClient, AuthScopes, EstimateOptions } from '../src/app';
+import { AuthProvider, Environment, ApiClient, AuthScopes, EstimateOptions, CustomerOptions, Estimate } from '../src/app';
 import { describe, expect, test } from 'bun:test';
 
 // Describe the Estimate API
@@ -48,6 +48,38 @@ describe('Live API: Estimates', async () => {
 		// Assert the Estimate
 		expect(foundEstimate).toBeDefined();
 		expect(foundEstimate.Id).toBe(testEstimate.Id);
+	});
+
+	// Test retrieving an estimate by Customer ID
+	test('should retrieve estimates by Customer ID', async () => {
+		// Setup the Customer Options
+		const estimateOptions: EstimateOptions = { searchOptions: { maxResults: 1 } };
+
+		// Get the Estimate
+		const searchResponse = await apiClient.estimates.getAllEstimates(estimateOptions);
+
+		// Get the First Estimate Customer ID
+		const testCustomerId = searchResponse.results[0]?.CustomerRef?.value;
+
+		// Assert the Customer
+		expect(testCustomerId).toBeDefined();
+		expect(testCustomerId).toBeString();
+
+		// Get the estimate query builder
+		const estimateQueryBuilder = await apiClient.estimates.getQueryBuilder();
+
+		// Add the Customer ID Filter
+		estimateQueryBuilder.whereCustomerId(testCustomerId);
+
+		// Make the Request
+		const estimateResponse = await apiClient.estimates.rawEstimateQuery(estimateQueryBuilder);
+
+		// Assert the Estimates
+		expect(estimateResponse.results).toBeInstanceOf(Array);
+		expect(estimateResponse.results.length).toBeGreaterThan(0);
+
+		// Assert the Estimates are for the Customer
+		expect(estimateResponse.results.every((estimate: Estimate) => estimate.CustomerRef.value === testCustomerId)).toBe(true);
 	});
 
 	// Test pagination

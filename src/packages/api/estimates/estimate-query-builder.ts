@@ -21,8 +21,7 @@ export class EstimateQueryBuilder extends BaseQueryBuilder<Estimate> {
 	 * @returns The Query Builder
 	 */
 	public whereCustomerId(customerId: string): this {
-		const whereProperty: DeepKeys<Estimate> = 'CustomerRef.value';
-		this.whereClauses.push(`${whereProperty} = '${customerId}'`);
+		this.whereClauses.push(`CustomerRef = '${customerId}'`);
 		return this;
 	}
 

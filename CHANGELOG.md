@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.7.3] - 2025-10-22
+
+### Bug Fixes
+
+- Fixed CustomerRef filter syntax in EstimateQueryBuilder to match QuickBooks API requirements
+- Removed unused DeepKeys import from EstimateQueryBuilder for cleaner code
+
+### Tests
+
+- Added new estimate API test case for retrieving estimates by customer ID
+- Enhanced estimate API test coverage with customer-specific filtering validation
+- Improved test validation for customer reference consistency across estimate queries
+
+### Code Quality
+
+- Simplified EstimateQueryBuilder CustomerRef filter implementation
+- Removed unnecessary type complexity in estimate query builder methods
+- Standardized CustomerRef filter usage across all query builders (now consistent with v0.7.2 fixes)
+
 ## [0.7.2] - 2025-10-22
 
 ### Bug Fixes
