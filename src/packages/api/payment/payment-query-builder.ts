@@ -31,7 +31,7 @@ export class PaymentQueryBuilder extends BaseQueryBuilder<Payment> {
 	 * @returns The Query Builder
 	 */
 	public whereCustomerId(customerId: string): this {
-		this.whereClauses.push(`CustomerRef.value = '${customerId}'`);
+		this.whereClauses.push(`CustomerRef = '${customerId}'`);
 		return this;
 	}
 }

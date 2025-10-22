@@ -89,7 +89,7 @@ describe('Live API: Bills', async () => {
 
 		// Get the Start Date
 		const startDate = new Date();
-		startDate.setDate(endDate.getDate() - 120);
+		startDate.setDate(endDate.getDate() - 730);
 
 		// Get the Bills
 		const searchResponse = await apiClient.bills.getBillsForDateRange(startDate, endDate);
