@@ -1,6 +1,6 @@
 // Imports
 import { Endpoints, AuthScopes, GrantType, type Token, type TokenResponse } from '../../types/types';
-import { EventEmitter } from 'node:events';
+import { TinyEmitter } from 'tiny-emitter';
 
 /**
  * The Auth Provider is responsible for handling the OAuth2 flow for the application.
@@ -17,7 +17,7 @@ export class AuthProvider {
 	/**
 	 * The Event Emitter for the Auth Provider
 	 */
-	private readonly eventEmitter: EventEmitter = new EventEmitter();
+	private readonly eventEmitter: TinyEmitter = new TinyEmitter();
 
 	/**
 	 * Wether to automatically refresh the token when it is expired
