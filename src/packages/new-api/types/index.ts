@@ -1,7 +1,7 @@
 import type { Documents } from "./defs";
 import type { OptionalKeys } from "./helpers";
 
-export type EnvironmentType = "sandbox" | "production";
+export type EnvironmentType = "Sandbox" | "Production";
 
 export type QBResponse<SuccessfulResponse extends Record<string, any>> =
     (

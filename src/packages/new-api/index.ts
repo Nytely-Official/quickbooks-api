@@ -14,10 +14,10 @@ function toQueryString(params: Record<string, string | number | boolean | null |
 
 async function baseUrl(authProvider: AuthProvider) {
     const token = await authProvider.getToken();
-    if (authProvider.environment === "sandbox") {
-        return `https://sandbox-quickbooks.api.intuit.com/v3/company/${token.realmId}`;
+    if (authProvider.environment === "Production") {
+        return `https://quickbooks.api.intuit.com/v3/company/${token.realmId}`;
     }
-    return `https://quickbooks.api.intuit.com/v3/company/${token.realmId}`;
+    return `https://sandbox-quickbooks.api.intuit.com/v3/company/${token.realmId}`;
 }
 
 export async function apiHeaders(

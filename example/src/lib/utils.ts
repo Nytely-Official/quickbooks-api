@@ -5,7 +5,7 @@ export const authProvider = new AuthProvider(
     QB_CLIENT_ID,
     QB_CLIENT_SECRET,
     "http://localhost:4000/callback",
-    "sandbox",
+    "Sandbox",
     [
         AuthScopes.Accounting,
     ]
