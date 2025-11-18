@@ -6,10 +6,10 @@ import {
     defaultRemove,
     defaultPDF,
 } from "./default-apis";
-import type { Invoice } from "./types/invoice";
-import { PickRequired } from "./types/helpers";
-import { AuthProvider } from "../auth/auth-provider";
 import { callApi } from ".";
+import type { AuthProvider } from "../auth/auth-provider";
+import type { Invoice } from "./types/invoice";
+import type { PickRequired } from "./types/helpers";
 
 export const query = defaultQuery("Invoice");
 export const read = defaultRead("Invoice");

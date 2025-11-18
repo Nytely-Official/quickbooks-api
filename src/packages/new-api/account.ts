@@ -1,6 +1,6 @@
 import { defaultRead, defaultQuery, defaultCreate, defaultUpdate } from "./default-apis";
 import type { Account } from "./types/account";
-import { PickRequired } from "./types/helpers";
+import type { PickRequired } from "./types/helpers";
 
 export const query = defaultQuery("Account");
 export const read = defaultRead("Account");

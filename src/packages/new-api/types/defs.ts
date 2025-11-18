@@ -1,10 +1,11 @@
-import { Account } from "./account";
-import { Customer } from "./customer";
-import { Estimate } from "./estimate";
-import { Prettify } from "./helpers";
-import { Invoice } from "./invoice";
-import Vendor from "./vendor";
-import { Bill } from "./bill";
+import type Account from "./account";
+import type Customer from "./customer";
+import type Estimate from "./estimate";
+import type Invoice from "./invoice";
+import type Vendor from "./vendor";
+import type Bill from "./bill";
+
+import type { Prettify } from "./helpers";
 
 /**
  * The ReferenceType Object

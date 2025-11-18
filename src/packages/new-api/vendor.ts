@@ -1,6 +1,6 @@
 import { defaultRead, defaultQuery, defaultCreate, defaultUpdate } from "./default-apis";
-import { PickRequired } from "./types/helpers";
-import Vendor from "./types/vendor";
+import type { PickRequired } from "./types/helpers";
+import type Vendor from "./types/vendor";
 
 export const create = defaultCreate<Partial<Vendor>, "Vendor">("Vendor");
 export const query = defaultQuery("Vendor");

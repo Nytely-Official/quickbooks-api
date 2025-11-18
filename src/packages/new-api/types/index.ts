@@ -1,6 +1,5 @@
-import { Documents } from "./defs";
-
-import { OptionalKeys } from "./helpers";
+import type { Documents } from "./defs";
+import type { OptionalKeys } from "./helpers";
 
 export type EnvironmentType = "sandbox" | "production";
 

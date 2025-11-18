@@ -1,6 +1,6 @@
 import { defaultRead, defaultQuery, defaultRemove, defaultCreate, defaultUpdate } from "./default-apis";
 import type { Bill } from "./types/bill";
-import { PickRequired } from "./types/helpers";
+import type { PickRequired } from "./types/helpers";
 
 export const read = defaultRead("Bill");
 export const query = defaultQuery("Bill");

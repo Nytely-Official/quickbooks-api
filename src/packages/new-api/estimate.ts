@@ -2,7 +2,7 @@ import { callApi } from ".";
 import { defaultRead, defaultQuery, defaultRemove, defaultCreate, defaultUpdate, defaultPDF } from "./default-apis";
 import type Estimate from "./types/estimate";
 import type { AuthProvider } from "../auth/auth-provider";
-import { PickRequired } from "./types/helpers";
+import type { PickRequired } from "./types/helpers";
 
 export const read = defaultRead("Estimate");
 export const query = defaultQuery("Estimate");

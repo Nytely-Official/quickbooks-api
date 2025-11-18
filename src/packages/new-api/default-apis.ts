@@ -1,8 +1,7 @@
 import { apiHeaders, buildUrl, callApi, parseResponse } from ".";
 import type { AuthProvider } from "../auth/auth-provider";
-import type { DocumentType } from "./types/defs";
-import type { Documents } from "./types/defs";
-import { Prettify } from "./types/helpers";
+import type { DocumentType, Documents } from "./types/defs";
+import type { Prettify } from "./types/helpers";
 
 
 export function defaultQuery<
