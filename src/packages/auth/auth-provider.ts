@@ -1,6 +1,7 @@
 // Imports
 import { Endpoints, AuthScopes, GrantType, type Token, type TokenResponse } from '../../types/types';
 import { TinyEmitter } from 'tiny-emitter';
+import { EnvironmentType } from '../new-api/types';
 
 /**
  * The Auth Provider is responsible for handling the OAuth2 flow for the application.
@@ -29,6 +30,7 @@ export class AuthProvider {
 	 * @param clientId The client ID for the application *Required*
 	 * @param clientSecret The client secret for the application *Required*
 	 * @param redirectUri The redirect URI for the application *Required*
+	 * @param environment The environment for the application *Required*
 	 * @param scopes The scopes for the application *Required*
 	 * @param token The token for the application (optional)
 	 */
@@ -37,6 +39,7 @@ export class AuthProvider {
 		private readonly clientId: string,
 		private readonly clientSecret: string,
 		private readonly redirectUri: string,
+		public readonly environment: EnvironmentType,
 		private readonly scopes: Array<AuthScopes>,
 		private token?: Token,
 	) {
