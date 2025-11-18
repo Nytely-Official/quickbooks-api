@@ -1,12 +1,15 @@
-import type { MetaData, ReferenceType, EmailAddress } from "./defs";
 import type {
+	MetaData,
+	ReferenceType,
+	EmailAddress,
 	PhysicalAddress,
+	GlobalTaxCalculation,
 	LinkedTxn,
-	TxnTaxDetail,
 	EmailStatus,
 	CustomField,
-	GlobalTaxCalculation,
-} from "./estimate";
+	TxnTaxDetail,
+} from "./defs";
+import type TransactionLine from "./transaction-line";
 
 /**
  * Invoice
@@ -29,9 +32,8 @@ export type Invoice = {
 	 * Valid Line types include: SalesItemLine, GroupLine, DescriptionOnlyLine,
 	 * DiscountLine and SubTotalLine.
 	 * If the transaction is taxable there is a limit of 750 lines per transaction.
-	 * Required.
 	 */
-	Line: InvoiceLine[];
+	Line: TransactionLine[];
 
 	/**
 	 * Reference to a customer or job.
@@ -121,7 +123,6 @@ export type Invoice = {
 
 	/**
 	 * Printing status of the invoice.
-	 * Valid values: NotSet, NeedToPrint, PrintComplete
 	 */
 	PrintStatus?: PrintStatus;
 
@@ -189,7 +190,6 @@ export type Invoice = {
 
 	/**
 	 * Email status of the invoice.
-	 * Valid values: NotSet, NeedToSend, EmailSent
 	 */
 	EmailStatus?: EmailStatus;
 
@@ -335,13 +335,6 @@ export type PrintStatus = 'NotSet' | 'NeedToPrint' | 'PrintComplete';
 
 export type DeliveryInfo = {
 	DeliveryType?: string;
-};
-
-export type InvoiceLine = {
-	readonly Id?: string;
-	DetailType?: string;
-	Amount?: number;
-	Description?: string;
 };
 
 export type { Invoice as default };

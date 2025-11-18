@@ -92,7 +92,6 @@ export type Account = {
 	/**
 	 * The high-level classification of an account.
 	 * Not supported for non-posting accounts.
-	 * Valid values: `Asset`, `Equity`, `Expense`, `Liability`, `Revenue`
 	 * @systemDefined
 	 * @filterable
 	 */
@@ -110,7 +109,6 @@ export type Account = {
 
 	/**
 	 * The account location. For France locales only.
-	 * Valid values: WithinFrance, FranceOverseas, OutsideFranceWithEU, OutsideEU
 	 * @minorVersion 5
 	 */
 	TxnLocationType?: AccountTxnLocationType;

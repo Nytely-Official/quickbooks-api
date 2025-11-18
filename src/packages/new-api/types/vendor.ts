@@ -1,5 +1,11 @@
-import type { EmailAddress, MetaData, ReferenceType, TelephoneNumber, WebsiteAddress } from "./defs";
-import type { PhysicalAddress } from "./estimate";
+import type { 
+	EmailAddress, 
+	MetaData, 
+	ReferenceType, 
+	TelephoneNumber, 
+	WebsiteAddress, 
+	PhysicalAddress 
+} from "./defs";
 
 export type Vendor = {
 	/**
@@ -138,10 +144,9 @@ export type Vendor = {
 
 	/**
 	 * Method in which the supplier tracks their income (FR only).
-	 * Valid values: Cash, Accrual.
 	 * @minorVersion 3
 	 */
-	TaxReportingBasis?: string;
+	TaxReportingBasis?: TaxReportingBasis;
 
 	/**
 	 * Mobile phone number.
@@ -305,5 +310,7 @@ export type VendorPaymentBankDetail = {
      */
 	BankAccountNumber?: string;
 };
+
+export type TaxReportingBasis = 'Cash' | 'Accrual';
 
 export type { Vendor as default };

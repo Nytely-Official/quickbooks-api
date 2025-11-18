@@ -3,7 +3,7 @@ import type {
 	EmailAddress,
 	MetaData,
 	ReferenceType,
-	Date,
+	QBDate,
 	TelephoneNumber,
 	WebsiteAddress,
 } from "./defs";
@@ -183,7 +183,7 @@ export type Customer = {
 	/**
 	 * Date of the Open Balance (for create only).
 	 */
-	OpenBalanceDate?: Date;
+	OpenBalanceDate?: QBDate;
 
 	/**
 	 * If true, transactions are taxable.
