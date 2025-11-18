@@ -79,13 +79,15 @@ export function defaultRead<
     return run
 }
 
-export function defaultRemove(
-    documentType: DocumentType
+export function defaultRemove<
+    const TDocumentType extends DocumentType
+>(
+    documentType: TDocumentType
 ) {
-    async function run(authProvider: AuthProvider, body: {
-        id: string;
-        syncToken: string;
-    }) {
+    async function run(
+        authProvider: AuthProvider,
+        body: Pick<Documents[TDocumentType], "Id" | "SyncToken">
+    ) {
         const response = await callApi<{
             [documentType]: {
                 "status": string;

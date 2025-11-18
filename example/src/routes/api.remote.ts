@@ -1,7 +1,7 @@
 import { command, query } from "$app/server";
 import * as v from "valibot"
 import { authProvider } from "$lib/utils";
-import { apiHeaders, buildUrl, estimate, parseResponse } from "$newApi";
+import { estimate } from "$newApi";
 
 export const refreshToken = command(async () => {
     console.log(await authProvider.getToken())

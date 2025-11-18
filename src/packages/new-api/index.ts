@@ -5,7 +5,7 @@ function toQueryString(params: Record<string, string | number | boolean | null |
     const queryParams = new URLSearchParams();
     for (const [key, value] of Object.entries(params)) {
         if (value === null || value === undefined) continue;
-        queryParams.set(key, encodeURIComponent(value));
+        queryParams.set(key, String(value));
     }
     const searchString = queryParams.toString(); // already percent-encoded
     if (!searchString) return '';
