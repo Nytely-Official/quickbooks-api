@@ -26,7 +26,8 @@
 		"publish:package": "bun run build && bun run test && bun publish"
 	},
 	"dependencies": {
-		"class-transformer": "^0.5.1"
+		"class-transformer": "^0.5.1",
+		"tiny-emitter": "^2.1.0"
 	},
 	"devDependencies": {
 		"@types/bun": "latest",
