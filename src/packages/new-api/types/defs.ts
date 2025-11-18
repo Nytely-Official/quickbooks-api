@@ -3,6 +3,7 @@ import { Customer } from "./customer";
 import { Estimate } from "./estimate";
 import { Prettify } from "./helpers";
 import { Invoice } from "./invoice";
+import Vendor from "./vendor";
 
 /**
  * The ReferenceType Object
@@ -100,6 +101,7 @@ export type Documents = {
     Estimate: Estimate,
     Account: Account,
     Invoice: Invoice,
+    Vendor: Vendor,
 }
 
 /**
