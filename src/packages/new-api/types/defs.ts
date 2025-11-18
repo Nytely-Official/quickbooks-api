@@ -4,6 +4,7 @@ import { Estimate } from "./estimate";
 import { Prettify } from "./helpers";
 import { Invoice } from "./invoice";
 import Vendor from "./vendor";
+import { Bill } from "./bill";
 
 /**
  * The ReferenceType Object
@@ -102,9 +103,41 @@ export type Documents = {
     Account: Account,
     Invoice: Invoice,
     Vendor: Vendor,
+    Bill: Bill,
 }
 
 /**
  * The Document Type Union
  */
 export type DocumentType = Prettify<keyof Documents>;
+
+
+/**
+ * The billable status of the expense. This field is not
+ * updatable through an API request. The value automatically
+ * changes when an invoice is created.
+ */
+export type BillableStatus = 'Billable' | 'NotBillable' | 'HasBeenBilled';
+
+/**
+ * The markup info for the expense.
+ */
+export type MarkupInfo = {
+    /**
+     * Reference to a PriceLevel for the markup.
+     */
+    PriceLevelRef?: ReferenceType;
+
+    /**
+     * Markup amount expressed as a percent of charges already entered
+     * in the current transaction. To enter a rate of 10% use 10.0, not 0.01.
+     */
+    Percent?: number;
+
+    /**
+     * The account associated with the markup.
+     * Available with invoice objects only and when LinkedTxn specifies a ReimburseCharge.
+     * @systemDefined
+     */
+    readonly MarkUpIncomeAccountRef?: ReferenceType;
+};
