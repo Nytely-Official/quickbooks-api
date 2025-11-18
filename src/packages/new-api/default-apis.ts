@@ -11,7 +11,7 @@ export function defaultQuery<
     documentType: TDocumentType
 ) {
     async function run(authProvider: AuthProvider, query: string) {
-        const selectEstimateRegex = new RegExp(`^select\\s+(.*)+\\s+from\\s+${documentType}`, "i");
+        const selectEstimateRegex = new RegExp(`^select [\s\S]+ from ${documentType}`, "i");
         if (!selectEstimateRegex.test(query.trim())) {
             return {
                 fault: {
