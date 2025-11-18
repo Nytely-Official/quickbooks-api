@@ -1,6 +1,6 @@
 import { callApi } from ".";
-import { defaultRead, defaultQuery, defaultRemove, defaultCreate, defaultUpdate, defaultPdf } from "./default-apis";
-import type { Estimate } from "./types/estimate";
+import { defaultRead, defaultQuery, defaultRemove, defaultCreate, defaultUpdate, defaultPDF } from "./default-apis";
+import type Estimate from "./types/estimate";
 import type { AuthProvider } from "../auth/auth-provider";
 import { PickRequired } from "./types/helpers";
 
@@ -31,4 +31,4 @@ export async function send(
     }
 }
 
-export const pdf = defaultPdf("Estimate");
+export const pdf = defaultPDF("Estimate");

@@ -1,4 +1,11 @@
-import { defaultRead, defaultQuery, defaultCreate, defaultUpdate, defaultRemove, defaultPdf } from "./default-apis";
+import {
+    defaultRead,
+    defaultQuery,
+    defaultCreate,
+    defaultUpdate,
+    defaultRemove,
+    defaultPDF,
+} from "./default-apis";
 import type { Invoice } from "./types/invoice";
 import { PickRequired } from "./types/helpers";
 import { AuthProvider } from "../auth/auth-provider";
@@ -86,4 +93,4 @@ export async function send(
     }
 }
 
-export const pdf = defaultPdf("Invoice");
+export const pdf = defaultPDF("Invoice");

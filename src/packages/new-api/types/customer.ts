@@ -6,6 +6,7 @@ import type {
 	QBDate,
 	TelephoneNumber,
 	WebsiteAddress,
+	PhysicalAddress,
 } from "./defs";
 
 
@@ -231,7 +232,7 @@ export type Customer = {
 	/**
 	 * Default shipping address.
 	 */
-	ShipAddr?: string;
+	ShipAddr?: PhysicalAddress;
 
 	/**
 	 * Reference to preferred payment method.
@@ -247,7 +248,7 @@ export type Customer = {
 	/**
 	 * Default billing address.
 	 */
-	BillAddr?: string;
+	BillAddr?: PhysicalAddress;
 
 	/**
 	 * Tax exemption reason ID, for automated sales tax

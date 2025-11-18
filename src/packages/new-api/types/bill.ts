@@ -31,7 +31,7 @@ export type Bill = {
 	 * Valid `Line` types include: `ItemBasedExpenseLine` and `AccountBasedExpenseLine`.
 	 * Required.
 	 */
-	Line: ExpenseLine;
+	Line: ExpenseLine[];
 
 	/**
 	 * Version number used for optimistic locking.
@@ -166,15 +166,6 @@ export type Bill = {
 	 * @filterable
 	 */
 	readonly Balance?: number;
-}
-
-const bill: Bill = "bill" as any as Bill
-if (bill.LinkedTxn) {
-	bill.LinkedTxn.map(linkedTxn => {
-		if (linkedTxn.TxnType === "Payment") {
-			console.log(linkedTxn.TxnId);
-		}
-	});
 }
 
 

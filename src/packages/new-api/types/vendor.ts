@@ -290,7 +290,7 @@ export type ContactInfo = {
     /**
      * The type of contact information.
      */
-	Type?: TelephoneNumber;
+	Type?: "TelephoneNumber";
 	Telephone?: TelephoneNumber;
 };
 
