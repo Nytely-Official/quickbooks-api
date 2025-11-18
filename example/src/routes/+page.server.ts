@@ -4,13 +4,10 @@ import { authProvider } from '$lib/utils';
 
 export const load = (async () => {
     try {
-        const token = await authProvider.getToken();
-        // console.log(token);
+        await authProvider.getToken();
         return {}
     } catch (error) {
-        // console.log(error);
         const authUrl = authProvider.generateAuthUrl();
-        // console.log(authUrl, authUrl.toString());
         redirect(302, authUrl.toString());
     }
 }) satisfies PageServerLoad;

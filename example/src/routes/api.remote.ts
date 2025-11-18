@@ -1,7 +1,7 @@
 import { command, query } from "$app/server";
 import * as v from "valibot"
 import { authProvider } from "$lib/utils";
-import { estimate } from "$newApi";
+import { apiHeaders, buildUrl, estimate, parseResponse } from "$newApi";
 
 export const refreshToken = command(async () => {
     console.log(await authProvider.getToken())
@@ -30,4 +30,8 @@ export const updateEstimateDate = command(v.object({
     });
     console.log(response);
     return response;
+});
+
+export const estimatePdf = query(v.union([v.string(), v.number()]), async (id) => {
+    return await estimate.pdf(authProvider, id);
 });

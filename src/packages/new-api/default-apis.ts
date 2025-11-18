@@ -1,4 +1,4 @@
-import { callApi } from ".";
+import { apiHeaders, buildUrl, callApi, parseResponse } from ".";
 import type { AuthProvider } from "../auth/auth-provider";
 import type { DocumentType } from "./types/defs";
 import type { Documents } from "./types/defs";
@@ -171,6 +171,36 @@ export function defaultUpdate<
         return {
             fault: undefined,
             data: response.data[documentType]
+        }
+    }
+
+    return run
+}
+
+export function defaultPdf(
+    documentType: "Estimate" | "Invoice"
+) {
+    async function run(authProvider: AuthProvider, id: string | number) {
+        const response = await fetch(
+            await buildUrl(authProvider, {
+                path: [documentType.toLowerCase(), id, "pdf"],
+            }),
+            {
+                method: "GET",
+                headers: await apiHeaders(authProvider, { useAcceptHeader: false }),
+            }
+        );
+        if (!response.ok) {
+            const responseData = await response.json();
+            const parsedResponseData = await parseResponse<any>(responseData);
+            return {
+                fault: parsedResponseData.fault,
+                data: undefined,
+            }
+        }
+        return {
+            data: await response.arrayBuffer(),
+            fault: undefined,
         }
     }
 

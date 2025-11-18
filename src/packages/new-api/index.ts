@@ -20,13 +20,21 @@ async function baseUrl(authProvider: AuthProvider) {
     return `https://quickbooks.api.intuit.com/v3/company/${token.realmId}`;
 }
 
-export async function apiHeaders(authProvider: AuthProvider) {
+export async function apiHeaders(
+    authProvider: AuthProvider,
+    options: {
+        useAcceptHeader?: boolean,
+    } = {}
+) {
     const token = await authProvider.getToken();
-    return {
+    const headers: Record<string, string> = {
         'Authorization': `Bearer ${token.accessToken}`,
-        'Accept': 'application/json',
         'Content-Type': 'application/json',
     }
+    if (options.useAcceptHeader !== false) {
+        headers['Accept'] = 'application/json';
+    }
+    return headers;
 }
 
 export async function buildUrl(authProvider: AuthProvider, { path, params = {} }: {
@@ -42,7 +50,7 @@ export async function buildUrl(authProvider: AuthProvider, { path, params = {} }
     return new URL(urlString + searchString);
 }
 
-async function parseResponse<
+export async function parseResponse<
     const TSuccess extends Record<string, any>,
     const TResponse extends QBResponse<TSuccess> = QBResponse<TSuccess>
 >(responseData: TResponse) {
