@@ -39,7 +39,7 @@ export type Bill = {
 	 * @systemDefined
 	 * @requiredForUpdate
 	 */
-	readonly SyncToken: string;
+	readonly SyncToken?: string;
 
 	/**
 	 * Reference to the currency in which amounts are expressed.

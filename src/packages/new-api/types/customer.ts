@@ -31,7 +31,7 @@ export type Customer = {
 	 * @systemDefined
 	 * @requiredForUpdate
 	 */
-	readonly SyncToken: string;
+	readonly SyncToken?: string;
 
 	/**
 	 * The name of the person or organization as displayed. Must be

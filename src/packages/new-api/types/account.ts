@@ -31,7 +31,7 @@ export type Account = {
 	 * @systemDefined
 	 * @requiredForUpdate
 	 */
-	readonly SyncToken: string;
+	readonly SyncToken?: string;
 
 	/**
 	 * User-defined account number. Must be unique. The Account.AcctNum attribute

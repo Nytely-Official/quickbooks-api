@@ -30,7 +30,7 @@ export type Estimate = {
 	 * @systemDefined
 	 * @requiredForUpdate
 	 */
-	readonly SyncToken: string;
+	readonly SyncToken?: string;
 
 	/**
 	 * Address where the goods are shipped from (or sale location when no shipping).

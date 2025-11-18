@@ -24,7 +24,7 @@ export type Vendor = {
 	 * @systemDefined
 	 * @requiredForUpdate
 	 */
-	readonly SyncToken: string;
+	readonly SyncToken?: string;
 
 	/**
 	 * Title of the person. Supports i18n, all locales.

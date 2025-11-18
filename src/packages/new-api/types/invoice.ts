@@ -48,7 +48,7 @@ export type Invoice = {
 	 * @systemDefined
 	 * @requiredForUpdate
 	 */
-	readonly SyncToken: string;
+	readonly SyncToken?: string;
 
 	/**
 	 * Identifies the address where the goods are shipped from.
