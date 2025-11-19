@@ -1,5 +1,5 @@
 import type { MetaData, ReferenceType } from "./defs";
-import { Prettify } from "./helpers";
+import type { Prettify } from "./helpers";
 
 export type Item = {
     /**
