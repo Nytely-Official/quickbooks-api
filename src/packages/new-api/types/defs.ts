@@ -4,6 +4,7 @@ import type Estimate from "./estimate";
 import type Invoice from "./invoice";
 import type Vendor from "./vendor";
 import type Bill from "./bill";
+import type Item from "./item";
 import type Preferences from "./preferences";
 
 import type { Prettify } from "./helpers";
@@ -107,6 +108,7 @@ export type Documents = {
     Vendor: Vendor,
     Bill: Bill,
     Preferences: Preferences,
+    Item: Item,
 }
 
 /**
