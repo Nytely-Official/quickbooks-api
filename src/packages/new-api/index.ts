@@ -1,7 +1,9 @@
 import type { QBResponse } from "./types";
 import type { AuthProvider } from "../auth/auth-provider";
 
-function toQueryString(params: Record<string, string | number | boolean | null | undefined>) {
+type QueryParams = Record<string, string | number | boolean | null | undefined>;
+
+function toQueryString(params: QueryParams) {
     const queryParams = new URLSearchParams();
     for (const [key, value] of Object.entries(params)) {
         if (value === null || value === undefined) continue;
@@ -38,8 +40,8 @@ export async function apiHeaders(
 }
 
 export async function buildUrl(authProvider: AuthProvider, { path, params = {} }: {
-    path: any[],
-    params?: Record<string, string>,
+    path: Array<string | number>,
+    params?: QueryParams,
 }) {
     const encodedPath = path.map(segment => encodeURIComponent(segment));
     const urlString = [
@@ -82,11 +84,11 @@ type ApiOptions = {
 } & (
         {
             method: "GET",
-            params?: Record<string, any>,
+            params?: QueryParams,
         }
         | {
             method: "POST",
-            params?: Record<string, any>,
+            params?: QueryParams,
             body?: Record<string, any>,
         }
     )
@@ -132,10 +134,14 @@ import * as estimate from "./estimate";
 import * as invoice from "./invoice";
 import * as account from "./account";
 import * as customer from "./customer";
+import * as bill from "./bill";
+import * as vendor from "./vendor";
 
 export {
     estimate,
     invoice,
     account,
     customer,
+    bill,
+    vendor,
 }
