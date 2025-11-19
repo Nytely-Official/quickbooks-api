@@ -28,7 +28,7 @@ export type Preferences = {
     /**
      * Email message preferences per document type.
      */
-    EmailMessagesPrefs?: {
+    EmailMessagesPrefs: {
         InvoiceMessage?: EmailMessageType;
         EstimateMessage?: EmailMessageType;
         SalesReceiptMessage?: EmailMessageType;
@@ -38,7 +38,7 @@ export type Preferences = {
     /**
      * Product and services preferences.
      */
-    ProductAndServicesPrefs?: {
+    ProductAndServicesPrefs: {
         /**
          * Revenue recognition enabled. (QBO Advanced only)
          * @minorVersion 65
@@ -67,7 +67,7 @@ export type Preferences = {
     /**
      * Accounting and company info preferences.
      */
-    AccountingInfoPrefs?: {
+    AccountingInfoPrefs: {
         /**
          * First month of fiscal year.
          * @minorVersion 21
@@ -125,7 +125,7 @@ export type Preferences = {
     /**
      * Sales forms preferences.
      */
-    SalesFormsPrefs?: {
+    SalesFormsPrefs: {
         /**
          * Default BCC email for invoices.
          * @minorVersion 8
@@ -202,7 +202,7 @@ export type Preferences = {
     /**
      * Vendor and purchases preferences.
      */
-    VendorAndPurchasesPrefs?: {
+    VendorAndPurchasesPrefs: {
         /**
          * Purchase Order Custom Field definitions (read-only).
          */
@@ -231,7 +231,7 @@ export type Preferences = {
     /**
      * Tax preferences and automated sales tax indicators.
      */
-    TaxPrefs?: {
+    TaxPrefs: {
         /**
          * Automated sales tax enabled and set up (read-only).
          */
@@ -249,12 +249,12 @@ export type Preferences = {
     /**
      * Name/Value extension preferences at top level.
      */
-    OtherPrefs?: NameValuePair[];
+    OtherPrefs: NameValuePair[];
 
     /**
      * Time tracking preferences.
      */
-    TimeTrackingPrefs?: {
+    TimeTrackingPrefs: {
         readonly WorkWeekStartDate?: WeekEnum;
         readonly MarkTimeEntriesBillable?: boolean;
         ShowBillRateToAll?: boolean;
@@ -265,7 +265,7 @@ export type Preferences = {
     /**
      * Currency preferences.
      */
-    CurrencyPrefs?: {
+    CurrencyPrefs: {
         /**
          * Currency code of the country where the business is located (read-only).
          */
