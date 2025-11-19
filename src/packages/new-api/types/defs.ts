@@ -7,8 +7,6 @@ import type Bill from "./bill";
 import type Item from "./item";
 import type Preferences from "./preferences";
 
-import type { Prettify } from "./helpers";
-
 /**
  * The ReferenceType Object
  */
@@ -114,7 +112,7 @@ export type Documents = {
 /**
  * The Document Type Union
  */
-export type DocumentType = Prettify<keyof Documents>;
+export type DocumentType = keyof Documents;
 
 
 /**
