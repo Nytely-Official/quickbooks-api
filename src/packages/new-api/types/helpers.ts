@@ -18,3 +18,5 @@ export type PickRequired<
     &
     Partial<Omit<T, K>>
 >;
+
+export type Pair<A, B> = [A, B];

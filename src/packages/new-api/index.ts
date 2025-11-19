@@ -136,6 +136,7 @@ import * as account from "./account";
 import * as customer from "./customer";
 import * as bill from "./bill";
 import * as vendor from "./vendor";
+import * as preferences from "./preferences";
 
 export {
     estimate,
@@ -144,4 +145,5 @@ export {
     customer,
     bill,
     vendor,
+    preferences,
 }
