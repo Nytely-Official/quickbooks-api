@@ -135,7 +135,7 @@ describe('Payment API', () => {
 			);
 
 			// Assert the Payment
-			expect(apiClient.payments.getPaymentById('invalid')).rejects.toThrow('Payment not found');
+			expect(apiClient.payments.getPaymentById('invalid')).rejects.toThrow('Failed to run request');
 		});
 	});
 

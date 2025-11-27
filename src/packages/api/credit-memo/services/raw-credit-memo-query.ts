@@ -17,7 +17,7 @@ export async function rawCreditMemoQuery(this: CreditMemoAPI, queryBuilder: Cred
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const creditmemos = this.formatResponse(response);
+	const creditmemos = await this.formatResponse(response);
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<CreditMemo> = {

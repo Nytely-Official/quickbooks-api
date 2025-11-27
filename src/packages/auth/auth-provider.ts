@@ -1,6 +1,9 @@
-// Imports
-import { Endpoints, AuthScopes, GrantType, type Token, type TokenResponse } from '../../types/types';
-import { EventEmitter } from 'node:events';
+// External Imports
+import { TinyEmitter } from 'tiny-emitter';
+
+// Internal Imports
+import { Endpoints, AuthScopes, GrantType, type Token, type TokenResponse, QuickbooksError } from '../../types/types';
+import { ApiClient } from '../api/api-client';
 
 /**
  * The Auth Provider is responsible for handling the OAuth2 flow for the application.
@@ -17,7 +20,7 @@ export class AuthProvider {
 	/**
 	 * The Event Emitter for the Auth Provider
 	 */
-	private readonly eventEmitter: EventEmitter = new EventEmitter();
+	private readonly eventEmitter: TinyEmitter = new TinyEmitter();
 
 	/**
 	 * Wether to automatically refresh the token when it is expired
@@ -60,11 +63,16 @@ export class AuthProvider {
 
 	/**
 	 * Get the Access Token
+	 * @throws {QuickbooksError} If the token is not provided
 	 * @returns {string} The access token
 	 */
 	public async getToken(): Promise<Token> {
 		// Check if the token is expired
-		if (!this.token) throw new Error('User is not Authorized, please re-authenticate or set the token manually with the setToken method');
+		if (!this.token)
+			throw new QuickbooksError(
+				'User is not Authorized, please re-authenticate or set the token manually with the setToken method',
+				await ApiClient.getIntuitErrorDetails(null),
+			);
 
 		// Check if the Token is Expired and Refresh it if it is
 		if (this.token.accessTokenExpiryDate < new Date() && this.autoRefresh) await this.refresh();
@@ -76,6 +84,7 @@ export class AuthProvider {
 	/**
 	 * Set the Token
 	 * @param token The token to set
+	 * @throws {QuickbooksError} If the token is not provided
 	 */
 	public async setToken(newToken: Token | null): Promise<void> {
 		// Check if the Token is not provided and clear the token
@@ -90,6 +99,7 @@ export class AuthProvider {
 
 	/**
 	 * Generates the OAuth2 URL to get the auth code from the user
+	 * @param state The state to use for the OAuth2 URL
 	 * @returns {URL} The OAuth2 URL to get the auth code from the user
 	 */
 	public generateAuthUrl(state: string = crypto.randomUUID()): URL {
@@ -113,6 +123,7 @@ export class AuthProvider {
 	/**
 	 * Exchanges an Auth Code for a Token
 	 * @param authCode The auth code to exchange for a token
+	 * @throws {QuickbooksError} If the token is not provided or the refresh token is expired
 	 * @returns {Promise<Token>} The token
 	 */
 	public async exchangeCode(code: string, realmId: string): Promise<Token> {
@@ -143,13 +154,16 @@ export class AuthProvider {
 			const errorMessage = await response.text();
 
 			// Throw an error
-			throw new Error(`Failed to exchange auth code for a token: ${errorMessage}`);
+			throw new QuickbooksError(
+				`Failed to exchange auth code for a token: ${errorMessage}`,
+				await ApiClient.getIntuitErrorDetails(response),
+			);
 		}
 
 		// Parse the response
-		const data = (await response.json().catch(() => {
-			throw new Error('Failed to parse the token response');
-		})) as TokenResponse;
+		const data: TokenResponse = await response.json().catch(async () => {
+			throw new QuickbooksError('Failed to parse the token response', await ApiClient.getIntuitErrorDetails(response));
+		});
 
 		// Clear the Current Token
 		this.token = undefined;
@@ -167,14 +181,20 @@ export class AuthProvider {
 	/**
 	 * Exchanges a Refresh Token for a Token
 	 * @param refreshToken The refresh token to exchange for a token
-	 * @returns {Promise<Token>} The token
+	 * @throws {QuickbooksError} If the token is not provided or the refresh token is expired
+	 * @returns {Promise<Token>} The refreshed token
 	 */
 	public async refresh(): Promise<Token> {
 		// Check if the token is provided
-		if (!this.token) throw new Error('Token is not provided, please set the token manually with the setToken method');
+		if (!this.token)
+			throw new QuickbooksError(
+				'Token is not provided, please set the token manually with the setToken method',
+				await ApiClient.getIntuitErrorDetails(null),
+			);
 
 		// Check if the refresh token is expired
-		if (this.token.refreshTokenExpiryDate < new Date()) throw new Error('Refresh token is expired, please re-authenticate');
+		if (this.token.refreshTokenExpiryDate < new Date())
+			throw new QuickbooksError('Refresh token is expired, please re-authenticate', await ApiClient.getIntuitErrorDetails(null));
 
 		// Setup the Request Data
 		const requestData = new URLSearchParams({
@@ -198,17 +218,17 @@ export class AuthProvider {
 
 		// Check if the response is successful
 		if (!response.ok) {
-			// Get the error message
-			const errorMessage = await response.text().catch(() => '');
+			// Get the Intuit Error Details
+			const errorDetails = await ApiClient.getIntuitErrorDetails(response);
 
-			// Throw an error
-			throw new Error(`Failed to refresh token: ${errorMessage}`);
+			// Throw the Quickbooks Error
+			throw new QuickbooksError(`Failed to refresh token`, errorDetails);
 		}
 
 		// Parse the response
-		const data = (await response.json().catch(() => {
-			throw new Error('Failed to parse the token response');
-		})) as TokenResponse;
+		const data: TokenResponse = await response.json().catch(async () => {
+			throw new QuickbooksError('Failed to parse the token response', await ApiClient.getIntuitErrorDetails(response));
+		});
 
 		// Parse the token response
 		const newToken = this.parseTokenResponse(data, this.token.realmId);
@@ -226,11 +246,16 @@ export class AuthProvider {
 	/**
 	 * Revokes a Token
 	 * @param token The token to revoke
+	 * @throws {QuickbooksError} If the token is not provided
 	 * @returns {Promise<boolean>} True if the token was revoked, false otherwise
 	 */
 	public async revoke(): Promise<boolean> {
 		// Check if the token is provided
-		if (!this.token) throw new Error('Token is not provided, please set the token manually with the setToken method');
+		if (!this.token)
+			throw new QuickbooksError(
+				'Token is not provided, please set the token manually with the setToken method',
+				await ApiClient.getIntuitErrorDetails(null),
+			);
 
 		// Setup the Request Data
 		const requestData = {
@@ -252,7 +277,7 @@ export class AuthProvider {
 		const response = await fetch(Endpoints.TokenRevoke, requestOptions);
 
 		// Check if the response is successful
-		if (!response.ok) throw new Error(`Failed to revoke token: invalid_token`);
+		if (!response.ok) throw new QuickbooksError(`Failed to revoke token: invalid_token`, await ApiClient.getIntuitErrorDetails(response));
 
 		// Emit the Revoke Event
 		this.eventEmitter.emit('revoke', this.token);
@@ -266,11 +291,16 @@ export class AuthProvider {
 
 	/**
 	 * Validates the Token
+	 * @throws {QuickbooksError} If the token is not provided
 	 * @returns {Promise<boolean>} True if the token is valid, false otherwise
 	 */
 	public async validateToken(): Promise<boolean> {
 		// Check if the token is provided
-		if (!this.token) throw new Error('Token is not provided, please set the token manually with the setToken method');
+		if (!this.token)
+			throw new QuickbooksError(
+				'Token is not provided, please set the token manually with the setToken method',
+				await ApiClient.getIntuitErrorDetails(null),
+			);
 
 		// Check if the token is expired
 		const tokenExpired = this.token.accessTokenExpiryDate < new Date();
@@ -279,16 +309,18 @@ export class AuthProvider {
 		const refreshTokenExpired = this.token.refreshTokenExpiryDate < new Date();
 
 		// Check if the Token and Refresh Token are expired
-		if (refreshTokenExpired) throw new Error('Token and Refresh Token are expired, please re-authenticate');
+		if (refreshTokenExpired)
+			throw new QuickbooksError('Token and Refresh Token are expired, please re-authenticate', await ApiClient.getIntuitErrorDetails(null));
 
 		// Refresh the token if it is expired
 		if (tokenExpired && this.autoRefresh)
-			await this.refresh().catch((error: Error) => {
-				throw new Error(`Failed to refresh token: ${error.message}`);
+			await this.refresh().catch((error: QuickbooksError) => {
+				throw new QuickbooksError(`Failed to refresh token: ${error.message}`, error.details);
 			});
 
 		// Check if the token is expired and auto refresh is disabled
-		if (tokenExpired && !this.autoRefresh) throw new Error('Token is expired, please refresh the token');
+		if (tokenExpired && !this.autoRefresh)
+			throw new QuickbooksError('Token is expired, please refresh the token', await ApiClient.getIntuitErrorDetails(null));
 
 		// Return true if the token is valid
 		return true;
@@ -296,14 +328,21 @@ export class AuthProvider {
 
 	/**
 	 * Serializes the Token
+	 * @param secretKey The secret key to use for the serialization
+	 * @throws {QuickbooksError} If the secret key is not provided or the token is not provided
 	 * @returns {string | undefined} The serialized token
 	 */
 	public async serializeToken(secretKey: string): Promise<string | undefined> {
 		// Check if the secret key is weak
-		if (secretKey.length < 32) throw new Error('Secret key must be at least 32 characters long');
+		if (secretKey.length < 32)
+			throw new QuickbooksError('Secret key must be at least 32 characters long', await ApiClient.getIntuitErrorDetails(null));
 
 		// Check if the token is not provided
-		if (!this.token) throw new Error('Token is not provided, please set the token manually with the setToken method');
+		if (!this.token)
+			throw new QuickbooksError(
+				'Token is not provided, please set the token manually with the setToken method',
+				await ApiClient.getIntuitErrorDetails(null),
+			);
 
 		// Generate a Random Salt
 		const salt = crypto.getRandomValues(new Uint8Array(16));
@@ -320,9 +359,9 @@ export class AuthProvider {
 		// Encrypt the Token Data with AES-GCM
 		const encrypted = await crypto.subtle
 			.encrypt({ name: 'AES-GCM', iv: iv, tagLength: 128 }, cryptoKey, tokenData)
-			.catch((error: Error) => {
+			.catch(async (error: Error) => {
 				// Throw an Error
-				throw new Error(`Token serialization failed: ${error.message}`);
+				throw new QuickbooksError(`Token serialization failed: ${error.message}`, await ApiClient.getIntuitErrorDetails(null));
 			});
 
 		// Setup the Combined Array
@@ -342,22 +381,25 @@ export class AuthProvider {
 	 * Deserializes the Token
 	 * @param serialized The serialized token to deserialize
 	 * @param secretKey The secret key used for decryption
+	 * @throws {QuickbooksError} If the serialized token is not valid or the secret key is not provided
 	 */
 	public async deserializeToken(serialized: string, secretKey: string): Promise<void> {
 		// Check if the Serialized String is not Valid
-		if (!serialized.includes(':')) throw new Error('Invalid serialized token');
+		if (!serialized.includes(':')) throw new QuickbooksError('Invalid serialized token', await ApiClient.getIntuitErrorDetails(null));
 
 		// Split the Serialized String
 		const [headerBase64, combinedBase64] = serialized.split(':');
 
 		// Check if the header or combined data is not valid
-		if (!headerBase64 || !combinedBase64) throw new Error('Invalid serialized token');
+		if (!headerBase64 || !combinedBase64)
+			throw new QuickbooksError('Invalid serialized token', await ApiClient.getIntuitErrorDetails(null));
 
 		// Convert the Header to a String
 		const headerString = Buffer.from(headerBase64, 'base64').toString('utf-8');
 
 		// Check if the Header is not Valid
-		if (headerString !== this.serializationHeader) throw new Error('Invalid serialized token');
+		if (headerString !== this.serializationHeader)
+			throw new QuickbooksError('Invalid serialized token', await ApiClient.getIntuitErrorDetails(null));
 
 		// Convert combined data from base64
 		const combined = Buffer.from(combinedBase64, 'base64');
@@ -371,9 +413,9 @@ export class AuthProvider {
 		const cryptoKey = await this.deriveKey(secretKey, salt, 'decrypt');
 
 		// Decrypt the data
-		const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv }, cryptoKey, ciphertext).catch((error: Error) => {
+		const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv }, cryptoKey, ciphertext).catch(async (error: Error) => {
 			// Throw an Error
-			throw new Error(`Token deserialization failed: ${error.message}`);
+			throw new QuickbooksError(`Token deserialization failed: ${error.message}`, await ApiClient.getIntuitErrorDetails(null));
 		});
 
 		// Decode the decrypted data

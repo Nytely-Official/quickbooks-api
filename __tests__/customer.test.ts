@@ -162,7 +162,7 @@ describe('Customer API', () => {
 			);
 
 			// Assert the Customer
-			expect(apiClient.customers.getCustomerById('invalid')).rejects.toThrow('Customer not found');
+			expect(apiClient.customers.getCustomerById('invalid')).rejects.toThrow('Failed to run request');
 		});
 	});
 

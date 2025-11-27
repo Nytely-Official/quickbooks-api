@@ -1,6 +1,6 @@
 // Imports
 import { ApiClient } from '../api-client';
-import { Environment, Query, type Payment, type PaymentQueryResponse } from '../../../types/types';
+import { Environment, Query, QuickbooksError, type Payment, type PaymentQueryResponse } from '../../../types/types';
 import { Endpoints } from '../../../types/enums/endpoints';
 import { PaymentQueryBuilder } from './payment-query-builder';
 
@@ -52,12 +52,18 @@ export class PaymentAPI {
 	 * @param response - The Response
 	 * @returns The Payments
 	 */
-	protected formatResponse(response: any): Array<Payment> {
+	protected async formatResponse(response: any): Promise<Array<Payment>> {
 		// Check if the Response is Invalid
-		if (!response?.QueryResponse) throw new Error('Invalid Response');
+		if (!response?.QueryResponse) {
+			// Get the Intuit Error Details
+			const errorDetails = await ApiClient.getIntuitErrorDetails(response);
 
-		// Check if the Payment is Not set and Initialize an Empty Array
-		if (!response.QueryResponse.Payment) response.QueryResponse.Payment = new Array<Payment>();
+			// Throw the Quickbooks Error
+			throw new QuickbooksError('Unable to format Payments', errorDetails);
+		}
+
+		// Check if the Payment is Not set and if it is, set the Payment to an empty array
+		if (!response.QueryResponse.Payment) response.QueryResponse.Payment = new Array();
 
 		// Get the Payments
 		const queryResponse = response.QueryResponse as PaymentQueryResponse;

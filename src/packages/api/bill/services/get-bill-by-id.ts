@@ -1,5 +1,6 @@
 // Import the Query Builder
-import type { Bill } from '../../../../types/types';
+import { QuickbooksError, type Bill } from '../../../../types/types';
+import { ApiClient } from '../../api-client';
 import { BillAPI } from '../bill-api';
 
 /**
@@ -22,10 +23,10 @@ export async function getBillById(this: BillAPI, id: string): Promise<Bill> {
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Check if the Response Failed to find an Bill
-	if (!response) throw new Error('Bill not found');
+	if (!response) throw new QuickbooksError('Bill not found', await ApiClient.getIntuitErrorDetails(null));
 
 	// Format the Response
-	const bills = this.formatResponse(response);
+	const bills = await this.formatResponse(response);
 
 	// Return the Bill
 	return bills[0];

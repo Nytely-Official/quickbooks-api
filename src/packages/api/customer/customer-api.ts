@@ -1,6 +1,6 @@
 // Imports
 import { ApiClient } from '../api-client';
-import { Environment, Query, type Customer, type CustomerQueryResponse } from '../../../types/types';
+import { Environment, Query, QuickbooksError, type Customer, type CustomerQueryResponse } from '../../../types/types';
 import { Endpoints } from '../../../types/enums/endpoints';
 import { CustomerQueryBuilder } from './customer-query-builder';
 
@@ -52,12 +52,18 @@ export class CustomerAPI {
 	 * @param response - The Response
 	 * @returns The Customers
 	 */
-	protected formatResponse(response: { QueryResponse?: { Customer?: Customer[] } }): Array<Customer> {
+	protected async formatResponse(response: any): Promise<Array<Customer>> {
 		// Check if the Response is Invalid
-		if (!response?.QueryResponse) throw new Error('Invalid Response');
+		if (!response?.QueryResponse) {
+			// Get the Intuit Error Details
+			const errorDetails = await ApiClient.getIntuitErrorDetails(response);
 
-		// Check if the Customer is Not set and Initialize an Empty Array
-		if (!response.QueryResponse.Customer) response.QueryResponse.Customer = new Array<Customer>();
+			// Throw the Quickbooks Error
+			throw new QuickbooksError('Unable to format Customers', errorDetails);
+		}
+
+		// Check if the Customer is Not set and if it is, set the Customer to an empty array
+		if (!response.QueryResponse.Customer) response.QueryResponse.Customer = new Array();
 
 		// Get the Customers
 		const queryResponse = response.QueryResponse as CustomerQueryResponse;

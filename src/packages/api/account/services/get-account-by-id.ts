@@ -27,7 +27,7 @@ export async function getAccountById(this: AccountAPI, id: string, options: Acco
 	if (!response) return null;
 
 	// Format the Response
-	const accounts = this.formatResponse(response);
+	const accounts = await this.formatResponse(response);
 
 	// Return the Account
 	return accounts[0];

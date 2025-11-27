@@ -1,5 +1,5 @@
 import { ApiClient } from '../api-client';
-import { Environment, Query, type Bill, type BillQueryResponse } from '../../../types/types';
+import { Environment, Query, QuickbooksError, type Bill, type BillQueryResponse } from '../../../types/types';
 import { BillQueryBuilder } from './bill-query-builder';
 
 // Import the Services
@@ -47,9 +47,18 @@ export class BillAPI {
 	 * @param response - The Response
 	 * @returns The Bills
 	 */
-	protected formatResponse(response: any): Array<Bill> {
+	protected async formatResponse(response: any): Promise<Array<Bill>> {
 		// Check if the Response is invalid
-		if (!response || response.QueryResponse?.Bill?.length < 1) throw new Error('Bills not found');
+		if (!response?.QueryResponse) {
+			// Get the Intuit Error Details
+			const errorDetails = await ApiClient.getIntuitErrorDetails(response);
+
+			// Throw the Quickbooks Error
+			throw new QuickbooksError('Unable to format Bills', errorDetails);
+		}
+
+		// Check if the Length is Less than 1 and if it is, set the Bill to an empty array
+		if (!response.QueryResponse.Bill) response.QueryResponse.Bill = new Array();
 
 		// Get the Bills
 		const queryResponse = response.QueryResponse as BillQueryResponse;

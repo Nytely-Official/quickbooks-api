@@ -21,7 +21,7 @@ export async function getPreferences(this: PreferenceAPI, options: PreferenceOpt
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	let preferences = this.formatResponse(response);
+	let preferences = await this.formatResponse(response);
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Preferences> = {

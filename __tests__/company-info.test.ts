@@ -103,7 +103,7 @@ describe('Company Info API', () => {
 		});
 
 		// Test error handling when no company info is found
-		it('should throw error when no company info is found', async () => {
+		it('should return undefined when no company info is found', async () => {
 			// Setup the Company Info Query Response with empty CompanyInfo array
 			const companyInfoQueryResponse = {
 				QueryResponse: {
@@ -117,8 +117,11 @@ describe('Company Info API', () => {
 			// Mock the Fetch with proper QueryResponse structure
 			global.fetch = mockFetch(JSON.stringify(companyInfoQueryResponse));
 
-			// Assert the Error
-			await expect(apiClient.companyInfo.getCompanyInfo()).rejects.toThrow('No Company Info found');
+			// Get the Company Info
+			const companyInfo = await apiClient.companyInfo.getCompanyInfo();
+
+			// Assert that it returns undefined when no company info is found
+			expect(companyInfo).toBeUndefined();
 		});
 
 		// Test error handling for invalid response
@@ -175,4 +178,4 @@ describe('Company Info API', () => {
 			await expect(apiClient.companyInfo.rawCompanyInfoQuery('invalid query')).rejects.toThrow('Failed to run request');
 		});
 	});
-}); 
+});

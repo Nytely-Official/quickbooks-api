@@ -1,6 +1,7 @@
 // Import the Query Builder
-import type { Estimate, EstimateOptions, SearchResponse } from '../../../../types/types';
+import { QuickbooksError, type Estimate, type EstimateOptions, type SearchResponse } from '../../../../types/types';
 import { EstimateAPI } from '../estimate-api';
+import { ApiClient } from '../../api-client';
 
 /**
  * Get Estimates for a Date Range
@@ -16,7 +17,7 @@ export async function getEstimatesForDateRange(
 	options: EstimateOptions = {},
 ): Promise<SearchResponse<Estimate>> {
 	// Ensure the Start Date is Before the End Date
-	if (startDate > endDate) throw new Error('Start date must be before end date');
+	if (startDate > endDate) throw new QuickbooksError('Start date must be before end date', await ApiClient.getIntuitErrorDetails(null));
 
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
@@ -35,7 +36,7 @@ export async function getEstimatesForDateRange(
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const estimates = this.formatResponse(response);
+	const estimates = await this.formatResponse(response);
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Estimate> = {

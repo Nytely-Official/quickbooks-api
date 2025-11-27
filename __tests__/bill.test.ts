@@ -134,7 +134,7 @@ describe('Bill API', () => {
 			);
 
 			// Assert the Error
-			expect(apiClient.bills.getBillById('-1')).rejects.toThrow('Bill not found');
+			expect(apiClient.bills.getBillById('-1')).rejects.toThrow('Failed to run request');
 		});
 	});
 

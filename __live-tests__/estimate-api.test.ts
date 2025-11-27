@@ -1,5 +1,5 @@
 // Imports
-import { AuthProvider, Environment, ApiClient, AuthScopes, EstimateOptions, CustomerOptions, Estimate } from '../src/app';
+import { AuthProvider, Environment, ApiClient, AuthScopes, EstimateOptions, CustomerOptions, Estimate, QuickbooksError } from '../src/app';
 import { describe, expect, test } from 'bun:test';
 
 // Describe the Estimate API
@@ -129,9 +129,53 @@ describe('Live API: Estimates', async () => {
 	});
 
 	// Test error handling for invalid ID
-	test('should throw error for invalid estimate ID', async () => {
-		// Assert the Error
-		expect(apiClient.estimates.getEstimateById('invalid')).rejects.toThrow();
+	test('should throw QuickbooksError for invalid estimate ID', async () => {
+		try {
+			await apiClient.estimates.getEstimateById('invalid');
+			expect(false).toBe(true); // Should not reach here
+		} catch (error) {
+			// Assert the Error is a QuickbooksError
+			expect(error).toBeInstanceOf(QuickbooksError);
+			expect(error).toBeInstanceOf(Error);
+
+			// Assert the Error has the correct structure
+			expect(error.message).toBeDefined();
+			expect(error.details).toBeDefined();
+			expect(error.details.statusCode).toBeDefined();
+			expect(typeof error.details.statusCode).toBe('number');
+			expect(error.details.intuitError).toBeDefined();
+			expect(Array.isArray(error.details.intuitError)).toBe(true);
+			expect(error.details.intuitTID).toBeDefined();
+			expect(typeof error.details.intuitTID).toBe('string');
+		}
+	});
+
+	// Test error handling for invalid raw query
+	test('should throw QuickbooksError for invalid raw query', async () => {
+		// Get the Query Builder
+		const queryBuilder = await apiClient.estimates.getQueryBuilder();
+
+		// Add an invalid ID filter that will cause an error
+		queryBuilder.whereId('invalid-id-that-does-not-exist');
+
+		try {
+			await apiClient.estimates.rawEstimateQuery(queryBuilder);
+			expect(false).toBe(true); // Should not reach here
+		} catch (error) {
+			// Assert the Error is a QuickbooksError
+			expect(error).toBeInstanceOf(QuickbooksError);
+			expect(error).toBeInstanceOf(Error);
+
+			// Assert the Error has the correct structure
+			expect(error.message).toBeDefined();
+			expect(error.details).toBeDefined();
+			expect(error.details.statusCode).toBeDefined();
+			expect(typeof error.details.statusCode).toBe('number');
+			expect(error.details.intuitError).toBeDefined();
+			expect(Array.isArray(error.details.intuitError)).toBe(true);
+			expect(error.details.intuitTID).toBeDefined();
+			expect(typeof error.details.intuitTID).toBe('string');
+		}
 	});
 
 	// Test returning an empty array if no estimates are updated

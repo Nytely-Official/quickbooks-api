@@ -132,7 +132,7 @@ describe('Estimate API', () => {
 			);
 
 			// Assert the Error
-			expect(apiClient.estimates.getEstimateById('invalid')).rejects.toThrow('Estimate not found');
+			expect(apiClient.estimates.getEstimateById('invalid')).rejects.toThrow('Failed to run request');
 		});
 	});
 

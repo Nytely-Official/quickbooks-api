@@ -18,6 +18,7 @@ import {
 	MemoRef,
 	TxnTaxDetail,
 	CustomField,
+	QuickbooksError,
 } from '../types';
 
 /**
@@ -325,13 +326,14 @@ export class Invoice {
 
 	/**
 	 * @description Reload the Invoice Data
+	 * @throws {QuickbooksError} If the Invoice was not found
 	 */
 	public async reload() {
 		// Get the Invoice by ID
 		const invoice = await this.apiClient.invoices.getInvoiceById(this.Id);
 
 		// Check if the Invoice was not Found
-		if (!invoice) throw new Error('Invoice not found');
+		if (!invoice) throw new QuickbooksError('Invoice not found', await ApiClient.getIntuitErrorDetails(null));
 
 		// Assign the Properties
 		Object.assign(this, invoice);
