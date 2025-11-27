@@ -119,6 +119,82 @@ const paidInvoices = await apiClient.invoices.getAllInvoices({ status: InvoiceSt
 
 ---
 
+## Error Handling
+
+The SDK uses a custom `QuickbooksError` class that extends the standard `Error` class and provides structured access to Intuit API error
+details.
+
+### QuickbooksError Structure
+
+```typescript
+import { QuickbooksError } from 'quickbooks-api';
+
+try {
+  const invoice = await apiClient.invoices.getInvoiceById('invalid-id');
+} catch (error) {
+  if (error instanceof QuickbooksError) {
+    // Access the error message
+    console.error('Error:', error.message);
+
+    // Access structured error details
+    console.error('Status Code:', error.details.statusCode);
+    console.error('Transaction ID:', error.details.intuitTID);
+
+    // Access Intuit-specific error information
+    error.details.intuitError.forEach((err) => {
+      console.error('Error Code:', err.code);
+      console.error('Error Message:', err.message);
+      console.error('Error Detail:', err.detail);
+    });
+  }
+}
+```
+
+### Error Details
+
+The `QuickbooksError` includes the following properties:
+
+- `message: string` - Human-readable error message
+- `details.statusCode: number` - HTTP status code from the API response
+- `details.intuitError: Array<{message: string, detail: string, code: string}>` - Array of Intuit API error objects
+- `details.intuitTID: string` - Intuit transaction ID for support tracking
+
+### Example: Handling API Errors
+
+```typescript
+import { ApiClient, QuickbooksError } from 'quickbooks-api';
+
+async function fetchAccount(accountId: string) {
+  try {
+    const account = await apiClient.accounts.getAccountById(accountId);
+    return account;
+  } catch (error) {
+    if (error instanceof QuickbooksError) {
+      // Handle specific error cases
+      if (error.details.statusCode === 404) {
+        console.error('Account not found');
+      } else if (error.details.statusCode === 401) {
+        console.error('Authentication failed - token may be expired');
+      } else {
+        // Log full error details for debugging
+        console.error('QuickBooks API Error:', {
+          message: error.message,
+          statusCode: error.details.statusCode,
+          intuitErrors: error.details.intuitError,
+          transactionId: error.details.intuitTID,
+        });
+      }
+    } else {
+      // Handle unexpected errors
+      console.error('Unexpected error:', error);
+    }
+    throw error;
+  }
+}
+```
+
+---
+
 ## Token Management
 
 The `AuthProvider` handles token refresh, revocation, and secure storage. Use the following methods:

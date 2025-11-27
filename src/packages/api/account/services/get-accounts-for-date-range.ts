@@ -1,5 +1,6 @@
 // Import the Query Builder
-import type { Account, AccountOptions, SearchResponse } from '../../../../types/types';
+import { QuickbooksError, type Account, type AccountOptions, type SearchResponse } from '../../../../types/types';
+import { ApiClient } from '../../api-client';
 import { AccountAPI } from '../account-api';
 
 /**
@@ -16,7 +17,7 @@ export async function getAccountsForDateRange(
 	options: AccountOptions = {},
 ): Promise<SearchResponse<Account>> {
 	// Ensure the Start Date is Before the End Date
-	if (startDate > endDate) throw new Error('Start date must be before end date');
+	if (startDate > endDate) throw new QuickbooksError('Start date must be before end date', await ApiClient.getIntuitErrorDetails(null));
 
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
@@ -35,7 +36,7 @@ export async function getAccountsForDateRange(
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const accounts = this.formatResponse(response);
+	const accounts = await this.formatResponse(response);
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Account> = {

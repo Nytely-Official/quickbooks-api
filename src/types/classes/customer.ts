@@ -1,6 +1,14 @@
 // Import the Types
 import { ApiClient } from '../../packages/api/api-client';
-import { DeliveryMethod, EmailAddress, ModificationMetadata, ReferenceType, TelephoneNumber, WebsiteAddress } from '../types';
+import {
+	DeliveryMethod,
+	EmailAddress,
+	ModificationMetadata,
+	QuickbooksError,
+	ReferenceType,
+	TelephoneNumber,
+	WebsiteAddress,
+} from '../types';
 
 /**
  * Customer
@@ -301,13 +309,14 @@ export class Customer {
 
 	/**
 	 * @description Reload the Customer Data
+	 * @throws {QuickbooksError} If the Customer was not found
 	 */
 	public async reload() {
 		// Get the Customer by ID
 		const customer = await this.apiClient.customers.getCustomerById(this.Id);
 
 		// Check if the Customer was not Found
-		if (!customer) throw new Error('Customer not found');
+		if (!customer) throw new QuickbooksError('Customer not found', await ApiClient.getIntuitErrorDetails(null));
 
 		// Assign the Properties
 		Object.assign(this, customer);

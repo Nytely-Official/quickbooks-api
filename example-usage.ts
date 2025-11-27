@@ -303,8 +303,11 @@ app.get('/generate-test-token', async (req: Request, res: Response): Promise<voi
 		// Example: Serialize the Token
 		const serialized = await testAuthProvider.serializeToken(process.env.SECRET_KEY!);
 
+		// Example: Deserialize the Token
+		const deserialized = await testAuthProvider.getToken();
+
 		// Return the Data
-		res.send(serialized);
+		res.send({ serialized, deserialized });
 	} catch (error) {
 		// Log the Error
 		console.error('Auth callback error:', error);

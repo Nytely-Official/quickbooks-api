@@ -17,7 +17,7 @@ export async function rawPreferenceQuery(this: PreferenceAPI, queryBuilder: Pref
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const preferences = this.formatResponse(response);
+	const preferences = await this.formatResponse(response);
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Preferences> = {

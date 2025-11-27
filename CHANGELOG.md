@@ -1,5 +1,43 @@
 # Changelog
 
+## [0.8.0] - 2025-11-27
+
+### Features
+
+- Added `QuickbooksError` class for enhanced error handling with structured Intuit API error details
+- Implemented `ApiClient.getIntuitErrorDetails()` static method for extracting error information from Intuit API responses
+- Enhanced error objects with comprehensive details:
+  - HTTP status codes
+  - Array of Intuit error objects (message, detail, code)
+  - Intuit transaction IDs (intuitTID) for support tracking
+
+### Breaking Changes
+
+- All API methods now throw `QuickbooksError` instead of generic `Error` instances
+- Error handling code must be updated to catch `QuickbooksError` and access `error.details` for Intuit-specific information
+- `formatResponse()` methods in all API classes are now async to support error detail extraction
+
+### Code Quality
+
+- Standardized error handling across all API classes (Account, Bill, CompanyInfo, CreditMemo, Customer, Estimate, Invoice, Payment,
+  Preferences)
+- Updated `AuthProvider` to use `QuickbooksError` for all error scenarios
+- Improved error propagation from Intuit API responses
+- Enhanced type safety with structured error data interfaces
+
+### Tests
+
+- Updated all live tests to validate `QuickbooksError` structure and properties
+- Added comprehensive error detail validation in test suites
+- Updated unit tests to expect `QuickbooksError` instead of generic `Error`
+- Enhanced error handling test coverage across all API endpoints
+
+### Documentation
+
+- Added error handling documentation to README
+- Included examples of catching and handling `QuickbooksError`
+- Documented error detail structure and properties
+
 ## [0.7.3] - 2025-10-22
 
 ### Bug Fixes

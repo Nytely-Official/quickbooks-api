@@ -1,5 +1,5 @@
 // Imports
-import { AuthProvider, Environment, ApiClient, AuthScopes, type CreditMemoOptions } from '../src/app';
+import { AuthProvider, Environment, ApiClient, AuthScopes, type CreditMemoOptions, QuickbooksError } from '../src/app';
 import { describe, expect, test } from 'bun:test';
 
 // Describe the CreditMemo API
@@ -98,9 +98,53 @@ describe('Live API: CreditMemos', async () => {
 	});
 
 	// Test error handling for invalid ID
-	test('should throw error for invalid creditMemo ID', async () => {
-		// Assert the Error
-		expect(apiClient.creditMemos.getCreditMemoById('invalid')).rejects.toThrow();
+	test('should throw QuickbooksError for invalid creditMemo ID', async () => {
+		try {
+			await apiClient.creditMemos.getCreditMemoById('invalid');
+			expect(false).toBe(true); // Should not reach here
+		} catch (error) {
+			// Assert the Error is a QuickbooksError
+			expect(error).toBeInstanceOf(QuickbooksError);
+			expect(error).toBeInstanceOf(Error);
+
+			// Assert the Error has the correct structure
+			expect(error.message).toBeDefined();
+			expect(error.details).toBeDefined();
+			expect(error.details.statusCode).toBeDefined();
+			expect(typeof error.details.statusCode).toBe('number');
+			expect(error.details.intuitError).toBeDefined();
+			expect(Array.isArray(error.details.intuitError)).toBe(true);
+			expect(error.details.intuitTID).toBeDefined();
+			expect(typeof error.details.intuitTID).toBe('string');
+		}
+	});
+
+	// Test error handling for invalid raw query
+	test('should throw QuickbooksError for invalid raw query', async () => {
+		// Get the Query Builder
+		const queryBuilder = await apiClient.creditMemos.getQueryBuilder();
+
+		// Add an invalid ID filter that will cause an error
+		queryBuilder.whereId('invalid-id-that-does-not-exist');
+
+		try {
+			await apiClient.creditMemos.rawCreditMemoQuery(queryBuilder);
+			expect(false).toBe(true); // Should not reach here
+		} catch (error) {
+			// Assert the Error is a QuickbooksError
+			expect(error).toBeInstanceOf(QuickbooksError);
+			expect(error).toBeInstanceOf(Error);
+
+			// Assert the Error has the correct structure
+			expect(error.message).toBeDefined();
+			expect(error.details).toBeDefined();
+			expect(error.details.statusCode).toBeDefined();
+			expect(typeof error.details.statusCode).toBe('number');
+			expect(error.details.intuitError).toBeDefined();
+			expect(Array.isArray(error.details.intuitError)).toBe(true);
+			expect(error.details.intuitTID).toBeDefined();
+			expect(typeof error.details.intuitTID).toBe('string');
+		}
 	});
 
 	// Test returning an empty array if no creditMemos are updated

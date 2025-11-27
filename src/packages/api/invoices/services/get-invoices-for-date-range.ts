@@ -1,7 +1,8 @@
 // Import the Query Builder
 import { plainToClass } from 'class-transformer';
-import { Invoice, type InvoiceOptions, type SearchResponse } from '../../../../types/types';
+import { Invoice, QuickbooksError, type InvoiceOptions, type SearchResponse } from '../../../../types/types';
 import { InvoiceAPI } from '../invoice-api';
+import { ApiClient } from '../../api-client';
 
 /**
  * Get Invoices for a Date Range
@@ -17,7 +18,7 @@ export async function getInvoicesForDateRange(
 	options: InvoiceOptions = {},
 ): Promise<SearchResponse<Invoice>> {
 	// Ensure the Start Date is Before the End Date
-	if (startDate > endDate) throw new Error('Start date must be before end date');
+	if (startDate > endDate) throw new QuickbooksError('Start date must be before end date', await ApiClient.getIntuitErrorDetails(null));
 
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
@@ -39,7 +40,7 @@ export async function getInvoicesForDateRange(
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const invoices = this.formatResponse(response);
+	const invoices = await this.formatResponse(response);
 
 	// Map the Invoices to Classes
 	const mappedInvoices = invoices.map((invoice) => plainToClass(Invoice, invoice));

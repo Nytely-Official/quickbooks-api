@@ -19,8 +19,8 @@ export async function rawCompanyInfoQuery(this: CompanyInfoAPI, query: string): 
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const companyInfo = this.formatResponse(response);
+	const companyInfo = await this.formatResponse(response);
 
 	// Return the Company Info
 	return companyInfo;
-} 
+}

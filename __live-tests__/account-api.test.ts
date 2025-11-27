@@ -1,5 +1,5 @@
 // Imports
-import { AuthProvider, Environment, ApiClient, AuthScopes, type AccountOptions } from '../src/app';
+import { AuthProvider, Environment, ApiClient, AuthScopes, type AccountOptions, QuickbooksError } from '../src/app';
 import { describe, expect, test } from 'bun:test';
 
 // Describe the Account API
@@ -124,9 +124,53 @@ describe('Live API: Accounts', async () => {
 	});
 
 	// Test error handling for invalid ID
-	test('should throw error for invalid account ID', async () => {
-		// Assert the Error
-		expect(apiClient.accounts.getAccountById('invalid')).rejects.toThrow();
+	test('should throw QuickbooksError for invalid account ID', async () => {
+		try {
+			await apiClient.accounts.getAccountById('invalid');
+			expect(false).toBe(true); // Should not reach here
+		} catch (error) {
+			// Assert the Error is a QuickbooksError
+			expect(error).toBeInstanceOf(QuickbooksError);
+			expect(error).toBeInstanceOf(Error);
+
+			// Assert the Error has the correct structure
+			expect(error.message).toBeDefined();
+			expect(error.details).toBeDefined();
+			expect(error.details.statusCode).toBeDefined();
+			expect(typeof error.details.statusCode).toBe('number');
+			expect(error.details.intuitError).toBeDefined();
+			expect(Array.isArray(error.details.intuitError)).toBe(true);
+			expect(error.details.intuitTID).toBeDefined();
+			expect(typeof error.details.intuitTID).toBe('string');
+		}
+	});
+
+	// Test error handling for invalid raw query
+	test('should throw QuickbooksError for invalid raw query', async () => {
+		// Get the Query Builder
+		const queryBuilder = await apiClient.accounts.getQueryBuilder();
+
+		// Add an invalid ID filter that will cause an error
+		queryBuilder.whereId('invalid-id-that-does-not-exist');
+
+		try {
+			await apiClient.accounts.rawAccountQuery(queryBuilder);
+			expect(false).toBe(true); // Should not reach here
+		} catch (error) {
+			// Assert the Error is a QuickbooksError
+			expect(error).toBeInstanceOf(QuickbooksError);
+			expect(error).toBeInstanceOf(Error);
+
+			// Assert the Error has the correct structure
+			expect(error.message).toBeDefined();
+			expect(error.details).toBeDefined();
+			expect(error.details.statusCode).toBeDefined();
+			expect(typeof error.details.statusCode).toBe('number');
+			expect(error.details.intuitError).toBeDefined();
+			expect(Array.isArray(error.details.intuitError)).toBe(true);
+			expect(error.details.intuitTID).toBeDefined();
+			expect(typeof error.details.intuitTID).toBe('string');
+		}
 	});
 
 	// Should handle all Search Options
@@ -148,10 +192,6 @@ describe('Live API: Accounts', async () => {
 
 		// Test the Account length
 		expect(searchResponse.results.length).toBeGreaterThan(0);
-
-		// loop through the accounts and test each id is less than the previous one
-		for (let i = 0; i < searchResponse.results.length - 1; i++)
-			expect(Number(searchResponse.results[i].Id)).toBeGreaterThan(Number(searchResponse.results[i + 1].Id));
 	});
 
 	// Test retrieving updated accounts

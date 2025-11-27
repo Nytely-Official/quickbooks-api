@@ -1,6 +1,6 @@
 // Imports
 import { ApiClient } from '../api-client';
-import { Environment, Query, type Preferences, type PreferenceQueryResponse } from '../../../types/types';
+import { Environment, Query, type Preferences, type PreferenceQueryResponse, QuickbooksError } from '../../../types/types';
 import { Endpoints } from '../../../types/enums/endpoints';
 import { PreferenceQueryBuilder } from './preference-query-builder';
 
@@ -44,12 +44,18 @@ export class PreferenceAPI {
 	 * @param response - The Response
 	 * @returns The Preferences
 	 */
-	protected formatResponse(response: any): Array<Preferences> {
+	protected async formatResponse(response: any): Promise<Array<Preferences>> {
 		// Check if the Response is Invalid
-		if (!response?.QueryResponse) throw new Error('Invalid Response');
+		if (!response?.QueryResponse) {
+			// Get the Intuit Error Details
+			const errorDetails = await ApiClient.getIntuitErrorDetails(response);
 
-		// Check if the Preferences is Not set and Initialize an Empty Array
-		if (!response.QueryResponse.Preferences) response.QueryResponse.Preferences = new Array<Preferences>();
+			// Throw the Quickbooks Error
+			throw new QuickbooksError('Unable to format Preferences', errorDetails);
+		}
+
+		// Check if the Preferences is Not set and if it is, set the Preferences to an empty array
+		if (!response.QueryResponse.Preferences) response.QueryResponse.Preferences = new Array();
 
 		// Get the Preferences
 		const queryResponse = response.QueryResponse as PreferenceQueryResponse;

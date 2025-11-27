@@ -1,6 +1,7 @@
 // Export the Classes
 export { Customer } from './classes/customer';
 export { Invoice } from './classes/invoice';
+export { QuickbooksError } from './classes/quickbooks-error';
 
 // Export the Enums
 export { APIUrls } from './enums/api-urls';
@@ -33,6 +34,8 @@ export type { DiscountLine } from './interfaces/discount-line';
 export type { Estimate } from './interfaces/estimate';
 export type { GroupLineDetail } from './interfaces/group-line-detail';
 export type { GroupLine } from './interfaces/group-line';
+export type { IntuitErrorData } from './interfaces/intuit-error-data';
+export type { IntuitErrorResponse } from './interfaces/intuit-error-response';
 export type { LineDetail } from './interfaces/line-detail';
 export type { LinkedTxn } from './interfaces/linked-txn';
 export type { MarkupInfo } from './interfaces/markup-info';

@@ -135,7 +135,7 @@ describe('Invoice API', () => {
 			);
 
 			// Assert the Invoice
-			expect(apiClient.invoices.getInvoiceById('invalid')).rejects.toThrow('Invoice not found');
+			expect(apiClient.invoices.getInvoiceById('invalid')).rejects.toThrow('Failed to run request');
 		});
 	});
 

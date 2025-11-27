@@ -1,6 +1,6 @@
 // Imports
 import { ApiClient } from '../api-client';
-import { Environment, Query, type Account, type AccountQueryResponse } from '../../../types/types';
+import { Environment, Query, QuickbooksError, type Account, type AccountQueryResponse } from '../../../types/types';
 import { Endpoints } from '../../../types/enums/endpoints';
 import { AccountQueryBuilder } from './account-query-builder';
 
@@ -52,9 +52,15 @@ export class AccountAPI {
 	 * @param response - The Response
 	 * @returns The Accounts
 	 */
-	protected formatResponse(response: any): Array<Account> {
+	protected async formatResponse(response: any): Promise<Array<Account>> {
 		// Check if the Response is Invalid
-		if (!response?.QueryResponse) throw new Error('Invalid Response');
+		if (!response?.QueryResponse) {
+			// Get the Intuit Error Details
+			const errorDetails = await ApiClient.getIntuitErrorDetails(response);
+
+			// Throw the Quickbooks Error
+			throw new QuickbooksError('Unable to format Accounts', errorDetails);
+		}
 
 		// Check if the Account is Not set and Initialize an Empty Array
 		if (!response.QueryResponse.Account) response.QueryResponse.Account = new Array<Account>();

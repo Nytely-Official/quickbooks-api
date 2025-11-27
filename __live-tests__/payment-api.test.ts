@@ -1,5 +1,5 @@
 // Imports
-import { AuthProvider, Environment, ApiClient, AuthScopes, type PaymentOptions } from '../src/app';
+import { AuthProvider, Environment, ApiClient, AuthScopes, type PaymentOptions, QuickbooksError } from '../src/app';
 import { describe, expect, test } from 'bun:test';
 
 // Describe the Payment API
@@ -162,5 +162,55 @@ describe('Live API: Payments', async () => {
 
 		// Assert the Payments Length
 		expect(searchResponse.results.length).toBe(0);
+	});
+
+	// Test error handling for invalid ID
+	test('should throw QuickbooksError for invalid payment ID', async () => {
+		try {
+			await apiClient.payments.getPaymentById('invalid');
+			expect(false).toBe(true); // Should not reach here
+		} catch (error) {
+			// Assert the Error is a QuickbooksError
+			expect(error).toBeInstanceOf(QuickbooksError);
+			expect(error).toBeInstanceOf(Error);
+
+			// Assert the Error has the correct structure
+			expect(error.message).toBeDefined();
+			expect(error.details).toBeDefined();
+			expect(error.details.statusCode).toBeDefined();
+			expect(typeof error.details.statusCode).toBe('number');
+			expect(error.details.intuitError).toBeDefined();
+			expect(Array.isArray(error.details.intuitError)).toBe(true);
+			expect(error.details.intuitTID).toBeDefined();
+			expect(typeof error.details.intuitTID).toBe('string');
+		}
+	});
+
+	// Test error handling for invalid raw query
+	test('should throw QuickbooksError for invalid raw query', async () => {
+		// Get the Query Builder
+		const queryBuilder = await apiClient.payments.getQueryBuilder();
+
+		// Add an invalid ID filter that will cause an error
+		queryBuilder.whereId('invalid-id-that-does-not-exist');
+
+		try {
+			await apiClient.payments.rawPaymentQuery(queryBuilder);
+			expect(false).toBe(true); // Should not reach here
+		} catch (error) {
+			// Assert the Error is a QuickbooksError
+			expect(error).toBeInstanceOf(QuickbooksError);
+			expect(error).toBeInstanceOf(Error);
+
+			// Assert the Error has the correct structure
+			expect(error.message).toBeDefined();
+			expect(error.details).toBeDefined();
+			expect(error.details.statusCode).toBeDefined();
+			expect(typeof error.details.statusCode).toBe('number');
+			expect(error.details.intuitError).toBeDefined();
+			expect(Array.isArray(error.details.intuitError)).toBe(true);
+			expect(error.details.intuitTID).toBeDefined();
+			expect(typeof error.details.intuitTID).toBe('string');
+		}
 	});
 });

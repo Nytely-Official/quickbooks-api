@@ -37,7 +37,7 @@ export async function getCustomerById(this: CustomerAPI, id: string, options: Cu
 	if (!response) return null;
 
 	// Format the Response
-	const customers = this.formatResponse(response);
+	const customers = await this.formatResponse(response);
 
 	// Convert the Customer to a Class
 	const customer = customers[0] ? plainToClass(Customer, customers[0]) : null;

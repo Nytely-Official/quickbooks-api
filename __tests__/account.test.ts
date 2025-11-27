@@ -172,7 +172,7 @@ describe('Account API', () => {
 			);
 
 			// Assert the Error
-			expect(apiClient.accounts.getAccountById('-1')).rejects.toThrow('Account not found');
+			expect(apiClient.accounts.getAccountById('-1')).rejects.toThrow('Failed to run request');
 		});
 	});
 

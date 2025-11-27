@@ -17,7 +17,7 @@ export async function rawEstimateQuery(this: EstimateAPI, queryBuilder: Estimate
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const estimates = this.formatResponse(response);
+	const estimates = await this.formatResponse(response);
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Estimate> = {
