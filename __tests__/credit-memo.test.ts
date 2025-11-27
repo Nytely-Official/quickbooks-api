@@ -135,7 +135,7 @@ describe('CreditMemo API', () => {
 			);
 
 			// Assert the CreditMemo
-			expect(apiClient.creditMemos.getCreditMemoById('invalid')).rejects.toThrow('CreditMemo not found');
+			expect(apiClient.creditMemos.getCreditMemoById('invalid')).rejects.toThrow('Failed to run request');
 		});
 	});
 

@@ -1,6 +1,6 @@
 // Imports
 import { AuthProvider } from '../auth/auth-provider';
-import { Environment } from '../../types/types';
+import { Environment, IntuitErrorData, IntuitErrorResponse, QuickbooksError } from '../../types/types';
 import { InvoiceAPI } from './invoices/invoice-api';
 import { EstimateAPI } from './estimates/estimate-api';
 import { CustomerAPI } from './customer/customer-api';
@@ -107,11 +107,11 @@ export class ApiClient {
 
 		// Check if the Response has failed
 		if (!response.ok) {
-			// Get the Error Message
-			const errorMessage = await response.text();
+			// Get the Intuit Error Details
+			const errorDetails = await ApiClient.getIntuitErrorDetails(response);
 
-			// Throw an Error
-			throw new Error(`Failed to run request: ${errorMessage}`);
+			// Throw the Quickbooks Error
+			throw new QuickbooksError(`Failed to run request`, errorDetails);
 		}
 
 		// Check if the response is an Object and if it is, parse it as JSON
@@ -119,5 +119,28 @@ export class ApiClient {
 
 		// Return the Response
 		return responseData;
+	}
+
+	/**
+	 * Gets the Intuit error details from the response
+	 * @param response The response to get the Intuit error details from
+	 * @returns {IntuitErrorData} The Intuit error details
+	 */
+	public static async getIntuitErrorDetails(response: Response | null): Promise<IntuitErrorData> {
+		// Setup the Default Response Data
+		const unknownResponseData: IntuitErrorResponse = { Fault: { Error: [], type: 'UnknownError' }, time: new Date().toISOString() };
+
+		// Get the Response Data
+		const responseData: IntuitErrorResponse = (await response?.json().catch(() => null)) ?? unknownResponseData;
+
+		// Get the Intuit Error Code
+		const errorDetails: IntuitErrorData = {
+			statusCode: response?.status ?? 0,
+			intuitError: responseData.Fault?.Error.map((error) => ({ message: error.Message, detail: error.Detail, code: error.code })),
+			intuitTID: response?.headers.get('intuit_tid') ?? '00000000',
+		};
+
+		// Return the Intuit Error Details
+		return errorDetails;
 	}
 }

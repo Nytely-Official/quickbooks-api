@@ -21,7 +21,7 @@ export async function getAllPayments(this: PaymentAPI, options: PaymentOptions =
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const payments = this.formatResponse(response);
+	const payments = await this.formatResponse(response);
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Payment> = {

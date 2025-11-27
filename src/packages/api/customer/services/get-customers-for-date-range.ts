@@ -1,7 +1,8 @@
 // Import the Query Builder
 import { plainToClass } from 'class-transformer';
-import { Customer, type CustomerOptions, type SearchResponse } from '../../../../types/types';
+import { Customer, QuickbooksError, type CustomerOptions, type SearchResponse } from '../../../../types/types';
 import { CustomerAPI } from '../customer-api';
+import { ApiClient } from '../../api-client';
 
 /**
  * Retrieves customers updated within a specified date range.
@@ -23,7 +24,7 @@ export async function getCustomersForDateRange(
 	options: CustomerOptions = {},
 ): Promise<SearchResponse<Customer>> {
 	// Ensure the Start Date is Before the End Date
-	if (startDate > endDate) throw new Error('Start date must be before end date');
+	if (startDate > endDate) throw new QuickbooksError('Start date must be before end date', await ApiClient.getIntuitErrorDetails(null));
 
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
@@ -42,7 +43,7 @@ export async function getCustomersForDateRange(
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const customers = this.formatResponse(response);
+	const customers = await this.formatResponse(response);
 
 	// Map the Customers to Classes
 	const mappedCustomers = customers.map((customer) => plainToClass(Customer, customer));

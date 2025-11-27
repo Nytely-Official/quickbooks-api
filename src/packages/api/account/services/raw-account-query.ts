@@ -17,7 +17,7 @@ export async function rawAccountQuery(this: AccountAPI, queryBuilder: AccountQue
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const accounts = this.formatResponse(response);
+	const accounts = await this.formatResponse(response);
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Account> = {

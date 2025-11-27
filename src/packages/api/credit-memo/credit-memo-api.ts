@@ -1,6 +1,6 @@
 // Imports
 import { ApiClient } from '../api-client';
-import { Environment, Query, type CreditMemo, type CreditMemoQueryResponse } from '../../../types/types';
+import { Environment, Query, QuickbooksError, type CreditMemo, type CreditMemoQueryResponse } from '../../../types/types';
 import { Endpoints } from '../../../types/enums/endpoints';
 import { CreditMemoQueryBuilder } from './credit-memo-query-builder';
 
@@ -50,12 +50,18 @@ export class CreditMemoAPI {
 	 * @param response - The Response
 	 * @returns The CreditMemos
 	 */
-	protected formatResponse(response: any): Array<CreditMemo> {
+	protected async formatResponse(response: any): Promise<Array<CreditMemo>> {
 		// Check if the Response is Invalid
-		if (!response?.QueryResponse) throw new Error('Invalid Response');
+		if (!response?.QueryResponse) {
+			// Get the Intuit Error Details
+			const errorDetails = await ApiClient.getIntuitErrorDetails(response);
 
-		// Check if the CreditMemo is Not set and Initialize an Empty Array
-		if (!response.QueryResponse.CreditMemo) response.QueryResponse.CreditMemo = new Array<CreditMemo>();
+			// Throw the Quickbooks Error
+			throw new QuickbooksError('Unable to format Credit Memos', errorDetails);
+		}
+
+		// Check if the Credit Memo is Not set and if it is, set the Credit Memo to an empty array
+		if (!response.QueryResponse.CreditMemo) response.QueryResponse.CreditMemo = new Array();
 
 		// Get the CreditMemos
 		const queryResponse = response.QueryResponse as CreditMemoQueryResponse;

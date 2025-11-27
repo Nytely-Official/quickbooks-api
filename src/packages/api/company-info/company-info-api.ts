@@ -1,6 +1,6 @@
 // Imports
 import { ApiClient } from '../api-client';
-import { Environment, Query, type CompanyInfo, type CompanyInfoQueryResponse } from '../../../types/types';
+import { Environment, Query, QuickbooksError, type CompanyInfo, type CompanyInfoQueryResponse } from '../../../types/types';
 import { Endpoints } from '../../../types/enums/endpoints';
 import { CompanyInfoQueryBuilder } from './company-info-query-builder';
 
@@ -43,14 +43,18 @@ export class CompanyInfoAPI {
 	 * @param response - The Response
 	 * @returns The Company Info
 	 */
-	protected formatResponse(response: any): CompanyInfo {
+	protected async formatResponse(response: any): Promise<CompanyInfo> {
 		// Check if the Response is Invalid
-		if (!response?.QueryResponse) throw new Error('Invalid Response');
+		if (!response?.QueryResponse) {
+			// Get the Intuit Error Details
+			const errorDetails = await ApiClient.getIntuitErrorDetails(response);
 
-		// Check if the CompanyInfo is Not set
-		if (!response.QueryResponse.CompanyInfo || response.QueryResponse.CompanyInfo.length === 0) {
-			throw new Error('No Company Info found');
+			// Throw the Quickbooks Error
+			throw new QuickbooksError('Unable to format Company Info', errorDetails);
 		}
+
+		// Check if the Company Info is Not set and if it is, set the Company Info to an empty array
+		if (!response.QueryResponse.CompanyInfo) response.QueryResponse.CompanyInfo = new Array();
 
 		// Get the Company Info
 		const queryResponse = response.QueryResponse as CompanyInfoQueryResponse;
@@ -73,4 +77,4 @@ export class CompanyInfoAPI {
 		// Return the Query Builder
 		return queryBuilder;
 	}
-} 
+}

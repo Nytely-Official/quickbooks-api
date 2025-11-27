@@ -1,5 +1,6 @@
 // Import the Query Builder
-import type { CreditMemo, CreditMemoOptions, SearchResponse } from '../../../../types/types';
+import { QuickbooksError, type CreditMemo, type CreditMemoOptions, type SearchResponse } from '../../../../types/types';
+import { ApiClient } from '../../api-client';
 import { CreditMemoAPI } from '../credit-memo-api';
 
 /**
@@ -16,7 +17,7 @@ export async function getCreditMemosForDateRange(
 	options: CreditMemoOptions = {},
 ): Promise<SearchResponse<CreditMemo>> {
 	// Ensure the Start Date is Before the End Date
-	if (startDate > endDate) throw new Error('Start date must be before end date');
+	if (startDate > endDate) throw new QuickbooksError('Start date must be before end date', await ApiClient.getIntuitErrorDetails(null));
 
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
@@ -34,7 +35,7 @@ export async function getCreditMemosForDateRange(
 	// Get the CreditMemos
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 	// Format the Response
-	const creditmemos = this.formatResponse(response);
+	const creditmemos = await this.formatResponse(response);
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<CreditMemo> = {

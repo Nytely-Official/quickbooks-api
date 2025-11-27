@@ -28,7 +28,7 @@ export async function getEstimateById(this: EstimateAPI, id: string, options: Es
 	if (!response) return null;
 
 	// Format the Response
-	const estimates = this.formatResponse(response);
+	const estimates = await this.formatResponse(response);
 
 	// Return the Estimate
 	return estimates[0];

@@ -1,6 +1,6 @@
 // Imports
 import { ApiClient } from '../api-client';
-import { Environment, Query, type Invoice, type InvoiceQueryResponse } from '../../../types/types';
+import { Environment, Query, QuickbooksError, type Invoice, type InvoiceQueryResponse } from '../../../types/types';
 import { Endpoints } from '../../../types/enums/endpoints';
 import { InvoiceQueryBuilder } from './invoice-query-builder';
 import path from 'path';
@@ -65,12 +65,18 @@ export class InvoiceAPI {
 	 * @param response - The Response
 	 * @returns The Invoices
 	 */
-	protected formatResponse(response: any): Array<Invoice> {
+	protected async formatResponse(response: any): Promise<Array<Invoice>> {
 		// Check if the Response is Invalid
-		if (!response?.QueryResponse) throw new Error('Invalid Response');
+		if (!response?.QueryResponse) {
+			// Get the Intuit Error Details
+			const errorDetails = await ApiClient.getIntuitErrorDetails(response);
 
-		// Check if the Invoice is Not set and Initialize an Empty Array
-		if (!response.QueryResponse.Invoice) response.QueryResponse.Invoice = new Array<Invoice>();
+			// Throw the Quickbooks Error
+			throw new QuickbooksError('Unable to format Invoices', errorDetails);
+		}
+
+		// Check if the Invoice is Not set and if it is, set the Invoice to an empty array
+		if (!response.QueryResponse.Invoice) response.QueryResponse.Invoice = new Array();
 
 		// Get the Invoices
 		const queryResponse = response.QueryResponse as InvoiceQueryResponse;

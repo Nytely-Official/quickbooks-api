@@ -24,7 +24,7 @@ export async function getAllInvoices(this: InvoiceAPI, options: InvoiceOptions =
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const invoices = this.formatResponse(response);
+	const invoices = await this.formatResponse(response);
 
 	// Map the Invoices to Classes
 	const mappedInvoices = invoices.map((invoice) => plainToClass(Invoice, invoice));

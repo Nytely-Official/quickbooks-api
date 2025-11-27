@@ -25,7 +25,7 @@ export async function getAllCustomers(this: CustomerAPI, options: CustomerOption
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const customers = this.formatResponse(response);
+	const customers = await this.formatResponse(response);
 
 	// Map the Customers to Classes
 	const mappedCustomers = customers.map((customer) => plainToClass(Customer, customer));

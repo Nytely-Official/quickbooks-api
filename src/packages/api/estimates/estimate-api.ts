@@ -1,6 +1,6 @@
 // Imports
 import { ApiClient } from '../api-client';
-import { Environment, Query, type Estimate, type EstimateQueryResponse } from '../../../types/types';
+import { Environment, Query, QuickbooksError, type Estimate, type EstimateQueryResponse } from '../../../types/types';
 import { Endpoints } from '../../../types/enums/endpoints';
 import { EstimateQueryBuilder } from './estimate-query-builder';
 
@@ -50,12 +50,18 @@ export class EstimateAPI {
 	 * @param response - The Response
 	 * @returns The Estimates
 	 */
-	protected formatResponse(response: any): Array<Estimate> {
+	protected async formatResponse(response: any): Promise<Array<Estimate>> {
 		// Check if the Response is Invalid
-		if (!response?.QueryResponse) throw new Error('Invalid Response');
+		if (!response?.QueryResponse) {
+			// Get the Intuit Error Details
+			const errorDetails = await ApiClient.getIntuitErrorDetails(response);
 
-		// Check if the Estimate is Not set and Initialize an Empty Array
-		if (!response.QueryResponse.Estimate) response.QueryResponse.Estimate = new Array<Estimate>();
+			// Throw the Quickbooks Error
+			throw new QuickbooksError('Unable to format Estimates', errorDetails);
+		}
+
+		// Check if the Estimate is Not set and if it is, set the Estimate to an empty array
+		if (!response.QueryResponse.Estimate) response.QueryResponse.Estimate = new Array();
 
 		// Get the Estimates
 		const queryResponse = response.QueryResponse as EstimateQueryResponse;

@@ -32,7 +32,7 @@ export async function getInvoiceById(this: InvoiceAPI, id: string, options: Invo
 	if (!response) return null;
 
 	// Format the Response
-	const invoices = this.formatResponse(response);
+	const invoices = await this.formatResponse(response);
 
 	// Convert the Invoice to a Class
 	const invoice = invoices[0] ? plainToClass(Invoice, invoices[0]) : null;

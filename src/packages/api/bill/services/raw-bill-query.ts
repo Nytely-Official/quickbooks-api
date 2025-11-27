@@ -17,7 +17,7 @@ export async function rawBillQuery(this: BillAPI, queryBuilder: BillQueryBuilder
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const bills = this.formatResponse(response);
+	const bills = await this.formatResponse(response);
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Bill> = {

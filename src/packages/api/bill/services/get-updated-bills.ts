@@ -25,7 +25,7 @@ export async function getUpdatedBills(this: BillAPI, lastUpdatedDate: Date, opti
 	const response = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const bills = this.formatResponse(response);
+	const bills = await this.formatResponse(response);
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Bill> = {

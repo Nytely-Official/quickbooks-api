@@ -28,7 +28,7 @@ export async function getCreditMemoById(this: CreditMemoAPI, id: string, options
 	if (!response) return null;
 
 	// Format the Response
-	const creditmemos = this.formatResponse(response);
+	const creditmemos = await this.formatResponse(response);
 
 	// Return the CreditMemo
 	return creditmemos[0];

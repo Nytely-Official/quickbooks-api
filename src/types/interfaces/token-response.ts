@@ -1,5 +1,5 @@
 // Imports
-import type { TokenType } from '../types';
+import type { TokenType } from '../enums/token-type';
 
 /**
  * The object returned from the Token Exchange Request

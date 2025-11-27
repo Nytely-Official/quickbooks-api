@@ -28,7 +28,7 @@ export async function getPaymentById(this: PaymentAPI, id: string, options: Paym
 	if (!response) return null;
 
 	// Format the Response
-	const payments = this.formatResponse(response);
+	const payments = await this.formatResponse(response);
 
 	// Return the Payment
 	return payments[0];
