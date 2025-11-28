@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.9.1] - 2025-11-28
+
+### Bug Fixes
+
+- Fixed error code parsing in `ApiClient` error handling to properly convert error codes to integers
+- Error codes from Intuit API responses are now correctly parsed as integers using `parseInt(String(error.code))` to handle both string and
+  number types returned from the API
+
 ## [0.9.0] - 2025-11-28
 
 ### Features

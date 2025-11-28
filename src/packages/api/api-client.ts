@@ -158,7 +158,11 @@ export class ApiClient {
 
 		// Check if the Fault is the old version and if it is, map the Error Objects to the lowercase version
 		if (responseData.Fault)
-			mappedErrors = responseData.Fault.Error.map((error) => ({ message: error.Message, detail: error.Detail, code: error.code }));
+			mappedErrors = responseData.Fault.Error.map((error) => ({
+				message: error.Message,
+				detail: error.Detail,
+				code: parseInt(String(error.code)), // We need to parse the error code as a string to an integer as a number gets returned from the API
+			}));
 
 		// Get the Intuit Error Code
 		const errorDetails: IntuitErrorData = {
