@@ -14,15 +14,16 @@ export async function rawPaymentQuery(this: PaymentAPI, queryBuilder: PaymentQue
 	const url = queryBuilder.build();
 
 	// Execute the custom query
-	const response = await this.apiClient.runRequest(url, { method: 'GET' });
+	const { responseData, intuitTID } = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const payments = await this.formatResponse(response);
+	const payments = await this.formatResponse(responseData);
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Payment> = {
 		results: payments,
 		hasNextPage: await this.hasNextPage(queryBuilder),
+		intuitTID,
 	};
 
 	// Return the Payments

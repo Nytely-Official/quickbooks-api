@@ -1,3 +1,6 @@
+// Internal Imports
+import { IntuitErrorItem, IntuitFaultType } from '../types';
+
 /**
  * The Intuit Error Response Interface
  */
@@ -10,22 +13,12 @@ export interface IntuitErrorData {
 	/**
 	 * The Array of Error Objects returned from the Intuit API
 	 */
-	intuitError: Array<{
-		/**
-		 * The message of the error
-		 */
-		message: string;
+	intuitError: Array<IntuitErrorItem>;
 
-		/**
-		 * The detail of the error
-		 */
-		detail: string;
-
-		/**
-		 * The code of the error
-		 */
-		code: string;
-	}>;
+	/**
+	 * The type of the error
+	 */
+	type: IntuitFaultType;
 
 	/**
 	 * The Transaction ID of the Request from Intuit

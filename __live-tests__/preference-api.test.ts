@@ -25,6 +25,10 @@ describe('Live API: Preferences', async () => {
 
 		// Test the Preference length
 		expect(searchResponse.results.length).toBeGreaterThan(0);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test Checking for Next Page
@@ -34,5 +38,9 @@ describe('Live API: Preferences', async () => {
 
 		// Test the Preferences
 		expect(searchResponse.hasNextPage).toBeDefined();
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 });

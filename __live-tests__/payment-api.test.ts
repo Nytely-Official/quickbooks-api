@@ -25,6 +25,10 @@ describe('Live API: Payments', async () => {
 
 		// Test the Payment length
 		expect(searchResponse.results.length).toBeGreaterThan(0);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test Checking for Next Page
@@ -34,6 +38,10 @@ describe('Live API: Payments', async () => {
 
 		// Test the Payments
 		expect(searchResponse.hasNextPage).toBe(true);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test retrieving a single payment
@@ -45,13 +53,16 @@ describe('Live API: Payments', async () => {
 		const payment = searchResponse.results[0];
 
 		// Get the Payment by ID
-		const foundPayment = await apiClient.payments.getPaymentById(payment.Id);
+		const paymentResponse = await apiClient.payments.getPaymentById(payment.Id);
 
-		// Test the Payment
-		expect(foundPayment).toBeDefined();
+		// Test the Payment Response Structure
+		expect(paymentResponse).toBeDefined();
+		expect(paymentResponse).toHaveProperty('payment');
+		expect(paymentResponse).toHaveProperty('intuitTID');
+		expect(typeof paymentResponse.intuitTID).toBe('string');
 
 		// Test the Payment ID
-		expect(foundPayment.Id).toBe(payment.Id);
+		expect(paymentResponse.payment?.Id).toBe(payment.Id);
 	});
 
 	// Test retrieving 10 payments
@@ -67,6 +78,10 @@ describe('Live API: Payments', async () => {
 
 		// Test the Payment length
 		expect(searchResponse.results.length).toBeGreaterThan(0);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test pagination
@@ -144,6 +159,10 @@ describe('Live API: Payments', async () => {
 
 		// Test the Payment length
 		expect(searchResponse.results.length).toBeGreaterThan(0);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test returning an empty array if no payments are updated
@@ -162,6 +181,10 @@ describe('Live API: Payments', async () => {
 
 		// Assert the Payments Length
 		expect(searchResponse.results.length).toBe(0);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test error handling for invalid ID

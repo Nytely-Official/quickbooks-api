@@ -33,10 +33,10 @@ export async function getUpdatedCustomers(
 	const url = queryBuilder.build();
 
 	// Get the Customers
-	const response = await this.apiClient.runRequest(url, { method: 'GET' });
+	const { responseData, intuitTID } = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const customers = await this.formatResponse(response);
+	const customers = await this.formatResponse(responseData);
 
 	// Map the Customers to Classes
 	const mappedCustomers = customers.map((customer) => plainToClass(Customer, customer));
@@ -45,6 +45,7 @@ export async function getUpdatedCustomers(
 	const searchResponse: SearchResponse<Customer> = {
 		results: mappedCustomers,
 		hasNextPage: await this.hasNextPage(queryBuilder),
+		intuitTID,
 	};
 
 	// Return the Customers

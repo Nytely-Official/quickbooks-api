@@ -23,6 +23,10 @@ describe('Live API: Estimates', async () => {
 		// Assert the Estimates
 		expect(searchResponse.results).toBeInstanceOf(Array);
 		expect(searchResponse.results.length).toBeGreaterThan(0);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test Checking for Next Page
@@ -32,6 +36,10 @@ describe('Live API: Estimates', async () => {
 
 		// Test the Estimates
 		expect(searchResponse.hasNextPage).toBe(true);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test retrieving a single estimate by ID
@@ -43,11 +51,16 @@ describe('Live API: Estimates', async () => {
 		const testEstimate = searchResponse.results[0];
 
 		// Get the Estimate by ID
-		const foundEstimate = await apiClient.estimates.getEstimateById(testEstimate.Id);
+		const estimateResponse = await apiClient.estimates.getEstimateById(testEstimate.Id);
 
-		// Assert the Estimate
-		expect(foundEstimate).toBeDefined();
-		expect(foundEstimate.Id).toBe(testEstimate.Id);
+		// Assert the Estimate Response Structure
+		expect(estimateResponse).toBeDefined();
+		expect(estimateResponse).toHaveProperty('estimate');
+		expect(estimateResponse).toHaveProperty('intuitTID');
+		expect(typeof estimateResponse.intuitTID).toBe('string');
+
+		// Assert the Estimate ID
+		expect(estimateResponse.estimate?.Id).toBe(testEstimate.Id);
 	});
 
 	// Test retrieving an estimate by Customer ID
@@ -114,6 +127,10 @@ describe('Live API: Estimates', async () => {
 
 		// Assert the Estimates
 		expect(searchResponse.results).toBeInstanceOf(Array);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test updated estimates
@@ -126,6 +143,10 @@ describe('Live API: Estimates', async () => {
 
 		// Assert the Estimates
 		expect(searchResponse.results).toBeInstanceOf(Array);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test error handling for invalid ID
@@ -194,5 +215,9 @@ describe('Live API: Estimates', async () => {
 
 		// Assert the Estimates Length
 		expect(searchResponse.results.length).toBe(0);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 });

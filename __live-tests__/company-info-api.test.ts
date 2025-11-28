@@ -18,13 +18,18 @@ describe('Live API: Company Info', async () => {
 	// Test retrieving company info
 	test('should retrieve company info', async () => {
 		// Get company info
-		const companyInfo = await apiClient.companyInfo.getCompanyInfo();
+		const companyInfoResponse = await apiClient.companyInfo.getCompanyInfo();
+
+		// Test the Company Info Response Structure
+		expect(companyInfoResponse).toBeDefined();
+		expect(companyInfoResponse).toHaveProperty('companyInfo');
+		expect(companyInfoResponse).toHaveProperty('intuitTID');
+		expect(typeof companyInfoResponse.intuitTID).toBe('string');
 
 		// Test the Company Info
-		expect(companyInfo).toBeDefined();
-		expect(companyInfo.Id).toBeDefined();
-		expect(companyInfo.CompanyName).toBeDefined();
-		expect(companyInfo.LegalName).toBeDefined();
+		expect(companyInfoResponse.companyInfo.Id).toBeDefined();
+		expect(companyInfoResponse.companyInfo.CompanyName).toBeDefined();
+		expect(companyInfoResponse.companyInfo.LegalName).toBeDefined();
 	});
 
 	// Test retrieving company info with search options
@@ -33,25 +38,35 @@ describe('Live API: Company Info', async () => {
 		const searchOptions: SearchOptions<CompanyInfo> = { maxResults: 1 };
 
 		// Get company info with search options
-		const companyInfo = await apiClient.companyInfo.getCompanyInfo(searchOptions);
+		const companyInfoResponse = await apiClient.companyInfo.getCompanyInfo(searchOptions);
+
+		// Test the Company Info Response Structure
+		expect(companyInfoResponse).toBeDefined();
+		expect(companyInfoResponse).toHaveProperty('companyInfo');
+		expect(companyInfoResponse).toHaveProperty('intuitTID');
+		expect(typeof companyInfoResponse.intuitTID).toBe('string');
 
 		// Test the Company Info
-		expect(companyInfo).toBeDefined();
-		expect(companyInfo.Id).toBeDefined();
-		expect(companyInfo.CompanyName).toBeDefined();
-		expect(companyInfo.LegalName).toBeDefined();
+		expect(companyInfoResponse.companyInfo.Id).toBeDefined();
+		expect(companyInfoResponse.companyInfo.CompanyName).toBeDefined();
+		expect(companyInfoResponse.companyInfo.LegalName).toBeDefined();
 	});
 
 	// Test retrieving company info with raw query
 	test('should retrieve company info with raw query', async () => {
 		// Get company info with raw query
-		const companyInfo = await apiClient.companyInfo.rawCompanyInfoQuery('select * from companyinfo');
+		const companyInfoResponse = await apiClient.companyInfo.rawCompanyInfoQuery('select * from companyinfo');
+
+		// Test the Company Info Response Structure
+		expect(companyInfoResponse).toBeDefined();
+		expect(companyInfoResponse).toHaveProperty('companyInfo');
+		expect(companyInfoResponse).toHaveProperty('intuitTID');
+		expect(typeof companyInfoResponse.intuitTID).toBe('string');
 
 		// Test the Company Info
-		expect(companyInfo).toBeDefined();
-		expect(companyInfo.Id).toBeDefined();
-		expect(companyInfo.CompanyName).toBeDefined();
-		expect(companyInfo.LegalName).toBeDefined();
+		expect(companyInfoResponse.companyInfo.Id).toBeDefined();
+		expect(companyInfoResponse.companyInfo.CompanyName).toBeDefined();
+		expect(companyInfoResponse.companyInfo.LegalName).toBeDefined();
 	});
 
 	// Test error handling for invalid raw query
@@ -79,56 +94,76 @@ describe('Live API: Company Info', async () => {
 	// Test company info contains expected fields
 	test('should contain expected fields', async () => {
 		// Get company info
-		const companyInfo = await apiClient.companyInfo.getCompanyInfo();
+		const companyInfoResponse = await apiClient.companyInfo.getCompanyInfo();
+
+		// Test the Company Info Response Structure
+		expect(companyInfoResponse).toHaveProperty('companyInfo');
+		expect(companyInfoResponse).toHaveProperty('intuitTID');
+		expect(typeof companyInfoResponse.intuitTID).toBe('string');
 
 		// Test the Company Info has expected fields
-		expect(companyInfo).toHaveProperty('Id');
-		expect(companyInfo).toHaveProperty('CompanyName');
-		expect(companyInfo).toHaveProperty('LegalName');
-		expect(companyInfo).toHaveProperty('CompanyAddr');
-		expect(companyInfo).toHaveProperty('Country');
-		expect(companyInfo).toHaveProperty('Email');
-		expect(companyInfo).toHaveProperty('WebAddr');
-		expect(companyInfo).toHaveProperty('SupportedLanguages');
-		expect(companyInfo).toHaveProperty('FiscalYearStartMonth');
+		expect(companyInfoResponse.companyInfo).toHaveProperty('Id');
+		expect(companyInfoResponse.companyInfo).toHaveProperty('CompanyName');
+		expect(companyInfoResponse.companyInfo).toHaveProperty('LegalName');
+		expect(companyInfoResponse.companyInfo).toHaveProperty('CompanyAddr');
+		expect(companyInfoResponse.companyInfo).toHaveProperty('Country');
+		expect(companyInfoResponse.companyInfo).toHaveProperty('Email');
+		expect(companyInfoResponse.companyInfo).toHaveProperty('WebAddr');
+		expect(companyInfoResponse.companyInfo).toHaveProperty('SupportedLanguages');
+		expect(companyInfoResponse.companyInfo).toHaveProperty('FiscalYearStartMonth');
 	});
 
 	// Test company info address structure
 	test('should have valid address structure', async () => {
 		// Get company info
-		const companyInfo = await apiClient.companyInfo.getCompanyInfo();
+		const companyInfoResponse = await apiClient.companyInfo.getCompanyInfo();
+
+		// Test the Company Info Response Structure
+		expect(companyInfoResponse).toHaveProperty('companyInfo');
+		expect(companyInfoResponse).toHaveProperty('intuitTID');
+		expect(typeof companyInfoResponse.intuitTID).toBe('string');
 
 		// Test the Company Address
-		expect(companyInfo.CompanyAddr).toBeDefined();
-		expect(companyInfo.CompanyAddr).toHaveProperty('Id');
-		expect(companyInfo.CompanyAddr).toHaveProperty('Line1');
-		expect(companyInfo.CompanyAddr).toHaveProperty('City');
-		expect(companyInfo.CompanyAddr).toHaveProperty('PostalCode');
+		expect(companyInfoResponse.companyInfo.CompanyAddr).toBeDefined();
+		expect(companyInfoResponse.companyInfo.CompanyAddr).toHaveProperty('Id');
+		expect(companyInfoResponse.companyInfo.CompanyAddr).toHaveProperty('Line1');
+		expect(companyInfoResponse.companyInfo.CompanyAddr).toHaveProperty('City');
+		expect(companyInfoResponse.companyInfo.CompanyAddr).toHaveProperty('PostalCode');
 	});
 
 	// Test company info metadata
 	test('should have valid metadata', async () => {
 		// Get company info
-		const companyInfo = await apiClient.companyInfo.getCompanyInfo();
+		const companyInfoResponse = await apiClient.companyInfo.getCompanyInfo();
+
+		// Test the Company Info Response Structure
+		expect(companyInfoResponse).toHaveProperty('companyInfo');
+		expect(companyInfoResponse).toHaveProperty('intuitTID');
+		expect(typeof companyInfoResponse.intuitTID).toBe('string');
 
 		// Test the Metadata
-		expect(companyInfo.MetaData).toBeDefined();
-		expect(companyInfo.MetaData).toHaveProperty('CreateTime');
-		expect(companyInfo.MetaData).toHaveProperty('LastUpdatedTime');
+		expect(companyInfoResponse.companyInfo.MetaData).toBeDefined();
+		expect(companyInfoResponse.companyInfo.MetaData).toHaveProperty('CreateTime');
+		expect(companyInfoResponse.companyInfo.MetaData).toHaveProperty('LastUpdatedTime');
 	});
 
 	// Test company info name values
 	test('should have name values', async () => {
 		// Get company info
-		const companyInfo = await apiClient.companyInfo.getCompanyInfo();
+		const companyInfoResponse = await apiClient.companyInfo.getCompanyInfo();
+
+		// Test the Company Info Response Structure
+		expect(companyInfoResponse).toHaveProperty('companyInfo');
+		expect(companyInfoResponse).toHaveProperty('intuitTID');
+		expect(typeof companyInfoResponse.intuitTID).toBe('string');
 
 		// Test the Name Values
-		expect(companyInfo.NameValue).toBeDefined();
-		expect(companyInfo.NameValue).toBeInstanceOf(Array);
-		expect(companyInfo.NameValue.length).toBeGreaterThan(0);
+		expect(companyInfoResponse.companyInfo.NameValue).toBeDefined();
+		expect(companyInfoResponse.companyInfo.NameValue).toBeInstanceOf(Array);
+		expect(companyInfoResponse.companyInfo.NameValue.length).toBeGreaterThan(0);
 
 		// Test the first Name Value
-		const firstNameValue = companyInfo.NameValue[0];
+		const firstNameValue = companyInfoResponse.companyInfo.NameValue[0];
 		expect(firstNameValue).toHaveProperty('Name');
 		expect(firstNameValue).toHaveProperty('Value');
 	});

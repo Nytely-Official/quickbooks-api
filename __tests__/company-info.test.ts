@@ -65,15 +65,21 @@ describe('Company Info API', () => {
 			global.fetch = mockFetch(JSON.stringify(companyInfoQueryResponse));
 
 			// Get the Company Info
-			const companyInfo = await apiClient.companyInfo.getCompanyInfo();
+			const companyInfoResponse = await apiClient.companyInfo.getCompanyInfo();
+
+			// Assert the Company Info Response Structure
+			expect(companyInfoResponse).toBeObject();
+			expect(companyInfoResponse).toHaveProperty('companyInfo');
+			expect(companyInfoResponse).toHaveProperty('intuitTID');
+			expect(typeof companyInfoResponse.intuitTID).toBe('string');
+			expect(companyInfoResponse.intuitTID).toBe('test-tid-12345-67890');
 
 			// Assert the Company Info
-			expect(companyInfo).toBeObject();
-			expect(companyInfo.Id).toBe(mockCompanyInfoData.Id);
-			expect(companyInfo.CompanyName).toBe(mockCompanyInfoData.CompanyName);
-			expect(companyInfo.LegalName).toBe(mockCompanyInfoData.LegalName);
-			expect(companyInfo.Email.Address).toBe(mockCompanyInfoData.Email.Address);
-			expect(companyInfo.PrimaryPhone.FreeFormNumber).toBe(mockCompanyInfoData.PrimaryPhone.FreeFormNumber);
+			expect(companyInfoResponse.companyInfo.Id).toBe(mockCompanyInfoData.Id);
+			expect(companyInfoResponse.companyInfo.CompanyName).toBe(mockCompanyInfoData.CompanyName);
+			expect(companyInfoResponse.companyInfo.LegalName).toBe(mockCompanyInfoData.LegalName);
+			expect(companyInfoResponse.companyInfo.Email.Address).toBe(mockCompanyInfoData.Email.Address);
+			expect(companyInfoResponse.companyInfo.PrimaryPhone.FreeFormNumber).toBe(mockCompanyInfoData.PrimaryPhone.FreeFormNumber);
 		});
 
 		// Test handling search options
@@ -92,14 +98,20 @@ describe('Company Info API', () => {
 			global.fetch = mockFetch(JSON.stringify(companyInfoQueryResponse));
 
 			// Get the Company Info with search options
-			const companyInfo = await apiClient.companyInfo.getCompanyInfo({
+			const companyInfoResponse = await apiClient.companyInfo.getCompanyInfo({
 				maxResults: 1,
 				page: 1,
 			});
 
+			// Assert the Company Info Response Structure
+			expect(companyInfoResponse).toBeObject();
+			expect(companyInfoResponse).toHaveProperty('companyInfo');
+			expect(companyInfoResponse).toHaveProperty('intuitTID');
+			expect(typeof companyInfoResponse.intuitTID).toBe('string');
+			expect(companyInfoResponse.intuitTID).toBe('test-tid-12345-67890');
+
 			// Assert the Company Info
-			expect(companyInfo).toBeObject();
-			expect(companyInfo.Id).toBe(mockCompanyInfoData.Id);
+			expect(companyInfoResponse.companyInfo.Id).toBe(mockCompanyInfoData.Id);
 		});
 
 		// Test error handling when no company info is found
@@ -118,10 +130,13 @@ describe('Company Info API', () => {
 			global.fetch = mockFetch(JSON.stringify(companyInfoQueryResponse));
 
 			// Get the Company Info
-			const companyInfo = await apiClient.companyInfo.getCompanyInfo();
+			const companyInfoResponse = await apiClient.companyInfo.getCompanyInfo();
 
-			// Assert that it returns undefined when no company info is found
-			expect(companyInfo).toBeUndefined();
+			// Assert that it returns a response with null companyInfo when no company info is found
+			expect(companyInfoResponse).toBeObject();
+			expect(companyInfoResponse).toHaveProperty('companyInfo');
+			expect(companyInfoResponse).toHaveProperty('intuitTID');
+			expect(companyInfoResponse.companyInfo).toBeUndefined();
 		});
 
 		// Test error handling for invalid response
@@ -156,12 +171,18 @@ describe('Company Info API', () => {
 			global.fetch = mockFetch(JSON.stringify(companyInfoQueryResponse));
 
 			// Execute Raw Query
-			const companyInfo = await apiClient.companyInfo.rawCompanyInfoQuery('select * from companyinfo');
+			const companyInfoResponse = await apiClient.companyInfo.rawCompanyInfoQuery('select * from companyinfo');
+
+			// Assert the Company Info Response Structure
+			expect(companyInfoResponse).toBeObject();
+			expect(companyInfoResponse).toHaveProperty('companyInfo');
+			expect(companyInfoResponse).toHaveProperty('intuitTID');
+			expect(typeof companyInfoResponse.intuitTID).toBe('string');
+			expect(companyInfoResponse.intuitTID).toBe('test-tid-12345-67890');
 
 			// Assert the Company Info
-			expect(companyInfo).toBeObject();
-			expect(companyInfo.Id).toBe(mockCompanyInfoData.Id);
-			expect(companyInfo.CompanyName).toBe(mockCompanyInfoData.CompanyName);
+			expect(companyInfoResponse.companyInfo.Id).toBe(mockCompanyInfoData.Id);
+			expect(companyInfoResponse.companyInfo.CompanyName).toBe(mockCompanyInfoData.CompanyName);
 		});
 
 		// Test error handling for raw query

@@ -1,6 +1,14 @@
 // Imports
 import { AuthProvider } from '../auth/auth-provider';
-import { Environment, IntuitErrorData, IntuitErrorResponse, QuickbooksError } from '../../types/types';
+import {
+	Environment,
+	IntuitErrorData,
+	IntuitErrorItem,
+	IntuitErrorResponse,
+	IntuitFaultCodes,
+	IntuitFaultType,
+	QuickbooksError,
+} from '../../types/types';
 import { InvoiceAPI } from './invoices/invoice-api';
 import { EstimateAPI } from './estimates/estimate-api';
 import { CustomerAPI } from './customer/customer-api';
@@ -89,7 +97,7 @@ export class ApiClient {
 	 * @param headers - The headers to run the request on
 	 * @returns {AuthProvider} The Auth Provider
 	 */
-	public async runRequest(url: string, requestInit: RequestInit): Promise<any> {
+	public async runRequest(url: string, requestInit: RequestInit): Promise<{ response: Response; responseData: any; intuitTID: string }> {
 		// Get the Token
 		const token = await this.authProvider.getToken();
 
@@ -117,8 +125,11 @@ export class ApiClient {
 		// Check if the response is an Object and if it is, parse it as JSON
 		const responseData = response.headers.get('Content-Type')?.includes('application/json') ? await response.json() : null;
 
-		// Return the Response
-		return responseData;
+		// Get the Intuit Transaction ID
+		const intuitTID = response.headers.get('intuit_tid') ?? '0-00000000-000000000000000000000000';
+
+		// Return the Response Data and Response Object
+		return { response, responseData, intuitTID };
 	}
 
 	/**
@@ -128,16 +139,33 @@ export class ApiClient {
 	 */
 	public static async getIntuitErrorDetails(response: Response | null): Promise<IntuitErrorData> {
 		// Setup the Default Response Data
-		const unknownResponseData: IntuitErrorResponse = { Fault: { Error: [], type: 'UnknownError' }, time: new Date().toISOString() };
+		const unknownResponseData: IntuitErrorResponse = {
+			fault: {
+				error: [{ message: 'Unknown Error', detail: 'Unknown Error', code: IntuitFaultCodes.UnknownError }],
+				type: IntuitFaultType.UnknownFault,
+			},
+			time: new Date(),
+		};
 
 		// Get the Response Data
 		const responseData: IntuitErrorResponse = (await response?.json().catch(() => null)) ?? unknownResponseData;
 
+		// Get the Fault
+		const fault = responseData.Fault ?? responseData.fault;
+
+		// Setup the Error Items (Mapped to the lowercase version)
+		let mappedErrors: IntuitErrorItem[] = responseData.fault?.error ?? new Array();
+
+		// Check if the Fault is the old version and if it is, map the Error Objects to the lowercase version
+		if (responseData.Fault)
+			mappedErrors = responseData.Fault.Error.map((error) => ({ message: error.Message, detail: error.Detail, code: error.code }));
+
 		// Get the Intuit Error Code
 		const errorDetails: IntuitErrorData = {
 			statusCode: response?.status ?? 0,
-			intuitError: responseData.Fault?.Error.map((error) => ({ message: error.Message, detail: error.Detail, code: error.code })),
-			intuitTID: response?.headers.get('intuit_tid') ?? '00000000',
+			intuitError: mappedErrors,
+			intuitTID: response?.headers.get('intuit_tid') ?? '	0-00000000-000000000000000000000000',
+			type: fault?.type ?? IntuitFaultType.UnknownFault,
 		};
 
 		// Return the Intuit Error Details

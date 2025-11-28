@@ -30,10 +30,10 @@ export async function getUpdatedInvoices(
 	const url = queryBuilder.build();
 
 	// Get the Invoices
-	const response = await this.apiClient.runRequest(url, { method: 'GET' });
+	const { responseData, intuitTID } = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const invoices = await this.formatResponse(response);
+	const invoices = await this.formatResponse(responseData);
 
 	// Map the Invoices to Classes
 	const mappedInvoices = invoices.map((invoice) => plainToClass(Invoice, invoice));
@@ -42,6 +42,7 @@ export async function getUpdatedInvoices(
 	const searchResponse: SearchResponse<Invoice> = {
 		results: mappedInvoices,
 		hasNextPage: await this.hasNextPage(queryBuilder),
+		intuitTID,
 	};
 
 	// Return the Invoices

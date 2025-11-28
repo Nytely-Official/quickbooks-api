@@ -9,7 +9,11 @@ import { InvoiceAPI } from '../invoice-api';
  * @param id - The ID of the invoice
  * @returns The Invoice
  */
-export async function getInvoiceById(this: InvoiceAPI, id: string, options: InvoiceOptions = {}): Promise<Invoice | null> {
+export async function getInvoiceById(
+	this: InvoiceAPI,
+	id: string,
+	options: InvoiceOptions = {},
+): Promise<{ invoice: Invoice | null; intuitTID: string }> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
@@ -26,13 +30,13 @@ export async function getInvoiceById(this: InvoiceAPI, id: string, options: Invo
 	const url = queryBuilder.build();
 
 	// Get the Invoice
-	const response = await this.apiClient.runRequest(url, { method: 'GET' });
+	const { responseData, intuitTID } = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Check if the Response Failed to find an Invoice
-	if (!response) return null;
+	if (!responseData) return { invoice: null, intuitTID };
 
 	// Format the Response
-	const invoices = await this.formatResponse(response);
+	const invoices = await this.formatResponse(responseData);
 
 	// Convert the Invoice to a Class
 	const invoice = invoices[0] ? plainToClass(Invoice, invoices[0]) : null;
@@ -40,6 +44,9 @@ export async function getInvoiceById(this: InvoiceAPI, id: string, options: Invo
 	// Check if the Invoice is valid and set the API Client
 	if (invoice) invoice.setApiClient(this.apiClient);
 
-	// Return the Invoice
-	return invoice;
+	// Return the Invoice with Intuit TID
+	return {
+		invoice,
+		intuitTID,
+	};
 }

@@ -14,15 +14,16 @@ export async function rawAccountQuery(this: AccountAPI, queryBuilder: AccountQue
 	const url = queryBuilder.build();
 
 	// Execute the custom query
-	const response = await this.apiClient.runRequest(url, { method: 'GET' });
+	const { responseData, intuitTID } = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const accounts = await this.formatResponse(response);
+	const accounts = await this.formatResponse(responseData);
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Account> = {
 		results: accounts,
 		hasNextPage: await this.hasNextPage(queryBuilder),
+		intuitTID,
 	};
 
 	// Return the Accounts

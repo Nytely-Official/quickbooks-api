@@ -65,6 +65,11 @@ describe('Estimate API', () => {
 			expect(searchResponse.results).toBeArray();
 			expect(searchResponse.results.length).toBe(mockEstimateData.length);
 			expect(searchResponse.results[0].Id).toBe(mockEstimateData[0].Id);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 
@@ -90,6 +95,11 @@ describe('Estimate API', () => {
 
 			// Assert the Estimates
 			expect(searchResponse.hasNextPage).toBe(true);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 
@@ -114,10 +124,17 @@ describe('Estimate API', () => {
 			global.fetch = mockFetch(JSON.stringify(estimateQueryResponse));
 
 			// Get the Estimate
-			const searchResponse = await apiClient.estimates.getEstimateById(testEstimate.Id);
+			const estimateResponse = await apiClient.estimates.getEstimateById(testEstimate.Id);
+
+			// Assert the Estimate Response Structure
+			expect(estimateResponse).toBeObject();
+			expect(estimateResponse).toHaveProperty('estimate');
+			expect(estimateResponse).toHaveProperty('intuitTID');
+			expect(typeof estimateResponse.intuitTID).toBe('string');
+			expect(estimateResponse.intuitTID).toBe('test-tid-12345-67890');
 
 			// Assert the Estimate
-			expect(searchResponse.Id).toBe(testEstimate.Id);
+			expect(estimateResponse.estimate?.Id).toBe(testEstimate.Id);
 		});
 
 		// Test the getEstimateById Method with an Invalid Estimate ID
@@ -176,6 +193,11 @@ describe('Estimate API', () => {
 			expect(searchResponse.results).toBeArray();
 			expect(searchResponse.results.length).toBe(estimatesInDateRange.length);
 			expect(searchResponse.results[0].Id).toBe(estimatesInDateRange[0].Id);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 
@@ -218,6 +240,11 @@ describe('Estimate API', () => {
 			expect(searchResponse.results).toBeArray();
 			expect(searchResponse.results.length).toBe(estimatesInDateRange.length);
 			expect(searchResponse.results[0].Id).toBe(estimatesInDateRange[0].Id);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 
 		// Describe the getUpdatedEstimates Method
@@ -239,6 +266,11 @@ describe('Estimate API', () => {
 
 			// Assert the Estimates Length
 			expect(searchResponse.results.length).toBe(0);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 });

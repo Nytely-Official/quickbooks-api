@@ -9,7 +9,7 @@ import { BillAPI } from '../bill-api';
  * @param id - The ID of the bill
  * @returns The Bill
  */
-export async function getBillById(this: BillAPI, id: string): Promise<Bill> {
+export async function getBillById(this: BillAPI, id: string): Promise<{ bill: Bill; intuitTID: string }> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
@@ -20,14 +20,17 @@ export async function getBillById(this: BillAPI, id: string): Promise<Bill> {
 	const url = queryBuilder.build();
 
 	// Get the Bill
-	const response = await this.apiClient.runRequest(url, { method: 'GET' });
+	const { responseData, intuitTID } = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Check if the Response Failed to find an Bill
-	if (!response) throw new QuickbooksError('Bill not found', await ApiClient.getIntuitErrorDetails(null));
+	if (!responseData) throw new QuickbooksError('Bill not found', await ApiClient.getIntuitErrorDetails(null));
 
 	// Format the Response
-	const bills = await this.formatResponse(response);
+	const bills = await this.formatResponse(responseData);
 
-	// Return the Bill
-	return bills[0];
+	// Return the Bill with Intuit TID
+	return {
+		bill: bills[0],
+		intuitTID,
+	};
 }

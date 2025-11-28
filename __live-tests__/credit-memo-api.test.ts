@@ -22,6 +22,10 @@ describe('Live API: CreditMemos', async () => {
 		// Assert the CreditMemos
 		expect(searchResponse.results).toBeInstanceOf(Array);
 		expect(searchResponse.results.length).toBeGreaterThan(0);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test Checking for Next Page
@@ -31,6 +35,10 @@ describe('Live API: CreditMemos', async () => {
 
 		// Test the CreditMemos
 		expect(searchResponse.hasNextPage).toBe(true);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test retrieving a single creditMemo by ID
@@ -42,11 +50,16 @@ describe('Live API: CreditMemos', async () => {
 		const testCreditMemo = searchResponse.results[0];
 
 		// Get the CreditMemo by ID
-		const foundCreditMemo = await apiClient.creditMemos.getCreditMemoById(testCreditMemo.Id);
+		const creditMemoResponse = await apiClient.creditMemos.getCreditMemoById(testCreditMemo.Id);
 
-		// Assert the CreditMemo
-		expect(foundCreditMemo).toBeDefined();
-		expect(foundCreditMemo.Id).toBe(testCreditMemo.Id);
+		// Assert the CreditMemo Response Structure
+		expect(creditMemoResponse).toBeDefined();
+		expect(creditMemoResponse).toHaveProperty('creditMemo');
+		expect(creditMemoResponse).toHaveProperty('intuitTID');
+		expect(typeof creditMemoResponse.intuitTID).toBe('string');
+
+		// Assert the CreditMemo ID
+		expect(creditMemoResponse.creditMemo?.Id).toBe(testCreditMemo.Id);
 	});
 
 	// #FIX Test pagination only 1 item in test account so this test will fail
@@ -83,6 +96,10 @@ describe('Live API: CreditMemos', async () => {
 
 		// Assert the CreditMemos
 		expect(searchResponse.results).toBeInstanceOf(Array);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test updated creditMemos
@@ -95,6 +112,10 @@ describe('Live API: CreditMemos', async () => {
 
 		// Assert the CreditMemos
 		expect(searchResponse.results).toBeInstanceOf(Array);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test error handling for invalid ID
@@ -163,5 +184,9 @@ describe('Live API: CreditMemos', async () => {
 
 		// Assert the CreditMemos Length
 		expect(searchResponse.results.length).toBe(0);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 });

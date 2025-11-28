@@ -17,7 +17,10 @@ export function mockFetch(responseData: BodyInit, responseStatus = 200) {
 		const responseBody: BodyInit = responseData;
 
 		// Setup the New Response
-		const response = new Response(responseBody, { status: responseStatus, headers: { 'Content-Type': 'application/json' } });
+		const response = new Response(responseBody, {
+			status: responseStatus,
+			headers: { 'Content-Type': 'application/json', intuit_tid: 'test-tid-12345-67890' },
+		});
 
 		// Return the Response
 		return response;

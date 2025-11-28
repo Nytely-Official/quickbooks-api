@@ -1,5 +1,53 @@
 # Changelog
 
+## [0.9.0] - 2025-11-28
+
+### Features
+
+- Added Intuit Transaction ID (`intuitTID`) to all successful API responses
+- Enhanced `ApiClient.runRequest()` to extract `intuitTID` from response headers
+- Updated `SearchResponse` interface to include `intuitTID` property for all search/list methods
+- Improved error handling to support both old (uppercase) and new (lowercase) Intuit error response formats
+- Added `IntuitFaultType` enum for type-safe error type handling
+- Enhanced error mapping to handle both `Fault.Error` and `fault.error` response structures
+
+### Breaking Changes
+
+- All `get*ById()` methods now return `{ item: T | null, intuitTID: string }` instead of just `T | null`:
+  - `getAccountById()`
+  - `getBillById()`
+  - `getCreditMemoById()`
+  - `getCustomerById()`
+  - `getEstimateById()`
+  - `getInvoiceById()`
+  - `getPaymentById()`
+- `getCompanyInfo()` and `rawCompanyInfoQuery()` now return `{ companyInfo: CompanyInfo, intuitTID: string }` instead of just `CompanyInfo`
+- All search/list methods now include `intuitTID` in the `SearchResponse` interface:
+  - All `getAll*()` methods
+  - All `get*ForDateRange()` methods
+  - All `getUpdated*()` methods
+  - All `raw*Query()` methods
+
+### Code Quality
+
+- Standardized response structure across all API methods
+- Improved type safety with structured response interfaces
+- Enhanced error handling compatibility with both Intuit API error response formats
+- Updated all API service methods to consistently return `intuitTID`
+
+### Tests
+
+- Updated all unit tests to validate `intuitTID` presence and format
+- Updated all live tests to check for `intuitTID` in responses
+- Enhanced mock helpers to include `intuit_tid` header in test responses
+- Added comprehensive test coverage for new response structures across all APIs
+
+### Documentation
+
+- Updated README with examples showing new response structures
+- Added migration guide for breaking changes
+- Documented `intuitTID` usage in API response examples
+
 ## [0.8.0] - 2025-11-27
 
 ### Features

@@ -8,7 +8,11 @@ import { PaymentAPI } from '../payment-api';
  * @param id - The ID of the payment
  * @returns The Payment
  */
-export async function getPaymentById(this: PaymentAPI, id: string, options: PaymentOptions = {}): Promise<Payment | null> {
+export async function getPaymentById(
+	this: PaymentAPI,
+	id: string,
+	options: PaymentOptions = {},
+): Promise<{ payment: Payment | null; intuitTID: string }> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
@@ -22,14 +26,17 @@ export async function getPaymentById(this: PaymentAPI, id: string, options: Paym
 	const url = queryBuilder.build();
 
 	// Get the Payment
-	const response = await this.apiClient.runRequest(url, { method: 'GET' });
+	const { responseData, intuitTID } = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Check if the Response Failed to find an Payment
-	if (!response) return null;
+	if (!responseData) return { payment: null, intuitTID };
 
 	// Format the Response
-	const payments = await this.formatResponse(response);
+	const payments = await this.formatResponse(responseData);
 
-	// Return the Payment
-	return payments[0];
+	// Return the Payment with Intuit TID
+	return {
+		payment: payments[0],
+		intuitTID,
+	};
 }

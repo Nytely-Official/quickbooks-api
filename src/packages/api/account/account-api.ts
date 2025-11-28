@@ -106,16 +106,22 @@ export class AccountAPI {
 		const url = queryBuilder.build();
 
 		// Run the Request
-		const response = await this.apiClient.runRequest(url, { method: 'GET' }).catch((error) => {
+		const result = await this.apiClient.runRequest(url, { method: 'GET' }).catch((error) => {
 			// Log the error
 			console.error(`Failed to check if there is a next page: ${error}`);
+
+			// Return null
+			return null;
 		});
 
+		// Check if the Result is null
+		if (!result) return false;
+
 		// Check if the Response is invalid
-		if (!response?.QueryResponse?.Account) return false;
+		if (!result.responseData?.QueryResponse?.Account) return false;
 
 		// Check if the Response is Invalid
-		if (response.QueryResponse.Account.length < 1) return false;
+		if (result.responseData.QueryResponse.Account.length < 1) return false;
 
 		// Return True
 		return true;

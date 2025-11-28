@@ -8,7 +8,11 @@ import { CreditMemoAPI } from '../credit-memo-api';
  * @param id - The ID of the creditmemo
  * @returns The CreditMemo
  */
-export async function getCreditMemoById(this: CreditMemoAPI, id: string, options: CreditMemoOptions = {}): Promise<CreditMemo | null> {
+export async function getCreditMemoById(
+	this: CreditMemoAPI,
+	id: string,
+	options: CreditMemoOptions = {},
+): Promise<{ creditMemo: CreditMemo | null; intuitTID: string }> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
@@ -22,14 +26,17 @@ export async function getCreditMemoById(this: CreditMemoAPI, id: string, options
 	const url = queryBuilder.build();
 
 	// Get the CreditMemo
-	const response = await this.apiClient.runRequest(url, { method: 'GET' });
+	const { responseData, intuitTID } = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Check if the Response Failed to find an CreditMemo
-	if (!response) return null;
+	if (!responseData) return { creditMemo: null, intuitTID };
 
 	// Format the Response
-	const creditmemos = await this.formatResponse(response);
+	const creditmemos = await this.formatResponse(responseData);
 
-	// Return the CreditMemo
-	return creditmemos[0];
+	// Return the CreditMemo with Intuit TID
+	return {
+		creditMemo: creditmemos[0],
+		intuitTID,
+	};
 }

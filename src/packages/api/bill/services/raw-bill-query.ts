@@ -14,15 +14,16 @@ export async function rawBillQuery(this: BillAPI, queryBuilder: BillQueryBuilder
 	const url = queryBuilder.build();
 
 	// Execute the custom query
-	const response = await this.apiClient.runRequest(url, { method: 'GET' });
+	const { responseData, intuitTID } = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const bills = await this.formatResponse(response);
+	const bills = await this.formatResponse(responseData);
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Bill> = {
 		results: bills,
 		hasNextPage: await this.hasNextPage(queryBuilder),
+		intuitTID,
 	};
 
 	// Return the Bills

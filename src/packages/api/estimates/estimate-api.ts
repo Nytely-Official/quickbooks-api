@@ -105,16 +105,17 @@ export class EstimateAPI {
 		const url = queryBuilder.build();
 
 		// Run the Request
-		const response = await this.apiClient.runRequest(url, { method: 'GET' }).catch((error) => {
+		const result = await this.apiClient.runRequest(url, { method: 'GET' }).catch((error) => {
 			// Log the error
 			console.error(`Failed to check if there is a next page: ${error}`);
+			return null;
 		});
 
 		// Check if the Response is invalid
-		if (!response?.QueryResponse?.Estimate) return false;
+		if (!result?.responseData || !result.responseData?.QueryResponse?.Estimate) return false;
 
 		// Check if the Response is Invalid
-		if (response.QueryResponse.Estimate.length < 1) return false;
+		if (result.responseData.QueryResponse.Estimate.length < 1) return false;
 
 		// Return True
 		return true;

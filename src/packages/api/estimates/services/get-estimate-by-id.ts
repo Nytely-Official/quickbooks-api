@@ -8,7 +8,11 @@ import { EstimateAPI } from '../estimate-api';
  * @param id - The ID of the estimate
  * @returns The Estimate
  */
-export async function getEstimateById(this: EstimateAPI, id: string, options: EstimateOptions = {}): Promise<Estimate | null> {
+export async function getEstimateById(
+	this: EstimateAPI,
+	id: string,
+	options: EstimateOptions = {},
+): Promise<{ estimate: Estimate | null; intuitTID: string }> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
@@ -22,14 +26,17 @@ export async function getEstimateById(this: EstimateAPI, id: string, options: Es
 	const url = queryBuilder.build();
 
 	// Get the Estimate
-	const response = await this.apiClient.runRequest(url, { method: 'GET' });
+	const { responseData, intuitTID } = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Check if the Response Failed to find an Estimate
-	if (!response) return null;
+	if (!responseData) return { estimate: null, intuitTID };
 
 	// Format the Response
-	const estimates = await this.formatResponse(response);
+	const estimates = await this.formatResponse(responseData);
 
-	// Return the Estimate
-	return estimates[0];
+	// Return the Estimate with Intuit TID
+	return {
+		estimate: estimates[0],
+		intuitTID,
+	};
 }

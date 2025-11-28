@@ -101,15 +101,16 @@ export class BillAPI {
 		const url = queryBuilder.build();
 
 		// Run the Request
-		const response = await this.apiClient.runRequest(url, { method: 'GET' }).catch((error) => {
+		const result = await this.apiClient.runRequest(url, { method: 'GET' }).catch((error) => {
 			console.error(`Failed to check if there is a next page: ${error}`);
+			return null;
 		});
 
 		// Check if the Response is Invalid
-		if (!response?.QueryResponse?.Bill) return false;
+		if (!result?.responseData || !result.responseData?.QueryResponse?.Bill) return false;
 
 		// Check if the Response has no Bills
-		if (response.QueryResponse.Bill.length < 1) return false;
+		if (result.responseData.QueryResponse.Bill.length < 1) return false;
 
 		// Return True
 		return true;

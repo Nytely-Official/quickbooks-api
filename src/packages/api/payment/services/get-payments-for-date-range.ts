@@ -33,15 +33,16 @@ export async function getPaymentsForDateRange(
 	const url = queryBuilder.build();
 
 	// Get the Payments
-	const response = await this.apiClient.runRequest(url, { method: 'GET' });
+	const { responseData, intuitTID } = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const payments = await this.formatResponse(response);
+	const payments = await this.formatResponse(responseData);
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Payment> = {
 		results: payments,
 		hasNextPage: await this.hasNextPage(queryBuilder),
+		intuitTID,
 	};
 
 	// Return the Payments
