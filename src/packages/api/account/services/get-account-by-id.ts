@@ -8,7 +8,11 @@ import { AccountAPI } from '../account-api';
  * @param id - The ID of the account
  * @returns The Account
  */
-export async function getAccountById(this: AccountAPI, id: string, options: AccountOptions = {}): Promise<Account | null> {
+export async function getAccountById(
+	this: AccountAPI,
+	id: string,
+	options: AccountOptions = {},
+): Promise<{ account: Account | null; intuitTID: string }> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
@@ -20,15 +24,23 @@ export async function getAccountById(this: AccountAPI, id: string, options: Acco
 
 	// Setup the URL
 	const url = queryBuilder.build();
+
 	// Get the Account
-	const response = await this.apiClient.runRequest(url, { method: 'GET' });
+	const { responseData, intuitTID } = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Check if the Response Failed to find an Account
-	if (!response) return null;
+	if (!responseData)
+		return {
+			account: null,
+			intuitTID,
+		};
 
 	// Format the Response
-	const accounts = await this.formatResponse(response);
+	const accounts = await this.formatResponse(responseData);
 
-	// Return the Account
-	return accounts[0];
+	// Return the Account with Intuit TID
+	return {
+		account: accounts[0],
+		intuitTID,
+	};
 }

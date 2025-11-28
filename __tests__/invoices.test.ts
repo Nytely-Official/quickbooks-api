@@ -68,6 +68,11 @@ describe('Invoice API', () => {
 
 			// Assert the Invoices
 			expect(searchResponse.results[0].Id).toBe(mockInvoiceData[0].Id);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 
@@ -93,6 +98,11 @@ describe('Invoice API', () => {
 
 			// Assert the Invoices
 			expect(searchResponse.hasNextPage).toBe(true);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 
@@ -117,10 +127,17 @@ describe('Invoice API', () => {
 			global.fetch = mockFetch(JSON.stringify(invoiceQueryResponse));
 
 			// Get the Invoice
-			const invoice = await apiClient.invoices.getInvoiceById(testInvoice.Id);
+			const invoiceResponse = await apiClient.invoices.getInvoiceById(testInvoice.Id);
+
+			// Assert the Invoice Response Structure
+			expect(invoiceResponse).toBeObject();
+			expect(invoiceResponse).toHaveProperty('invoice');
+			expect(invoiceResponse).toHaveProperty('intuitTID');
+			expect(typeof invoiceResponse.intuitTID).toBe('string');
+			expect(invoiceResponse.intuitTID).toBe('test-tid-12345-67890');
 
 			// Assert the Invoice
-			expect(invoice.Id).toBe(testInvoice.Id);
+			expect(invoiceResponse.invoice?.Id).toBe(testInvoice.Id);
 		});
 
 		// Describe the getInvoiceById Method
@@ -227,6 +244,11 @@ describe('Invoice API', () => {
 
 			// Assert the Invoices
 			expect(searchResponse.results[0].Id).toBe(invoicesInDateRange[0].Id);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 
 		// Describe the getUpdatedInvoices Method
@@ -248,6 +270,11 @@ describe('Invoice API', () => {
 
 			// Assert the Invoices Length
 			expect(searchResponse.results.length).toBe(0);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 
@@ -282,6 +309,11 @@ describe('Invoice API', () => {
 
 			// Assert the Invoices
 			expect(new Date(searchResponse.results[0].DueDate).getTime()).toBe(testDate.getTime());
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 });

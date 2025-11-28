@@ -106,16 +106,17 @@ export class PaymentAPI {
 		const url = queryBuilder.build();
 
 		// Run the Request
-		const response = await this.apiClient.runRequest(url, { method: 'GET' }).catch((error) => {
+		const result = await this.apiClient.runRequest(url, { method: 'GET' }).catch((error) => {
 			// Log the error
 			console.error(`Failed to check if there is a next page: ${error}`);
+			return null;
 		});
 
 		// Check if the Response is invalid
-		if (!response?.QueryResponse?.Payment) return false;
+		if (!result?.responseData || !result.responseData?.QueryResponse?.Payment) return false;
 
 		// Check if the Response is Invalid
-		if (response.QueryResponse.Payment.length < 1) return false;
+		if (result.responseData.QueryResponse.Payment.length < 1) return false;
 
 		// Return True
 		return true;

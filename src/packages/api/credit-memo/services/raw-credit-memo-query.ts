@@ -14,15 +14,16 @@ export async function rawCreditMemoQuery(this: CreditMemoAPI, queryBuilder: Cred
 	const url = queryBuilder.build();
 
 	// Execute the custom query
-	const response = await this.apiClient.runRequest(url, { method: 'GET' });
+	const { responseData, intuitTID } = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const creditmemos = await this.formatResponse(response);
+	const creditmemos = await this.formatResponse(responseData);
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<CreditMemo> = {
 		results: creditmemos,
 		hasNextPage: await this.hasNextPage(queryBuilder),
+		intuitTID,
 	};
 
 	// Return the CreditMemos

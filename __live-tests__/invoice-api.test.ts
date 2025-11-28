@@ -35,6 +35,10 @@ describe('Live API: Invoices', async () => {
 
 		// Test the Invoice length
 		expect(searchResponse.results.length).toBeGreaterThan(0);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test Checking for Next Page
@@ -44,6 +48,10 @@ describe('Live API: Invoices', async () => {
 
 		// Test the Invoices
 		expect(searchResponse.hasNextPage).toBe(true);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test retrieving a single invoice
@@ -55,13 +63,16 @@ describe('Live API: Invoices', async () => {
 		const invoice = searchResponse.results[0];
 
 		// Get the Invoice by ID
-		const foundInvoice = await apiClient.invoices.getInvoiceById(invoice.Id);
+		const invoiceResponse = await apiClient.invoices.getInvoiceById(invoice.Id);
 
-		// Test the Invoice
-		expect(foundInvoice).toBeDefined();
+		// Test the Invoice Response Structure
+		expect(invoiceResponse).toBeDefined();
+		expect(invoiceResponse).toHaveProperty('invoice');
+		expect(invoiceResponse).toHaveProperty('intuitTID');
+		expect(typeof invoiceResponse.intuitTID).toBe('string');
 
 		// Test the Invoice ID
-		expect(foundInvoice.Id).toBe(invoice.Id);
+		expect(invoiceResponse.invoice?.Id).toBe(invoice.Id);
 	});
 
 	// Test retrieving 10 invoices
@@ -77,6 +88,10 @@ describe('Live API: Invoices', async () => {
 
 		// Test the Invoice length
 		expect(searchResponse.results.length).toBeGreaterThan(0);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test retrieving Invoices by Status
@@ -191,6 +206,10 @@ describe('Live API: Invoices', async () => {
 		// Test the Invoice length
 		expect(searchResponse.results.length).toBeGreaterThan(0);
 
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
+
 		// loop through the invoices and test each id is less than the previous one
 		for (let i = 0; i < searchResponse.results.length - 1; i++)
 			expect(Number(searchResponse.results[i].Id)).toBeGreaterThan(Number(searchResponse.results[i + 1].Id));
@@ -209,6 +228,10 @@ describe('Live API: Invoices', async () => {
 
 		// Test the Invoice length
 		expect(searchResponse.results.length).toBeGreaterThan(0);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test returning an empty array if no invoices are updated

@@ -75,6 +75,11 @@ describe('Account API', () => {
 			// Assert the Accounts
 			expect(searchResponse.results).toBeArray();
 			expect(searchResponse.results.length).toBe(10);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 
 		// Test fetching all accounts
@@ -101,6 +106,11 @@ describe('Account API', () => {
 			searchResponse.results.forEach((account, index) => {
 				expect(account.Id).toBe(mockAccountData[index].Id);
 			});
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 
@@ -125,6 +135,11 @@ describe('Account API', () => {
 
 			// Assert the Next Page
 			expect(searchResponse.hasNextPage).toBe(true);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 
@@ -153,11 +168,18 @@ describe('Account API', () => {
 				global.fetch = mockFetch(JSON.stringify(accountQueryResponse));
 
 				// Get the Account
-				const searchResponse = await apiClient.accounts.getAccountById(account.Id);
+				const accountResponse = await apiClient.accounts.getAccountById(account.Id);
+
+				// Assert the Account Response Structure
+				expect(accountResponse).toBeObject();
+				expect(accountResponse).toHaveProperty('account');
+				expect(accountResponse).toHaveProperty('intuitTID');
+				expect(typeof accountResponse.intuitTID).toBe('string');
+				expect(accountResponse.intuitTID).toBe('test-tid-12345-67890');
 
 				// Assert the Account
-				expect(searchResponse).toBeObject();
-				expect(searchResponse.Id).toBe(account.Id);
+				expect(accountResponse.account).toBeObject();
+				expect(accountResponse.account?.Id).toBe(account.Id);
 			}
 		});
 
@@ -213,6 +235,11 @@ describe('Account API', () => {
 			expect(searchResponse.results).toBeArray();
 			expect(searchResponse.results.length).toBe(accountsInDateRange.length);
 			expect(searchResponse.results[0].Id).toBe(accountsInDateRange[0].Id);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 
@@ -250,6 +277,11 @@ describe('Account API', () => {
 			expect(searchResponse.results).toBeArray();
 			expect(searchResponse.results.length).toBe(updatedAccounts.length);
 			expect(searchResponse.results[0].Id).toBe(updatedAccounts[0].Id);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 
 		// Describe the getUpdatedCustomers Method
@@ -271,6 +303,11 @@ describe('Account API', () => {
 
 			// Assert the Accounts Length
 			expect(searchResponse.results.length).toBe(0);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 
@@ -300,6 +337,11 @@ describe('Account API', () => {
 			expect(searchResponse.results).toBeArray();
 			expect(searchResponse.results.length).toBe(mockAccountData.length);
 			expect(searchResponse.results[0].Id).toBe(mockAccountData[0].Id);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 });

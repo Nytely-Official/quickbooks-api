@@ -115,11 +115,17 @@ describe('Bill API', () => {
 				global.fetch = mockFetch(JSON.stringify(billQueryResponse));
 
 				// Get the Bill
-				const searchResponse = await apiClient.bills.getBillById(bill.Id);
+				const billResponse = await apiClient.bills.getBillById(bill.Id);
+
+				// Assert the Bill Response Structure
+				expect(billResponse).toBeObject();
+				expect(billResponse).toHaveProperty('bill');
+				expect(billResponse).toHaveProperty('intuitTID');
+				expect(typeof billResponse.intuitTID).toBe('string');
+				expect(billResponse.intuitTID).toBe('test-tid-12345-67890');
 
 				// Assert the Bill
-				expect(searchResponse).toBeObject();
-				expect(searchResponse.Id).toBe(bill.Id);
+				expect(billResponse.bill.Id).toBe(bill.Id);
 			}
 		});
 

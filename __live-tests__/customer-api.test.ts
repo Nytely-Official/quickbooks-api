@@ -25,6 +25,10 @@ describe('Live API: Customers', async () => {
 
 		// Test the Customer length
 		expect(searchResponse.results.length).toBeGreaterThan(0);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test Checking for Next Page
@@ -34,6 +38,10 @@ describe('Live API: Customers', async () => {
 
 		// Test the Customers
 		expect(searchResponse.hasNextPage).toBe(true);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test retrieving a single customer
@@ -45,13 +53,16 @@ describe('Live API: Customers', async () => {
 		const customer = searchResponse.results[0];
 
 		// Get the Customer by ID
-		const foundCustomer = await apiClient.customers.getCustomerById(customer.Id);
+		const customerResponse = await apiClient.customers.getCustomerById(customer.Id);
 
-		// Test the Customer
-		expect(foundCustomer).toBeDefined();
+		// Test the Customer Response Structure
+		expect(customerResponse).toBeDefined();
+		expect(customerResponse).toHaveProperty('customer');
+		expect(customerResponse).toHaveProperty('intuitTID');
+		expect(typeof customerResponse.intuitTID).toBe('string');
 
 		// Test the Customer ID
-		expect(foundCustomer.Id).toBe(customer.Id);
+		expect(customerResponse.customer?.Id).toBe(customer.Id);
 	});
 
 	// Test retrieving 10 customers
@@ -66,6 +77,10 @@ describe('Live API: Customers', async () => {
 
 		// Test the Customer length
 		expect(searchResponse.results.length).toBeGreaterThan(0);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test pagination
@@ -127,6 +142,10 @@ describe('Live API: Customers', async () => {
 
 		// Test the Customer length
 		expect(searchResponse.results.length).toBeGreaterThan(0);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test returning an empty array if no customers are updated
@@ -145,6 +164,10 @@ describe('Live API: Customers', async () => {
 
 		// Assert the Customers Length
 		expect(searchResponse.results.length).toBe(0);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test error handling for invalid ID

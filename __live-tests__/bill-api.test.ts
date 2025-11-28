@@ -23,6 +23,10 @@ describe('Live API: Bills', async () => {
 		// Test the Bills
 		expect(searchResponse.results).toBeInstanceOf(Array);
 		expect(searchResponse.results.length).toBeGreaterThan(0);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test Checking for Next Page
@@ -32,6 +36,10 @@ describe('Live API: Bills', async () => {
 
 		// Test the Bills
 		expect(searchResponse.hasNextPage).toBe(true);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test retrieving a single bill
@@ -43,11 +51,16 @@ describe('Live API: Bills', async () => {
 		const bill = searchResponse.results[0];
 
 		// Get the Bill by ID
-		const foundBill = await apiClient.bills.getBillById(bill.Id);
+		const billResponse = await apiClient.bills.getBillById(bill.Id);
 
-		// Test the Bill
-		expect(foundBill).toBeDefined();
-		expect(foundBill.Id).toBe(bill.Id);
+		// Test the Bill Response Structure
+		expect(billResponse).toBeDefined();
+		expect(billResponse).toHaveProperty('bill');
+		expect(billResponse).toHaveProperty('intuitTID');
+		expect(typeof billResponse.intuitTID).toBe('string');
+
+		// Test the Bill ID
+		expect(billResponse.bill.Id).toBe(bill.Id);
 	});
 
 	// Test retrieving limited bills
@@ -96,6 +109,10 @@ describe('Live API: Bills', async () => {
 
 		// Assert the Bills
 		expect(searchResponse.results).toBeInstanceOf(Array);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test updated bills

@@ -66,6 +66,11 @@ describe('CreditMemo API', () => {
 			// Assert the CreditMemos Length
 			expect(searchResponse.results.length).toBe(mockCreditMemoData.length);
 
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
+
 			// Assert the CreditMemos
 			expect(searchResponse.results[0].Id).toBe(mockCreditMemoData[0].Id);
 		});
@@ -93,6 +98,11 @@ describe('CreditMemo API', () => {
 
 			// Assert the CreditMemos
 			expect(searchResponse.hasNextPage).toBe(true);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 
@@ -117,10 +127,17 @@ describe('CreditMemo API', () => {
 			global.fetch = mockFetch(JSON.stringify(creditMemoQueryResponse));
 
 			// Get the CreditMemo
-			const creditMemo = await apiClient.creditMemos.getCreditMemoById(testCreditMemo.Id);
+			const creditMemoResponse = await apiClient.creditMemos.getCreditMemoById(testCreditMemo.Id);
+
+			// Assert the CreditMemo Response Structure
+			expect(creditMemoResponse).toBeObject();
+			expect(creditMemoResponse).toHaveProperty('creditMemo');
+			expect(creditMemoResponse).toHaveProperty('intuitTID');
+			expect(typeof creditMemoResponse.intuitTID).toBe('string');
+			expect(creditMemoResponse.intuitTID).toBe('test-tid-12345-67890');
 
 			// Assert the CreditMemo
-			expect(creditMemo.Id).toBe(testCreditMemo.Id);
+			expect(creditMemoResponse.creditMemo?.Id).toBe(testCreditMemo.Id);
 		});
 
 		// Describe the getCreditMemoById Method
@@ -180,6 +197,11 @@ describe('CreditMemo API', () => {
 
 			// Assert the CreditMemos
 			expect(searchResponse.results[0].Id).toBe(creditMemosInDateRange[0].Id);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 
@@ -225,6 +247,11 @@ describe('CreditMemo API', () => {
 
 			// Assert the CreditMemos
 			expect(searchResponse.results[0].Id).toBe(creditMemosInDateRange[0].Id);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 
 		// Describe the getUpdatedCreditMemos Method
@@ -246,6 +273,11 @@ describe('CreditMemo API', () => {
 
 			// Assert the CreditMemos Length
 			expect(searchResponse.results.length).toBe(0);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 });

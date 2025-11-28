@@ -68,6 +68,11 @@ describe('Preference API', () => {
 
 			// Assert the Preferences
 			expect(searchResponse.results[0].Id).toBe(mockPreferenceData[0].Id);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 });

@@ -14,15 +14,16 @@ export async function rawPreferenceQuery(this: PreferenceAPI, queryBuilder: Pref
 	const url = queryBuilder.build();
 
 	// Execute the custom query
-	const response = await this.apiClient.runRequest(url, { method: 'GET' });
+	const { responseData, intuitTID } = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const preferences = await this.formatResponse(response);
+	const preferences = await this.formatResponse(responseData);
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Preferences> = {
 		results: preferences,
 		hasNextPage: await this.hasNextPage(queryBuilder),
+		intuitTID,
 	};
 
 	// Return the Preferences

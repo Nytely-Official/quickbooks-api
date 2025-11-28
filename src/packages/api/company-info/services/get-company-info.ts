@@ -9,7 +9,10 @@ import { CompanyInfoAPI } from '../company-info-api';
  * @param options - The Search Options
  * @returns The Company Info
  */
-export async function getCompanyInfo(this: CompanyInfoAPI, options: CompanyInfoOptions = {}): Promise<CompanyInfo> {
+export async function getCompanyInfo(
+	this: CompanyInfoAPI,
+	options: CompanyInfoOptions = {},
+): Promise<{ companyInfo: CompanyInfo; intuitTID: string }> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
@@ -20,11 +23,14 @@ export async function getCompanyInfo(this: CompanyInfoAPI, options: CompanyInfoO
 	const url = queryBuilder.build();
 
 	// Get the Company Info
-	const response = await this.apiClient.runRequest(url, { method: 'GET' });
+	const { responseData, intuitTID } = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const companyInfo = await this.formatResponse(response);
+	const companyInfo = await this.formatResponse(responseData);
 
-	// Return the Company Info
-	return companyInfo;
+	// Return the Company Info with Intuit TID
+	return {
+		companyInfo,
+		intuitTID,
+	};
 }

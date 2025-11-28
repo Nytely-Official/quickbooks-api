@@ -25,6 +25,10 @@ describe('Live API: Accounts', async () => {
 
 		// Test the Account length
 		expect(searchResponse.results.length).toBeGreaterThan(0);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test Checking for Next Page
@@ -34,6 +38,10 @@ describe('Live API: Accounts', async () => {
 
 		// Test the Accounts
 		expect(searchResponse.hasNextPage).toBe(true);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test retrieving a single account
@@ -47,11 +55,14 @@ describe('Live API: Accounts', async () => {
 				// Get the Account
 				const accountResponse = await apiClient.accounts.getAccountById(account.Id);
 
-				// Test the Account
+				// Test the Account Response Structure
 				expect(accountResponse).toBeDefined();
+				expect(accountResponse).toHaveProperty('account');
+				expect(accountResponse).toHaveProperty('intuitTID');
+				expect(typeof accountResponse.intuitTID).toBe('string');
 
 				// Test the Account ID
-				expect(accountResponse).toHaveProperty('Id');
+				expect(accountResponse.account).toHaveProperty('Id');
 			}),
 		);
 	});
@@ -70,6 +81,10 @@ describe('Live API: Accounts', async () => {
 		// Test the Account length
 		expect(searchResponse.results.length).toBeGreaterThan(0);
 		expect(searchResponse.results.length).toBeLessThanOrEqual(10);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test pagination
@@ -108,6 +123,10 @@ describe('Live API: Accounts', async () => {
 
 		// Assert the Accounts
 		expect(searchResponse.results).toBeInstanceOf(Array);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test updated accounts
@@ -121,6 +140,10 @@ describe('Live API: Accounts', async () => {
 
 		// Assert the Accounts
 		expect(searchResponse.results).toBeInstanceOf(Array);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test error handling for invalid ID
@@ -207,6 +230,10 @@ describe('Live API: Accounts', async () => {
 
 		// Test the Account length
 		expect(searchResponse.results.length).toBeGreaterThan(0);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
 	// Test returning an empty array if no accounts are updated
@@ -225,5 +252,9 @@ describe('Live API: Accounts', async () => {
 
 		// Assert the Customers Length
 		expect(searchResponse.results.length).toBe(0);
+
+		// Test the Intuit TID
+		expect(searchResponse.intuitTID).toBeDefined();
+		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 });

@@ -18,15 +18,16 @@ export async function getPreferences(this: PreferenceAPI, options: PreferenceOpt
 	const url = queryBuilder.build();
 
 	// Get the Preferences
-	const response = await this.apiClient.runRequest(url, { method: 'GET' });
+	const { responseData, intuitTID } = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	let preferences = await this.formatResponse(response);
+	let preferences = await this.formatResponse(responseData);
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Preferences> = {
 		results: preferences,
 		hasNextPage: await this.hasNextPage(queryBuilder),
+		intuitTID,
 	};
 
 	// Return the Preferences

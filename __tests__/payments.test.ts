@@ -66,6 +66,11 @@ describe('Payment API', () => {
 			// Assert the Payments Length
 			expect(searchResponse.results.length).toBe(mockPaymentData.length);
 
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
+
 			// Assert the Payments
 			expect(searchResponse.results[0].Id).toBe(mockPaymentData[0].Id);
 		});
@@ -93,6 +98,11 @@ describe('Payment API', () => {
 
 			// Assert the Payments
 			expect(searchResponse.hasNextPage).toBe(true);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 
@@ -117,10 +127,17 @@ describe('Payment API', () => {
 			global.fetch = mockFetch(JSON.stringify(paymentQueryResponse));
 
 			// Get the Payment
-			const payment = await apiClient.payments.getPaymentById(testPayment.Id);
+			const paymentResponse = await apiClient.payments.getPaymentById(testPayment.Id);
+
+			// Assert the Payment Response Structure
+			expect(paymentResponse).toBeObject();
+			expect(paymentResponse).toHaveProperty('payment');
+			expect(paymentResponse).toHaveProperty('intuitTID');
+			expect(typeof paymentResponse.intuitTID).toBe('string');
+			expect(paymentResponse.intuitTID).toBe('test-tid-12345-67890');
 
 			// Assert the Payment
-			expect(payment.Id).toBe(testPayment.Id);
+			expect(paymentResponse.payment?.Id).toBe(testPayment.Id);
 		});
 
 		// Describe the getPaymentById Method
@@ -180,6 +197,11 @@ describe('Payment API', () => {
 
 			// Assert the Payments
 			expect(searchResponse.results[0].Id).toBe(paymentsInDateRange[0].Id);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 
@@ -246,6 +268,11 @@ describe('Payment API', () => {
 
 			// Assert the Payments Length
 			expect(searchResponse.results.length).toBe(0);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 });

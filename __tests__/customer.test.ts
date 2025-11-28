@@ -76,6 +76,11 @@ describe('Customer API', () => {
 
 			// Assert the Customers
 			expect(searchResponse.hasNextPage).toBe(true);
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 		});
 	});
 
@@ -116,6 +121,11 @@ describe('Customer API', () => {
 			// Assert the Customers
 			expect(searchResponse.results).toBeArray();
 
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
+
 			// Assert the Customers Length
 			expect(searchResponse.results.length).toBe(customersInDateRange.length);
 
@@ -145,9 +155,15 @@ describe('Customer API', () => {
 			global.fetch = mockFetch(JSON.stringify(customerQueryResponse));
 
 			// Get the Customer
-			const customer = await apiClient.customers.getCustomerById(testCustomer.Id);
+			const customerResponse = await apiClient.customers.getCustomerById(testCustomer.Id);
+			// Assert the Customer Response Structure
+			expect(customerResponse).toBeObject();
+			expect(customerResponse).toHaveProperty('customer');
+			expect(customerResponse).toHaveProperty('intuitTID');
+			expect(typeof customerResponse.intuitTID).toBe('string');
+			expect(customerResponse.intuitTID).toBe('test-tid-12345-67890');
 			// Assert the Customer
-			expect(customer.Id).toBe(testCustomer.Id);
+			expect(customerResponse.customer?.Id).toBe(testCustomer.Id);
 		});
 
 		// Describe the getCustomerById Method
@@ -188,6 +204,11 @@ describe('Customer API', () => {
 
 			// Assert the Customers
 			expect(searchResponse.results).toBeArray();
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 
 			// Assert the Customers Length
 			expect(searchResponse.results.length).toBe(mockCustomerData.length);
@@ -232,6 +253,11 @@ describe('Customer API', () => {
 
 			// Assert the Customers
 			expect(searchResponse.results).toBeArray();
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 			// Assert the Customers Length
 			expect(searchResponse.results.length).toBe(customersInDateRange.length);
 
@@ -255,6 +281,11 @@ describe('Customer API', () => {
 
 			// Assert the Customers
 			expect(searchResponse.results).toBeArray();
+
+			// Assert the Intuit TID
+			expect(searchResponse.intuitTID).toBeDefined();
+			expect(typeof searchResponse.intuitTID).toBe('string');
+			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
 
 			// Assert the Customers Length
 			expect(searchResponse.results.length).toBe(0);

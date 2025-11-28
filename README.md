@@ -109,12 +109,16 @@ while (hasNextPage) {
   // Check if there is a next page
   hasNextPage = searchResponse.hasNextPage;
 
+  // Log the Intuit Transaction ID for tracking
+  console.log('Transaction ID:', searchResponse.intuitTID);
+
   // Increment the Page
   page++;
 }
 
 // Get the list of Paid Invoice
 const paidInvoices = await apiClient.invoices.getAllInvoices({ status: InvoiceStatus.Paid });
+console.log('Transaction ID:', paidInvoices.intuitTID);
 ```
 
 ---
@@ -130,7 +134,11 @@ details.
 import { QuickbooksError } from 'quickbooks-api';
 
 try {
-  const invoice = await apiClient.invoices.getInvoiceById('invalid-id');
+  const { invoice, intuitTID } = await apiClient.invoices.getInvoiceById('invalid-id');
+  if (invoice) {
+    console.log('Invoice ID:', invoice.Id);
+    console.log('Transaction ID:', intuitTID);
+  }
 } catch (error) {
   if (error instanceof QuickbooksError) {
     // Access the error message
@@ -166,8 +174,13 @@ import { ApiClient, QuickbooksError } from 'quickbooks-api';
 
 async function fetchAccount(accountId: string) {
   try {
-    const account = await apiClient.accounts.getAccountById(accountId);
-    return account;
+    const { account, intuitTID } = await apiClient.accounts.getAccountById(accountId);
+    if (account) {
+      console.log('Account retrieved:', account.Name);
+      console.log('Transaction ID:', intuitTID);
+      return account;
+    }
+    return null;
   } catch (error) {
     if (error instanceof QuickbooksError) {
       // Handle specific error cases
@@ -192,6 +205,71 @@ async function fetchAccount(accountId: string) {
   }
 }
 ```
+
+---
+
+## API Response Structure
+
+All API methods now include the Intuit Transaction ID (`intuitTID`) in their responses for better request tracking and support debugging.
+
+### Search/List Methods
+
+Methods that return multiple results (like `getAllInvoices()`, `getAllAccounts()`, etc.) return a `SearchResponse` object:
+
+```typescript
+interface SearchResponse<T> {
+  results: Array<T>;
+  hasNextPage?: boolean;
+  intuitTID: string; // Intuit Transaction ID
+}
+```
+
+**Example:**
+
+```typescript
+const response = await apiClient.invoices.getAllInvoices();
+console.log('Invoices:', response.results);
+console.log('Has next page:', response.hasNextPage);
+console.log('Transaction ID:', response.intuitTID);
+```
+
+### Single Item Methods
+
+Methods that return a single item (like `getInvoiceById()`, `getAccountById()`, etc.) return an object with the item and `intuitTID`:
+
+```typescript
+// For most entities
+const { invoice, intuitTID } = await apiClient.invoices.getInvoiceById('123');
+if (invoice) {
+  console.log('Invoice ID:', invoice.Id);
+  console.log('Transaction ID:', intuitTID);
+}
+
+// For Company Info
+const { companyInfo, intuitTID } = await apiClient.companyInfo.getCompanyInfo();
+console.log('Company Name:', companyInfo.CompanyName);
+console.log('Transaction ID:', intuitTID);
+```
+
+**Affected Methods:**
+
+- `getAccountById()`
+- `getBillById()`
+- `getCreditMemoById()`
+- `getCustomerById()`
+- `getEstimateById()`
+- `getInvoiceById()`
+- `getPaymentById()`
+- `getCompanyInfo()`
+- `rawCompanyInfoQuery()`
+
+### Using Transaction IDs
+
+The `intuitTID` is useful for:
+
+- **Support Requests**: Provide the transaction ID when contacting Intuit support
+- **Debugging**: Track specific API requests in logs
+- **Audit Trails**: Maintain records of API interactions
 
 ---
 

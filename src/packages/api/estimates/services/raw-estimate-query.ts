@@ -14,15 +14,16 @@ export async function rawEstimateQuery(this: EstimateAPI, queryBuilder: Estimate
 	const url = queryBuilder.build();
 
 	// Execute the custom query
-	const response = await this.apiClient.runRequest(url, { method: 'GET' });
+	const { responseData, intuitTID } = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const estimates = await this.formatResponse(response);
+	const estimates = await this.formatResponse(responseData);
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Estimate> = {
 		results: estimates,
 		hasNextPage: await this.hasNextPage(queryBuilder),
+		intuitTID,
 	};
 
 	// Return the Estimates
