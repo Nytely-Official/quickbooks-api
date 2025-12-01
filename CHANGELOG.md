@@ -1,5 +1,65 @@
 # Changelog
 
+## [0.10.0] - 2025-12-01
+
+### Features
+
+- Added comprehensive entity management methods to all QuickBooks entity classes:
+  - **Invoice**: Added `send()` method to send invoices via email
+  - **Invoice**: Added `downloadPDF()` method to download invoices as PDF blobs
+  - **Invoice**: Added `void()` method to void invoices
+  - **Estimate**: Added `send()` method to send estimates via email
+  - **Estimate**: Added `downloadPDF()` method to download estimates as PDF blobs
+  - **CreditMemo**: Added `send()` method to send credit memos via email
+  - **CreditMemo**: Added `downloadPDF()` method to download credit memos as PDF blobs
+  - **CreditMemo**: Added `void()` method to void credit memos
+  - **Bill**: Added `downloadPDF()` method to download bills as PDF blobs
+  - **Payment**: Added `downloadPDF()` method to download payments as PDF blobs
+  - **Payment**: Added `void()` method to void payments
+  - **Account**: Added `delete()` method to soft-delete accounts (sets Active=false)
+  - **Customer**: Added `delete()` method to soft-delete customers (sets Active=false)
+- All new methods include comprehensive JSDoc documentation
+- Methods properly validate entity state (ID presence) before operations
+- PDF downloads return `Blob` objects for easy file handling
+- Soft deletes use `Active=false` pattern for Account and Customer entities
+
+### Bug Fixes
+
+- Fixed `Invoice.save()` to properly extract entity data from `responseData`
+- Fixed `Customer.save()` to properly extract entity data from `responseData`
+- All `save()` methods now correctly handle QuickBooks API response structure with proper entity extraction
+
+### Tests
+
+- Added `mockPDF()` helper function for PDF response mocking in test utilities
+- Added comprehensive unit tests for all new entity class methods:
+  - Method existence validation
+  - Success case testing with mocked responses
+  - Error handling for missing ID scenarios
+  - Response validation and property updates
+- Added live integration tests for PDF downloads (read-only, safe operations):
+  - Invoice PDF download tests
+  - Estimate PDF download tests
+  - CreditMemo PDF download tests
+  - Bill PDF download tests (with graceful error handling)
+  - Payment PDF download tests
+- Fixed content-type validation to handle charset parameter variations
+- Added proper error handling for unsupported operations (Bill PDF downloads)
+
+### Code Quality
+
+- All new methods follow QuickBooks API documentation patterns
+- Consistent error handling with `QuickbooksError` across all new methods
+- Proper response data extraction from QuickBooks API responses
+- Enhanced type safety with proper TypeScript type definitions
+- Methods follow existing code patterns and conventions
+
+### Documentation
+
+- All new methods include comprehensive JSDoc comments
+- Methods document required parameters, return types, and error conditions
+- Examples provided in test code for reference
+
 ## [0.9.1] - 2025-11-28
 
 ### Bug Fixes
