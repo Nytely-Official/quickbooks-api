@@ -350,10 +350,28 @@ export class Customer {
 		};
 
 		// Update the Customer
-		const response = await this.apiClient.runRequest(url.href, requestData);
+		const { responseData } = await this.apiClient.runRequest(url.href, requestData);
+
+		// Extract the Customer from the response (QuickBooks returns { Customer: {...} } or wrapped format)
+		const customerData = responseData?.Customer?.[0] || responseData?.Customer || responseData;
 
 		// Assign the Properties
-		Object.assign(this, response);
+		Object.assign(this, customerData);
+	}
+
+	/**
+	 * @description Deletes (deactivates) the Customer by setting Active=false
+	 * @throws {QuickbooksError} If the Customer ID is not set or the delete fails
+	 */
+	public async delete() {
+		// Check if the Customer has an ID
+		if (!this.Id) throw new QuickbooksError('Customer must be saved before deleting', await ApiClient.getIntuitErrorDetails(null));
+
+		// Set Active to false for soft delete
+		this.Active = false;
+
+		// Save the Customer with Active=false
+		await this.save();
 	}
 }
 

@@ -1,5 +1,5 @@
 import { ApiClient } from '../src/app';
-import { AuthProvider, Environment, AuthScopes, type CompanyInfoQueryResponse } from '../src/app';
+import { AuthProvider, Environment, AuthScopes, type CompanyInfoQueryResponse, CompanyInfo } from '../src/app';
 import { describe, expect, it, beforeEach, afterEach } from 'bun:test';
 import { mockFetch, mockTokenData } from './helpers';
 import { mockCompanyInfoData } from './__mocks__/company-info-data';
@@ -112,6 +112,13 @@ describe('Company Info API', () => {
 
 			// Assert the Company Info
 			expect(companyInfoResponse.companyInfo.Id).toBe(mockCompanyInfoData.Id);
+
+			// Assert the CompanyInfo is a class instance
+			if (companyInfoResponse.companyInfo) {
+				expect(companyInfoResponse.companyInfo).toBeInstanceOf(CompanyInfo);
+				expect(typeof companyInfoResponse.companyInfo.setApiClient).toBe('function');
+				expect(typeof companyInfoResponse.companyInfo.reload).toBe('function');
+			}
 		});
 
 		// Test error handling when no company info is found
@@ -197,6 +204,70 @@ describe('Company Info API', () => {
 
 			// Assert the Error
 			await expect(apiClient.companyInfo.rawCompanyInfoQuery('invalid query')).rejects.toThrow('Failed to run request');
+		});
+	});
+
+	// Describe the CompanyInfo Class Methods
+	describe('CompanyInfo Class', () => {
+		afterEach(() => {
+			global.fetch = globalFetch;
+		});
+
+		it('should return CompanyInfo class instance', async () => {
+			const companyInfoQueryResponse = {
+				QueryResponse: {
+					CompanyInfo: [mockCompanyInfoData],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(companyInfoQueryResponse));
+
+			const companyInfoResponse = await apiClient.companyInfo.getCompanyInfo();
+
+			expect(companyInfoResponse.companyInfo).toBeInstanceOf(CompanyInfo);
+			expect(typeof companyInfoResponse.companyInfo?.setApiClient).toBe('function');
+			expect(typeof companyInfoResponse.companyInfo?.reload).toBe('function');
+		});
+
+		it('should reload company info data', async () => {
+			const initialCompanyInfo = mockCompanyInfoData;
+			const updatedCompanyInfo = { ...initialCompanyInfo, CompanyName: 'Updated Company Name' };
+
+			// Setup initial fetch
+			const companyInfoQueryResponse = {
+				QueryResponse: {
+					CompanyInfo: [initialCompanyInfo],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(companyInfoQueryResponse));
+
+			const companyInfoResponse = await apiClient.companyInfo.getCompanyInfo();
+			const companyInfo = companyInfoResponse.companyInfo!;
+
+			// Modify locally (if possible)
+			(companyInfo as any).CompanyName = 'Local-Change';
+
+			// Setup reload response
+			const reloadQueryResponse = {
+				QueryResponse: {
+					CompanyInfo: [updatedCompanyInfo],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(reloadQueryResponse));
+
+			// Reload the company info
+			await companyInfo.reload();
+
+			// Assert the company info was reloaded
+			expect(companyInfo.CompanyName).toBe(updatedCompanyInfo.CompanyName);
 		});
 	});
 });

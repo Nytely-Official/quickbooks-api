@@ -220,4 +220,39 @@ describe('Live API: Estimates', async () => {
 		expect(searchResponse.intuitTID).toBeDefined();
 		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
+
+	// Test Estimate class methods
+	describe('Estimate Class Methods', () => {
+		// Test downloading estimate PDF
+		test('should download estimate PDF', async () => {
+			// Get all estimates
+			const searchResponse = await apiClient.estimates.getAllEstimates({ searchOptions: { maxResults: 1 } });
+
+			// Check if we have at least one estimate
+			if (searchResponse.results.length === 0) {
+				console.log('No estimates found, skipping PDF download test');
+				return;
+			}
+
+			// Get the first estimate
+			const estimate = searchResponse.results[0];
+
+			// Get the estimate by ID to get class instance
+			const estimateResponse = await apiClient.estimates.getEstimateById(estimate.Id);
+
+			// Check if estimate exists
+			if (!estimateResponse.estimate) {
+				console.log('Estimate not found, skipping PDF download test');
+				return;
+			}
+
+			// Download the PDF
+			const pdf = await estimateResponse.estimate.downloadPDF();
+
+			// Assert the PDF is a Blob
+			expect(pdf).toBeInstanceOf(Blob);
+			expect(pdf.type).toContain('application/pdf');
+			expect(pdf.size).toBeGreaterThan(0);
+		});
+	});
 });

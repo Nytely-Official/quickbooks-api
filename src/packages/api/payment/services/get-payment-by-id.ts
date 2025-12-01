@@ -1,5 +1,6 @@
 // Import the Query Builder
-import type { Payment, PaymentOptions } from '../../../../types/types';
+import { plainToClass } from 'class-transformer';
+import { Payment, type PaymentOptions } from '../../../../types/types';
 import { PaymentAPI } from '../payment-api';
 
 /**
@@ -34,9 +35,15 @@ export async function getPaymentById(
 	// Format the Response
 	const payments = await this.formatResponse(responseData);
 
+	// Convert the Payment to a Class
+	const payment = payments[0] ? plainToClass(Payment, payments[0]) : null;
+
+	// Check if the Payment is valid and set the API Client
+	if (payment) payment.setApiClient(this.apiClient);
+
 	// Return the Payment with Intuit TID
 	return {
-		payment: payments[0],
+		payment,
 		intuitTID,
 	};
 }

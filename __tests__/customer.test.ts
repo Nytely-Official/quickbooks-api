@@ -1,5 +1,5 @@
 import { ApiClient } from '../src/app';
-import { AuthProvider, Environment, AuthScopes, type CustomerQueryResponse } from '../src/app';
+import { AuthProvider, Environment, AuthScopes, type CustomerQueryResponse, Customer } from '../src/app';
 import { describe, expect, it, beforeEach, afterEach } from 'bun:test';
 import { mockFetch, mockCustomerData, mockTokenData } from './helpers';
 
@@ -289,6 +289,75 @@ describe('Customer API', () => {
 
 			// Assert the Customers Length
 			expect(searchResponse.results.length).toBe(0);
+		});
+	});
+
+	// Describe the Customer Class Methods
+	describe('Customer Class', () => {
+		afterEach(() => {
+			global.fetch = globalFetch;
+		});
+
+		it('should return Customer class instance', async () => {
+			const testCustomer = mockCustomerData[0];
+			const customerQueryResponse = {
+				QueryResponse: {
+					Customer: [testCustomer],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(customerQueryResponse));
+
+			const customerResponse = await apiClient.customers.getCustomerById(testCustomer.Id);
+
+			expect(customerResponse.customer).toBeInstanceOf(Customer);
+			expect(typeof customerResponse.customer?.setApiClient).toBe('function');
+			expect(typeof customerResponse.customer?.reload).toBe('function');
+			expect(typeof customerResponse.customer?.save).toBe('function');
+			expect(typeof customerResponse.customer?.delete).toBe('function');
+		});
+
+		it('should delete (deactivate) customer by setting Active=false', async () => {
+			const testCustomer = mockCustomerData[0];
+			const deletedCustomer = { ...testCustomer, Active: false, SyncToken: '1' };
+
+			// Setup the Customer Query Response for initial fetch
+			const customerQueryResponse = {
+				QueryResponse: {
+					Customer: [testCustomer],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+
+			// Mock the Fetch for initial fetch
+			global.fetch = mockFetch(JSON.stringify(customerQueryResponse));
+
+			// Get the Customer
+			const customerResponse = await apiClient.customers.getCustomerById(testCustomer.Id);
+			const customer = customerResponse.customer!;
+
+			// Ensure customer is active
+			customer.Active = true;
+
+			// Setup the response for delete (save with Active=false)
+			const deleteResponse = {
+				QueryResponse: {
+					Customer: [deletedCustomer],
+				},
+			};
+
+			// Mock the Fetch for delete
+			global.fetch = mockFetch(JSON.stringify(deleteResponse));
+
+			// Delete the Customer
+			await customer.delete();
+
+			// Assert the customer was deactivated
+			expect(customer.Active).toBe(false);
 		});
 	});
 });

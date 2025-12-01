@@ -3,6 +3,7 @@ import { ApiClient } from '../api-client';
 import { Environment, Query, QuickbooksError, type Estimate, type EstimateQueryResponse } from '../../../types/types';
 import { Endpoints } from '../../../types/enums/endpoints';
 import { EstimateQueryBuilder } from './estimate-query-builder';
+import path from 'path';
 
 // Import the Services
 import { getAllEstimates } from './services/get-all-estimates';
@@ -68,6 +69,18 @@ export class EstimateAPI {
 
 		// Return the Estimates
 		return queryResponse.Estimate;
+	}
+
+	// Returns the Estimate URL
+	public async getUrl() {
+		// Setup the URL
+		const url = new URL(await this.getCompanyEndpoint());
+
+		// Set the Estimate Endpoint
+		url.pathname = path.join(url.pathname, 'estimate');
+
+		// Return the URL
+		return url;
 	}
 
 	/**

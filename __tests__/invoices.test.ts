@@ -1,7 +1,7 @@
 import { ApiClient } from '../src/app';
-import { AuthProvider, Environment, AuthScopes, type InvoiceQueryResponse } from '../src/app';
+import { AuthProvider, Environment, AuthScopes, type InvoiceQueryResponse, Invoice } from '../src/app';
 import { describe, expect, it, beforeEach, afterEach } from 'bun:test';
-import { mockFetch, mockInvoiceData, mockTokenData } from './helpers';
+import { mockFetch, mockInvoiceData, mockTokenData, mockPDF } from './helpers';
 
 // Mock configuration
 const TEST_CONFIG = {
@@ -314,6 +314,190 @@ describe('Invoice API', () => {
 			expect(searchResponse.intuitTID).toBeDefined();
 			expect(typeof searchResponse.intuitTID).toBe('string');
 			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
+		});
+	});
+
+	// Describe the Invoice Class Methods
+	describe('Invoice Class', () => {
+		afterEach(() => {
+			global.fetch = globalFetch;
+		});
+
+		it('should return Invoice class instance', async () => {
+			const testInvoice = mockInvoiceData[0];
+			const invoiceQueryResponse: { QueryResponse: InvoiceQueryResponse } = {
+				QueryResponse: {
+					Invoice: [testInvoice],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(invoiceQueryResponse));
+
+			const invoiceResponse = await apiClient.invoices.getInvoiceById(testInvoice.Id);
+
+			expect(invoiceResponse.invoice).toBeInstanceOf(Invoice);
+			expect(typeof invoiceResponse.invoice?.setApiClient).toBe('function');
+			expect(typeof invoiceResponse.invoice?.reload).toBe('function');
+			expect(typeof invoiceResponse.invoice?.save).toBe('function');
+			expect(typeof invoiceResponse.invoice?.send).toBe('function');
+			expect(typeof invoiceResponse.invoice?.downloadPDF).toBe('function');
+			expect(typeof invoiceResponse.invoice?.void).toBe('function');
+		});
+
+		it('should send invoice via email', async () => {
+			const testInvoice = mockInvoiceData[0];
+			const sentInvoice = { ...testInvoice, EmailStatus: 'EmailSent' };
+
+			// Setup initial fetch
+			const invoiceQueryResponse: { QueryResponse: InvoiceQueryResponse } = {
+				QueryResponse: {
+					Invoice: [testInvoice],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(invoiceQueryResponse));
+
+			const invoiceResponse = await apiClient.invoices.getInvoiceById(testInvoice.Id);
+			const invoice = invoiceResponse.invoice!;
+
+			// Setup send response
+			const sendResponse = {
+				Invoice: [sentInvoice],
+			};
+			global.fetch = mockFetch(JSON.stringify(sendResponse));
+
+			// Send the invoice
+			await invoice.send();
+
+			// Assert the invoice was updated
+			expect(invoice.EmailStatus).toBe(sentInvoice.EmailStatus);
+		});
+
+		it('should throw error when sending invoice without ID', async () => {
+			const invoiceQueryResponse: { QueryResponse: InvoiceQueryResponse } = {
+				QueryResponse: {
+					Invoice: [mockInvoiceData[0]],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(invoiceQueryResponse));
+
+			const invoiceResponse = await apiClient.invoices.getInvoiceById(mockInvoiceData[0].Id);
+			const invoice = invoiceResponse.invoice!;
+
+			// Remove ID to simulate unsaved invoice
+			(invoice as any).Id = null;
+
+			// Assert send throws error
+			await expect(invoice.send()).rejects.toThrow('Invoice must be saved before sending');
+		});
+
+		it('should download invoice PDF', async () => {
+			const testInvoice = mockInvoiceData[0];
+			const pdfBlob = new Blob(['PDF content'], { type: 'application/pdf' });
+
+			// Setup initial fetch
+			const invoiceQueryResponse: { QueryResponse: InvoiceQueryResponse } = {
+				QueryResponse: {
+					Invoice: [testInvoice],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(invoiceQueryResponse));
+
+			const invoiceResponse = await apiClient.invoices.getInvoiceById(testInvoice.Id);
+			const invoice = invoiceResponse.invoice!;
+
+			// Setup PDF response
+			global.fetch = mockPDF(pdfBlob);
+
+			// Download the PDF
+			const pdf = await invoice.downloadPDF();
+
+			// Assert the PDF is a Blob
+			expect(pdf).toBeInstanceOf(Blob);
+			expect(pdf.type).toBe('application/pdf');
+		});
+
+		it('should throw error when downloading PDF without ID', async () => {
+			const invoiceQueryResponse: { QueryResponse: InvoiceQueryResponse } = {
+				QueryResponse: {
+					Invoice: [mockInvoiceData[0]],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(invoiceQueryResponse));
+
+			const invoiceResponse = await apiClient.invoices.getInvoiceById(mockInvoiceData[0].Id);
+			const invoice = invoiceResponse.invoice!;
+
+			// Remove ID to simulate unsaved invoice
+			(invoice as any).Id = null;
+
+			// Assert downloadPDF throws error
+			await expect(invoice.downloadPDF()).rejects.toThrow('Invoice must be saved before downloading PDF');
+		});
+
+		it('should void invoice', async () => {
+			const testInvoice = mockInvoiceData[0];
+			const voidedInvoice = { ...testInvoice, Balance: 0, SyncToken: '1' };
+
+			// Setup initial fetch
+			const invoiceQueryResponse: { QueryResponse: InvoiceQueryResponse } = {
+				QueryResponse: {
+					Invoice: [testInvoice],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(invoiceQueryResponse));
+
+			const invoiceResponse = await apiClient.invoices.getInvoiceById(testInvoice.Id);
+			const invoice = invoiceResponse.invoice!;
+
+			// Setup void response
+			const voidResponse = {
+				Invoice: [voidedInvoice],
+			};
+			global.fetch = mockFetch(JSON.stringify(voidResponse));
+
+			// Void the invoice
+			await invoice.void();
+
+			// Assert the invoice was updated
+			expect(invoice.Balance).toBe(voidedInvoice.Balance);
+		});
+
+		it('should throw error when voiding invoice without ID', async () => {
+			const invoiceQueryResponse: { QueryResponse: InvoiceQueryResponse } = {
+				QueryResponse: {
+					Invoice: [mockInvoiceData[0]],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(invoiceQueryResponse));
+
+			const invoiceResponse = await apiClient.invoices.getInvoiceById(mockInvoiceData[0].Id);
+			const invoice = invoiceResponse.invoice!;
+
+			// Remove ID to simulate unsaved invoice
+			(invoice as any).Id = null;
+
+			// Assert void throws error
+			await expect(invoice.void()).rejects.toThrow('Invoice must be saved before voiding');
 		});
 	});
 });

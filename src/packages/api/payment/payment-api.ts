@@ -3,6 +3,7 @@ import { ApiClient } from '../api-client';
 import { Environment, Query, QuickbooksError, type Payment, type PaymentQueryResponse } from '../../../types/types';
 import { Endpoints } from '../../../types/enums/endpoints';
 import { PaymentQueryBuilder } from './payment-query-builder';
+import path from 'path';
 
 // Import the Services
 import { getAllPayments } from './services/get-all-payments';
@@ -70,6 +71,18 @@ export class PaymentAPI {
 
 		// Return the Payments
 		return queryResponse.Payment;
+	}
+
+	// Returns the Payment URL
+	public async getUrl() {
+		// Setup the URL
+		const url = new URL(await this.getCompanyEndpoint());
+
+		// Set the Payment Endpoint
+		url.pathname = path.join(url.pathname, 'payment');
+
+		// Return the URL
+		return url;
 	}
 
 	/**

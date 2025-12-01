@@ -301,4 +301,39 @@ describe('Live API: Invoices', async () => {
 			expect(typeof error.details.intuitTID).toBe('string');
 		}
 	});
+
+	// Test Invoice class methods
+	describe('Invoice Class Methods', () => {
+		// Test downloading invoice PDF
+		test('should download invoice PDF', async () => {
+			// Get all invoices
+			const searchResponse = await apiClient.invoices.getAllInvoices({ searchOptions: { maxResults: 1 } });
+
+			// Check if we have at least one invoice
+			if (searchResponse.results.length === 0) {
+				console.log('No invoices found, skipping PDF download test');
+				return;
+			}
+
+			// Get the first invoice
+			const invoice = searchResponse.results[0];
+
+			// Get the invoice by ID to get class instance
+			const invoiceResponse = await apiClient.invoices.getInvoiceById(invoice.Id);
+
+			// Check if invoice exists
+			if (!invoiceResponse.invoice) {
+				console.log('Invoice not found, skipping PDF download test');
+				return;
+			}
+
+			// Download the PDF
+			const pdf = await invoiceResponse.invoice.downloadPDF();
+
+			// Assert the PDF is a Blob
+			expect(pdf).toBeInstanceOf(Blob);
+			expect(pdf.type).toContain('application/pdf');
+			expect(pdf.size).toBeGreaterThan(0);
+		});
+	});
 });

@@ -62,25 +62,6 @@ describe('Live API: CreditMemos', async () => {
 		expect(creditMemoResponse.creditMemo?.Id).toBe(testCreditMemo.Id);
 	});
 
-	// #FIX Test pagination only 1 item in test account so this test will fail
-	// test('should handle pagination', async () => {
-	// 	// Get the CreditMemos
-	// 	// Setup the CreditMemo Options
-	// 	const creditMemoOptions1: CreditMemoOptions = { searchOptions: { maxResults: 10, page: 1 } };
-	// 	const creditMemoOptions2: CreditMemoOptions = { searchOptions: { maxResults: 10, page: 2 } };
-
-	// 	// Get the CreditMemos
-	// 	const searchResponse1 = await apiClient.creditMemos.getAllCreditMemos(creditMemoOptions1);
-	// 	const searchResponse2 = await apiClient.creditMemos.getAllCreditMemos(creditMemoOptions2);
-
-	// 	// Assert the CreditMemos
-	// 	expect(searchResponse1.results).toBeInstanceOf(Array);
-	// 	expect(searchResponse2.results).toBeInstanceOf(Array);
-	// 	expect(searchResponse1.results.length).toBeGreaterThan(0);
-	// 	expect(searchResponse2.results.length).toBeGreaterThan(0);
-	// 	expect(searchResponse1.results).not.toEqual(searchResponse2.results);
-	// });
-
 	// Test date range filtering
 	test('should retrieve creditMemos within date range', async () => {
 		// Get the End Date
@@ -188,5 +169,40 @@ describe('Live API: CreditMemos', async () => {
 		// Test the Intuit TID
 		expect(searchResponse.intuitTID).toBeDefined();
 		expect(typeof searchResponse.intuitTID).toBe('string');
+	});
+
+	// Test CreditMemo class methods
+	describe('CreditMemo Class Methods', () => {
+		// Test downloading credit memo PDF
+		test('should download credit memo PDF', async () => {
+			// Get all credit memos
+			const searchResponse = await apiClient.creditMemos.getAllCreditMemos({ searchOptions: { maxResults: 1 } });
+
+			// Check if we have at least one credit memo
+			if (searchResponse.results.length === 0) {
+				console.log('No credit memos found, skipping PDF download test');
+				return;
+			}
+
+			// Get the first credit memo
+			const creditMemo = searchResponse.results[0];
+
+			// Get the credit memo by ID to get class instance
+			const creditMemoResponse = await apiClient.creditMemos.getCreditMemoById(creditMemo.Id);
+
+			// Check if credit memo exists
+			if (!creditMemoResponse.creditMemo) {
+				console.log('Credit memo not found, skipping PDF download test');
+				return;
+			}
+
+			// Download the PDF
+			const pdf = await creditMemoResponse.creditMemo.downloadPDF();
+
+			// Assert the PDF is a Blob
+			expect(pdf).toBeInstanceOf(Blob);
+			expect(pdf.type).toContain('application/pdf');
+			expect(pdf.size).toBeGreaterThan(0);
+		});
 	});
 });

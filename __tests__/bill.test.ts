@@ -1,7 +1,7 @@
 import { ApiClient } from '../src/app';
-import { AuthProvider, Environment, AuthScopes, type BillQueryResponse } from '../src/app';
+import { AuthProvider, Environment, AuthScopes, type BillQueryResponse, Bill } from '../src/app';
 import { describe, expect, it, beforeEach, afterEach } from 'bun:test';
-import { mockFetch, mockBillData, mockTokenData } from './helpers';
+import { mockFetch, mockBillData, mockTokenData, mockPDF } from './helpers';
 
 // Mock configuration
 const TEST_CONFIG = {
@@ -125,7 +125,16 @@ describe('Bill API', () => {
 				expect(billResponse.intuitTID).toBe('test-tid-12345-67890');
 
 				// Assert the Bill
-				expect(billResponse.bill.Id).toBe(bill.Id);
+				expect(billResponse.bill).toBeObject();
+				expect(billResponse.bill?.Id).toBe(bill.Id);
+
+				// Assert the Bill is a class instance
+				if (billResponse.bill) {
+					expect(billResponse.bill).toBeInstanceOf(Bill);
+					expect(typeof billResponse.bill.setApiClient).toBe('function');
+					expect(typeof billResponse.bill.reload).toBe('function');
+					expect(typeof billResponse.bill.save).toBe('function');
+				}
 			}
 		});
 
@@ -245,6 +254,158 @@ describe('Bill API', () => {
 			expect(searchResponse.results).toBeArray();
 			expect(searchResponse.results.length).toBe(mockBillData.length);
 			expect(searchResponse.results[0].Id).toBe(mockBillData[0].Id);
+		});
+	});
+
+	// Describe the Bill Class Methods
+	describe('Bill Class', () => {
+		afterEach(() => {
+			global.fetch = globalFetch;
+		});
+
+		it('should return Bill class instance', async () => {
+			const testBill = mockBillData[0];
+			const billQueryResponse = {
+				QueryResponse: {
+					Bill: [testBill],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(billQueryResponse));
+
+			const billResponse = await apiClient.bills.getBillById(testBill.Id!);
+
+			expect(billResponse.bill).toBeInstanceOf(Bill);
+			expect(typeof billResponse.bill?.setApiClient).toBe('function');
+			expect(typeof billResponse.bill?.reload).toBe('function');
+			expect(typeof billResponse.bill?.save).toBe('function');
+		});
+
+		it('should reload bill data', async () => {
+			const testBill = mockBillData[0];
+			const updatedBill = { ...testBill, DocNumber: 'Updated-123' };
+
+			// Setup initial fetch
+			const billQueryResponse = {
+				QueryResponse: {
+					Bill: [testBill],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(billQueryResponse));
+
+			const billResponse = await apiClient.bills.getBillById(testBill.Id!);
+			const bill = billResponse.bill!;
+
+			// Modify locally
+			(bill as any).DocNumber = 'Local-Change';
+
+			// Setup reload response
+			const reloadQueryResponse = {
+				QueryResponse: {
+					Bill: [updatedBill],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(reloadQueryResponse));
+
+			// Reload the bill
+			await bill.reload();
+
+			// Assert the bill was reloaded
+			expect(bill.DocNumber).toBe(updatedBill.DocNumber);
+		});
+
+		it('should save bill data', async () => {
+			const testBill = mockBillData[0];
+			const savedBill = { ...testBill, SyncToken: '1', Id: testBill.Id };
+
+			// Setup initial fetch
+			const billQueryResponse = {
+				QueryResponse: {
+					Bill: [testBill],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(billQueryResponse));
+
+			const billResponse = await apiClient.bills.getBillById(testBill.Id!);
+			const bill = billResponse.bill!;
+
+			// Modify the bill
+			if (bill.DocNumber !== undefined) {
+				bill.DocNumber = 'Updated-Doc-123';
+			}
+
+			// Setup save response
+			const saveResponse = {
+				Bill: savedBill,
+			};
+			global.fetch = mockFetch(JSON.stringify(saveResponse));
+
+			// Save the bill
+			await bill.save();
+
+			// Assert the save was called
+			expect(global.fetch).toBeDefined();
+		});
+
+		it('should download bill PDF', async () => {
+			const testBill = mockBillData[0];
+			const pdfBlob = new Blob(['PDF content'], { type: 'application/pdf' });
+
+			// Setup initial fetch
+			const billQueryResponse = {
+				QueryResponse: {
+					Bill: [testBill],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(billQueryResponse));
+
+			const billResponse = await apiClient.bills.getBillById(testBill.Id!);
+			const bill = billResponse.bill!;
+
+			// Setup PDF response
+			global.fetch = mockPDF(pdfBlob);
+
+			// Download the PDF
+			const pdf = await bill.downloadPDF();
+
+			// Assert the PDF is a Blob
+			expect(pdf).toBeInstanceOf(Blob);
+			expect(pdf.type).toBe('application/pdf');
+		});
+
+		it('should throw error when downloading PDF without ID', async () => {
+			const billQueryResponse = {
+				QueryResponse: {
+					Bill: [mockBillData[0]],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(billQueryResponse));
+
+			const billResponse = await apiClient.bills.getBillById(mockBillData[0].Id!);
+			const bill = billResponse.bill!;
+
+			// Remove ID to simulate unsaved bill
+			(bill as any).Id = null;
+
+			// Assert downloadPDF throws error
+			await expect(bill.downloadPDF()).rejects.toThrow('Bill must be saved before downloading PDF');
 		});
 	});
 });

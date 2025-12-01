@@ -7,7 +7,7 @@ import { mock } from 'bun:test';
  * @param ok - Whether the response is ok
  * @returns The mocked fetch function
  */
-export function mockFetch(responseData: BodyInit, responseStatus = 200) {
+export function mockFetch(responseData: BodyInit, responseStatus = 200, contentType = 'application/json') {
 	// Setup the Mock
 	return mock<typeof fetch>(async (_input: URL | RequestInfo, options: undefined | RequestInit) => {
 		// Check if the options are not valid
@@ -19,7 +19,33 @@ export function mockFetch(responseData: BodyInit, responseStatus = 200) {
 		// Setup the New Response
 		const response = new Response(responseBody, {
 			status: responseStatus,
-			headers: { 'Content-Type': 'application/json', intuit_tid: 'test-tid-12345-67890' },
+			headers: { 'Content-Type': contentType, intuit_tid: 'test-tid-12345-67890' },
+		});
+
+		// Return the Response
+		return response;
+	});
+}
+
+/**
+ * Mocks the fetch function for PDF responses
+ * @param pdfData - The PDF blob data to mock
+ * @param responseStatus - The response status code
+ * @returns The mocked fetch function
+ */
+export function mockPDF(pdfData: Blob | ArrayBuffer, responseStatus = 200) {
+	// Setup the Mock
+	return mock<typeof fetch>(async (_input: URL | RequestInfo, options: undefined | RequestInit) => {
+		// Check if the options are not valid
+		if (!options) throw new Error('Invalid options');
+
+		// Setup the Response Body
+		const responseBody: BodyInit = pdfData instanceof Blob ? pdfData : new Blob([pdfData]);
+
+		// Setup the New Response
+		const response = new Response(responseBody, {
+			status: responseStatus,
+			headers: { 'Content-Type': 'application/pdf', intuit_tid: 'test-tid-12345-67890' },
 		});
 
 		// Return the Response
