@@ -1,6 +1,13 @@
 // Export the Classes
 export { Customer } from './classes/customer';
 export { Invoice } from './classes/invoice';
+export { Account } from './classes/account';
+export { Bill } from './classes/bill';
+export { CompanyInfo } from './classes/company-info';
+export { CreditMemo } from './classes/credit-memo';
+export { Estimate } from './classes/estimate';
+export { Payment } from './classes/payment';
+export { Preferences } from './classes/preferences';
 export { QuickbooksError } from './classes/quickbooks-error';
 
 // Export the Enums
@@ -33,7 +40,7 @@ export type { DescriptionLineDetail } from './interfaces/description-line-detail
 export type { DescriptionOnlyLine } from './interfaces/description-only-line';
 export type { DiscountLineDetail } from './interfaces/discount-line-detail';
 export type { DiscountLine } from './interfaces/discount-line';
-export type { Estimate } from './interfaces/estimate';
+export type { Estimate as EstimateInterface } from './interfaces/estimate';
 export type { GroupLineDetail } from './interfaces/group-line-detail';
 export type { GroupLine } from './interfaces/group-line';
 export type { IntuitErrorData } from './interfaces/intuit-error-data';
@@ -44,10 +51,10 @@ export type { LinkedTxn } from './interfaces/linked-txn';
 export type { MarkupInfo } from './interfaces/markup-info';
 export type { MemoRef } from './interfaces/memo-ref';
 export type { ModificationMetadata } from './interfaces/modification-metadata';
-export type { Payment } from './interfaces/payment';
+export type { Payment as PaymentInterface } from './interfaces/payment';
 export type { PhysicalAddress } from './interfaces/physical-address';
 export type { EmailAddress } from './interfaces/email-address';
-export type { Bill } from './interfaces/bill';
+export type { Bill as BillInterface } from './interfaces/bill';
 export type {
 	InvoiceOptions,
 	EstimateOptions,
@@ -58,10 +65,10 @@ export type {
 	PreferenceOptions,
 	BillOptions,
 } from './interfaces/options';
-export type { Account } from './interfaces/account';
-export type { CompanyInfo } from './interfaces/company';
-export type { CreditMemo } from './interfaces/credit-memo';
-export type { Preferences } from './interfaces/preferences';
+export type { Account as AccountInterface } from './interfaces/account';
+export type { CompanyInfo as CompanyInfoInterface } from './interfaces/company';
+export type { CreditMemo as CreditMemoInterface } from './interfaces/credit-memo';
+export type { Preferences as PreferencesInterface } from './interfaces/preferences';
 export type {
 	QueryResponse,
 	InvoiceQueryResponse,

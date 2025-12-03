@@ -367,10 +367,108 @@ export class Invoice {
 		};
 
 		// Update the Invoice
-		const response = await this.apiClient.runRequest(url.href, requestData);
+		const { responseData } = await this.apiClient.runRequest(url.href, requestData);
+
+		// Extract the Invoice from the response (QuickBooks returns { Invoice: {...} } or wrapped format)
+		const invoiceData = responseData?.Invoice?.[0] || responseData?.Invoice || responseData;
 
 		// Assign the Properties
-		Object.assign(this, response);
+		Object.assign(this, invoiceData);
+	}
+
+	/**
+	 * @description Sends the Invoice via email
+	 * @throws {QuickbooksError} If the Invoice ID is not set or the send fails
+	 */
+	public async send() {
+		// Check if the Invoice has an ID
+		if (!this.Id) throw new QuickbooksError('Invoice must be saved before sending', await ApiClient.getIntuitErrorDetails(null));
+
+		// Get the Invoice URL and append /send
+		const url = await this.apiClient.invoices.getUrl();
+		url.pathname = `${url.pathname}/${this.Id}/send`;
+
+		// Setup the Request Data
+		const requestData: RequestInit = {
+			method: 'POST',
+			body: JSON.stringify({ ...this.toJSON(), sparse: true }),
+		};
+
+		// Send the Invoice
+		const { responseData } = await this.apiClient.runRequest(url.href, requestData);
+
+		// Extract the Invoice from the response
+		const invoiceData = responseData?.Invoice?.[0] || responseData?.Invoice || responseData;
+
+		// Assign the Properties
+		if (invoiceData) Object.assign(this, invoiceData);
+	}
+
+	/**
+	 * @description Downloads the Invoice as a PDF
+	 * @returns {Promise<Blob>} The PDF file as a Blob
+	 * @throws {QuickbooksError} If the Invoice ID is not set or the download fails
+	 */
+	public async downloadPDF(): Promise<Blob> {
+		// Check if the Invoice has an ID
+		if (!this.Id) throw new QuickbooksError('Invoice must be saved before downloading PDF', await ApiClient.getIntuitErrorDetails(null));
+
+		// Get the Invoice URL and append /pdf
+		const url = await this.apiClient.invoices.getUrl();
+		url.pathname = `${url.pathname}/${this.Id}/pdf`;
+
+		// Get the Token
+		const token = await this.apiClient.authProvider.getToken();
+
+		// Setup the Request Data for PDF
+		const requestData: RequestInit = {
+			method: 'GET',
+			headers: {
+				Accept: 'application/pdf',
+				Authorization: `Bearer ${token.accessToken}`,
+			},
+		};
+
+		// Download the PDF
+		const response = await fetch(url.href, requestData);
+
+		// Check if the Response has failed
+		if (!response.ok) {
+			const errorDetails = await ApiClient.getIntuitErrorDetails(response);
+			throw new QuickbooksError('Failed to download PDF', errorDetails);
+		}
+
+		// Return the PDF as a Blob
+		return await response.blob();
+	}
+
+	/**
+	 * @description Voids the Invoice
+	 * @throws {QuickbooksError} If the Invoice ID is not set or the void fails
+	 */
+	public async void() {
+		// Check if the Invoice has an ID
+		if (!this.Id) throw new QuickbooksError('Invoice must be saved before voiding', await ApiClient.getIntuitErrorDetails(null));
+
+		// Get the Invoice URL and append operation=void
+		const url = await this.apiClient.invoices.getUrl();
+		url.pathname = `${url.pathname}/${this.Id}`;
+		url.searchParams.set('operation', 'void');
+
+		// Setup the Request Data
+		const requestData: RequestInit = {
+			method: 'POST',
+			body: JSON.stringify({ ...this.toJSON(), sparse: true }),
+		};
+
+		// Void the Invoice
+		const { responseData } = await this.apiClient.runRequest(url.href, requestData);
+
+		// Extract the Invoice from the response
+		const invoiceData = responseData?.Invoice?.[0] || responseData?.Invoice || responseData;
+
+		// Assign the Properties
+		if (invoiceData) Object.assign(this, invoiceData);
 	}
 }
 

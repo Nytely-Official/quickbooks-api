@@ -1,6 +1,7 @@
 // Imports
+import { plainToClass } from 'class-transformer';
 import { CompanyInfoOptions } from '../../../../types/interfaces/options';
-import type { CompanyInfo } from '../../../../types/types';
+import { CompanyInfo } from '../../../../types/types';
 import { CompanyInfoAPI } from '../company-info-api';
 
 /**
@@ -12,7 +13,7 @@ import { CompanyInfoAPI } from '../company-info-api';
 export async function getCompanyInfo(
 	this: CompanyInfoAPI,
 	options: CompanyInfoOptions = {},
-): Promise<{ companyInfo: CompanyInfo; intuitTID: string }> {
+): Promise<{ companyInfo: CompanyInfo | undefined; intuitTID: string }> {
 	// Get the Query Builder
 	const queryBuilder = await this.getQueryBuilder();
 
@@ -26,7 +27,19 @@ export async function getCompanyInfo(
 	const { responseData, intuitTID } = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	const companyInfo = await this.formatResponse(responseData);
+	const companyInfoData = await this.formatResponse(responseData);
+
+	// Check if CompanyInfo data exists
+	if (!companyInfoData) return { companyInfo: undefined, intuitTID };
+
+	// Convert the CompanyInfo to a Class
+	const companyInfo = plainToClass(CompanyInfo, companyInfoData);
+
+	// Check if the conversion was successful
+	if (!companyInfo) return { companyInfo: undefined, intuitTID };
+
+	// Set the API Client
+	companyInfo.setApiClient(this.apiClient);
 
 	// Return the Company Info with Intuit TID
 	return {

@@ -3,6 +3,7 @@ import { ApiClient } from '../api-client';
 import { Environment, Query, QuickbooksError, type Account, type AccountQueryResponse } from '../../../types/types';
 import { Endpoints } from '../../../types/enums/endpoints';
 import { AccountQueryBuilder } from './account-query-builder';
+import path from 'path';
 
 // Import the Services
 import { getAllAccounts } from './services/get-all-accounts';
@@ -70,6 +71,18 @@ export class AccountAPI {
 
 		// Return the Accounts
 		return queryResponse.Account;
+	}
+
+	// Returns the Account URL
+	public async getUrl() {
+		// Setup the URL
+		const url = new URL(await this.getCompanyEndpoint());
+
+		// Set the Account Endpoint
+		url.pathname = path.join(url.pathname, 'account');
+
+		// Return the URL
+		return url;
 	}
 
 	/**

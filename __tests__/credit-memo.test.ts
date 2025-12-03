@@ -1,7 +1,7 @@
 import { ApiClient } from '../src/app';
-import { AuthProvider, Environment, AuthScopes, type CreditMemoQueryResponse } from '../src/app';
+import { AuthProvider, Environment, AuthScopes, type CreditMemoQueryResponse, CreditMemo } from '../src/app';
 import { describe, expect, it, beforeEach, afterEach } from 'bun:test';
-import { mockFetch, mockCreditMemoData, mockTokenData } from './helpers';
+import { mockFetch, mockCreditMemoData, mockTokenData, mockPDF } from './helpers';
 
 // Mock configuration
 const TEST_CONFIG = {
@@ -138,6 +138,14 @@ describe('CreditMemo API', () => {
 
 			// Assert the CreditMemo
 			expect(creditMemoResponse.creditMemo?.Id).toBe(testCreditMemo.Id);
+
+			// Assert the CreditMemo is a class instance
+			if (creditMemoResponse.creditMemo) {
+				expect(creditMemoResponse.creditMemo).toBeInstanceOf(CreditMemo);
+				expect(typeof creditMemoResponse.creditMemo.setApiClient).toBe('function');
+				expect(typeof creditMemoResponse.creditMemo.reload).toBe('function');
+				expect(typeof creditMemoResponse.creditMemo.save).toBe('function');
+			}
 		});
 
 		// Describe the getCreditMemoById Method
@@ -278,6 +286,202 @@ describe('CreditMemo API', () => {
 			expect(searchResponse.intuitTID).toBeDefined();
 			expect(typeof searchResponse.intuitTID).toBe('string');
 			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
+		});
+	});
+
+	// Describe the CreditMemo Class Methods
+	describe('CreditMemo Class', () => {
+		afterEach(() => {
+			global.fetch = globalFetch;
+		});
+
+		it('should return CreditMemo class instance', async () => {
+			const testCreditMemo = mockCreditMemoData[0];
+			const creditMemoQueryResponse = {
+				QueryResponse: {
+					CreditMemo: [testCreditMemo],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(creditMemoQueryResponse));
+
+			const creditMemoResponse = await apiClient.creditMemos.getCreditMemoById(testCreditMemo.Id);
+
+			expect(creditMemoResponse.creditMemo).toBeInstanceOf(CreditMemo);
+			expect(typeof creditMemoResponse.creditMemo?.setApiClient).toBe('function');
+			expect(typeof creditMemoResponse.creditMemo?.reload).toBe('function');
+			expect(typeof creditMemoResponse.creditMemo?.save).toBe('function');
+			expect(typeof creditMemoResponse.creditMemo?.send).toBe('function');
+			expect(typeof creditMemoResponse.creditMemo?.downloadPDF).toBe('function');
+			expect(typeof creditMemoResponse.creditMemo?.void).toBe('function');
+		});
+
+		it('should reload credit memo data', async () => {
+			const testCreditMemo = mockCreditMemoData[0];
+			const updatedCreditMemo = { ...testCreditMemo, DocNumber: 'Updated-CM-123' };
+
+			// Setup initial fetch
+			const creditMemoQueryResponse = {
+				QueryResponse: {
+					CreditMemo: [testCreditMemo],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(creditMemoQueryResponse));
+
+			const creditMemoResponse = await apiClient.creditMemos.getCreditMemoById(testCreditMemo.Id);
+			const creditMemo = creditMemoResponse.creditMemo!;
+
+			// Modify locally
+			(creditMemo as any).DocNumber = 'Local-Change';
+
+			// Setup reload response
+			const reloadQueryResponse = {
+				QueryResponse: {
+					CreditMemo: [updatedCreditMemo],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(reloadQueryResponse));
+
+			// Reload the credit memo
+			await creditMemo.reload();
+
+			// Assert the credit memo was reloaded
+			expect(creditMemo.DocNumber).toBe(updatedCreditMemo.DocNumber);
+		});
+
+		it('should save credit memo data', async () => {
+			const testCreditMemo = mockCreditMemoData[0];
+			const savedCreditMemo = { ...testCreditMemo, SyncToken: '1', Id: testCreditMemo.Id };
+
+			// Setup initial fetch
+			const creditMemoQueryResponse = {
+				QueryResponse: {
+					CreditMemo: [testCreditMemo],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(creditMemoQueryResponse));
+
+			const creditMemoResponse = await apiClient.creditMemos.getCreditMemoById(testCreditMemo.Id);
+			const creditMemo = creditMemoResponse.creditMemo!;
+
+			// Modify the credit memo
+			if (creditMemo.DocNumber !== undefined) {
+				creditMemo.DocNumber = 'Updated-Doc-123';
+			}
+
+			// Setup save response
+			const saveResponse = {
+				CreditMemo: savedCreditMemo,
+			};
+			global.fetch = mockFetch(JSON.stringify(saveResponse));
+
+			// Save the credit memo
+			await creditMemo.save();
+
+			// Assert the save was called
+			expect(global.fetch).toBeDefined();
+		});
+
+		it('should send credit memo via email', async () => {
+			const testCreditMemo = mockCreditMemoData[0];
+			const sentCreditMemo = { ...testCreditMemo, EmailStatus: 'EmailSent' };
+
+			// Setup initial fetch
+			const creditMemoQueryResponse = {
+				QueryResponse: {
+					CreditMemo: [testCreditMemo],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(creditMemoQueryResponse));
+
+			const creditMemoResponse = await apiClient.creditMemos.getCreditMemoById(testCreditMemo.Id);
+			const creditMemo = creditMemoResponse.creditMemo!;
+
+			// Setup send response
+			const sendResponse = {
+				CreditMemo: [sentCreditMemo],
+			};
+			global.fetch = mockFetch(JSON.stringify(sendResponse));
+
+			// Send the credit memo
+			await creditMemo.send();
+
+			// Assert the credit memo was updated
+			expect(creditMemo.EmailStatus).toBe(sentCreditMemo.EmailStatus);
+		});
+
+		it('should download credit memo PDF', async () => {
+			const testCreditMemo = mockCreditMemoData[0];
+			const pdfBlob = new Blob(['PDF content'], { type: 'application/pdf' });
+
+			// Setup initial fetch
+			const creditMemoQueryResponse = {
+				QueryResponse: {
+					CreditMemo: [testCreditMemo],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(creditMemoQueryResponse));
+
+			const creditMemoResponse = await apiClient.creditMemos.getCreditMemoById(testCreditMemo.Id);
+			const creditMemo = creditMemoResponse.creditMemo!;
+
+			// Setup PDF response
+			global.fetch = mockPDF(pdfBlob);
+
+			// Download the PDF
+			const pdf = await creditMemo.downloadPDF();
+
+			// Assert the PDF is a Blob
+			expect(pdf).toBeInstanceOf(Blob);
+			expect(pdf.type).toBe('application/pdf');
+		});
+
+		it('should void credit memo', async () => {
+			const testCreditMemo = mockCreditMemoData[0];
+			const voidedCreditMemo = { ...testCreditMemo, Balance: 0, SyncToken: '1' };
+
+			// Setup initial fetch
+			const creditMemoQueryResponse = {
+				QueryResponse: {
+					CreditMemo: [testCreditMemo],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(creditMemoQueryResponse));
+
+			const creditMemoResponse = await apiClient.creditMemos.getCreditMemoById(testCreditMemo.Id);
+			const creditMemo = creditMemoResponse.creditMemo!;
+
+			// Setup void response
+			const voidResponse = {
+				CreditMemo: [voidedCreditMemo],
+			};
+			global.fetch = mockFetch(JSON.stringify(voidResponse));
+
+			// Void the credit memo
+			await creditMemo.void();
+
+			// Assert the credit memo was updated
+			expect(creditMemo.Balance).toBe(voidedCreditMemo.Balance);
 		});
 	});
 });

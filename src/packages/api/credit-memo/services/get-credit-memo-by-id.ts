@@ -1,5 +1,6 @@
 // Import the Query Builder
-import type { CreditMemo, CreditMemoOptions } from '../../../../types/types';
+import { plainToClass } from 'class-transformer';
+import { CreditMemo, type CreditMemoOptions } from '../../../../types/types';
 import { CreditMemoAPI } from '../credit-memo-api';
 
 /**
@@ -34,9 +35,15 @@ export async function getCreditMemoById(
 	// Format the Response
 	const creditmemos = await this.formatResponse(responseData);
 
+	// Convert the CreditMemo to a Class
+	const creditMemo = creditmemos[0] ? plainToClass(CreditMemo, creditmemos[0]) : null;
+
+	// Check if the CreditMemo is valid and set the API Client
+	if (creditMemo) creditMemo.setApiClient(this.apiClient);
+
 	// Return the CreditMemo with Intuit TID
 	return {
-		creditMemo: creditmemos[0],
+		creditMemo,
 		intuitTID,
 	};
 }

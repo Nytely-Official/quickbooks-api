@@ -1,5 +1,6 @@
 // Imports
-import type { Preferences, PreferenceOptions, SearchResponse } from '../../../../types/types';
+import { plainToClass } from 'class-transformer';
+import { Preferences, type PreferenceOptions, type SearchResponse } from '../../../../types/types';
 import { PreferenceAPI } from '../preference-api';
 
 /**
@@ -21,7 +22,14 @@ export async function getPreferences(this: PreferenceAPI, options: PreferenceOpt
 	const { responseData, intuitTID } = await this.apiClient.runRequest(url, { method: 'GET' });
 
 	// Format the Response
-	let preferences = await this.formatResponse(responseData);
+	const preferencesData = await this.formatResponse(responseData);
+
+	// Convert the Preferences to Classes
+	const preferences = preferencesData.map((pref) => {
+		const prefClass = plainToClass(Preferences, pref);
+		prefClass.setApiClient(this.apiClient);
+		return prefClass;
+	});
 
 	// Setup the Search Response
 	const searchResponse: SearchResponse<Preferences> = {

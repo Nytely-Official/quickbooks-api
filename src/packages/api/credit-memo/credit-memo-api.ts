@@ -3,6 +3,7 @@ import { ApiClient } from '../api-client';
 import { Environment, Query, QuickbooksError, type CreditMemo, type CreditMemoQueryResponse } from '../../../types/types';
 import { Endpoints } from '../../../types/enums/endpoints';
 import { CreditMemoQueryBuilder } from './credit-memo-query-builder';
+import path from 'path';
 
 // Import the Services
 import { getAllCreditMemos } from './services/get-all-credit-memos';
@@ -68,6 +69,18 @@ export class CreditMemoAPI {
 
 		// Return the CreditMemos
 		return queryResponse.CreditMemo;
+	}
+
+	// Returns the CreditMemo URL
+	public async getUrl() {
+		// Setup the URL
+		const url = new URL(await this.getCompanyEndpoint());
+
+		// Set the CreditMemo Endpoint
+		url.pathname = path.join(url.pathname, 'creditmemo');
+
+		// Return the URL
+		return url;
 	}
 
 	/**

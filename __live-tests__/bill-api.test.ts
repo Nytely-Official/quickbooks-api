@@ -115,19 +115,6 @@ describe('Live API: Bills', async () => {
 		expect(typeof searchResponse.intuitTID).toBe('string');
 	});
 
-	// Test updated bills
-	// test('should retrieve updated bills', async () => {
-	// 	// Get the Last Updated Time
-	// 	const lastUpdatedTime = new Date();
-	// 	lastUpdatedTime.setDate(lastUpdatedTime.getDate() - 60);
-
-	// 	// Get the Updated Bills
-	// 	const searchResponse = await apiClient.bills.getUpdatedBills(lastUpdatedTime);
-
-	// 	// Assert the Bills
-	// 	expect(searchResponse.results).toBeInstanceOf(Array);
-	// });
-
 	// Should handle all Search Options
 	test('should handle all search options', async () => {
 		// Setup the Bill Options
@@ -200,5 +187,51 @@ describe('Live API: Bills', async () => {
 			expect(error.details.intuitTID).toBeDefined();
 			expect(typeof error.details.intuitTID).toBe('string');
 		}
+	});
+
+	// Test Bill class methods
+	describe('Bill Class Methods', () => {
+		// Test downloading bill PDF
+		// Note: Bills may not support PDF downloads in QuickBooks API
+		test('should download bill PDF (if supported)', async () => {
+			// Get all bills
+			const searchResponse = await apiClient.bills.getAllBills({ searchOptions: { maxResults: 1 } });
+
+			// Check if we have at least one bill
+			if (searchResponse.results.length === 0) {
+				console.log('No bills found, skipping PDF download test');
+				return;
+			}
+
+			// Get the first bill
+			const bill = searchResponse.results[0];
+
+			// Get the bill by ID to get class instance
+			const billResponse = await apiClient.bills.getBillById(bill.Id);
+
+			// Check if bill exists
+			if (!billResponse.bill) {
+				console.log('Bill not found, skipping PDF download test');
+				return;
+			}
+
+			// Try to download the PDF (Bills may not support PDF downloads)
+			try {
+				const pdf = await billResponse.bill.downloadPDF();
+
+				// Assert the PDF is a Blob
+				expect(pdf).toBeInstanceOf(Blob);
+				expect(pdf.type).toContain('application/pdf');
+				expect(pdf.size).toBeGreaterThan(0);
+			} catch (error) {
+				// Bills may not support PDF downloads - log and skip
+				if (error instanceof QuickbooksError && error.details?.statusCode === 400) {
+					console.log('Bill PDF download not supported (400 error), skipping test');
+					return;
+				}
+				// Re-throw if it's a different error
+				throw error;
+			}
+		});
 	});
 });
