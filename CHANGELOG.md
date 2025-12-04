@@ -1,5 +1,53 @@
 # Changelog
 
+## [0.11.0] - 2025-12-04
+
+### Features
+
+- **Single Sign-On (SSO) Support:** Added comprehensive OpenID Connect support for QuickBooks Single Sign-On
+  - Added `openid`, `profile`, `email`, `phone`, and `address` scopes to `AuthScopes` enum
+  - Automatic ID token decoding and validation during token exchange
+  - Automatic user profile fetching when `profile` scope is included
+  - ID token and user profile stored in token for easy access
+- **New AuthProvider Methods:**
+  - `decodeIdToken(idTokenString: string)`: Decode and parse ID token JWT strings
+  - `validateIdToken(idToken: IdToken, nonce?: string)`: Validate ID token claims (issuer, audience, expiration, nonce, email verification)
+  - `getUserProfile()`: Retrieve user profile from Intuit's user info endpoint
+  - `getCurrentUserProfile()`: Convenience method to get cached or fetch user profile
+  - `isSsoEnabled()`: Check if SSO (OpenID Connect) is enabled based on scopes
+- **Enhanced OAuth Flow:**
+  - `generateAuthUrl()` now supports optional `nonce` parameter for OpenID Connect
+  - `exchangeCode()` now supports optional `nonce` validation and `autoFetchUserProfile` parameter
+  - Automatic nonce generation when SSO is enabled
+- **Environment Support:**
+  - Added `environment` parameter to `AuthProvider` constructor (defaults to Production)
+  - Environment-aware user info endpoint selection (Sandbox vs Production)
+- **New Type Definitions:**
+  - `IdToken` interface for decoded ID tokens
+  - `IdTokenClaims` interface for ID token claims
+  - `UserProfile` interface for user profile information
+  - Updated `Token` interface to include optional `idToken` and `userProfile` properties
+  - Updated `TokenResponse` interface to include optional `id_token` field
+
+### Code Quality
+
+- Enhanced token parsing to handle ID tokens gracefully (warnings instead of errors for invalid tokens)
+- Improved error handling for SSO-related operations with fallback behavior
+- Added comprehensive JSDoc documentation for all SSO-related methods
+- Standardized OpenID Connect endpoint URLs for both Sandbox and Production environments
+
+### Dependencies
+
+- Updated `express` from `^5.1.0` to `^5.2.1`
+- Updated `@types/express` from `^5.0.5` to `^5.0.6`
+
+### Documentation
+
+- Added comprehensive SSO documentation section to README
+- Included examples for enabling SSO, accessing user profiles, and ID token validation
+- Updated example usage with SSO flow demonstrations
+- Enhanced code examples with null safety checks
+
 ## [0.10.0] - 2025-12-01
 
 ### Features

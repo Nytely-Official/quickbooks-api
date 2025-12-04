@@ -43,6 +43,8 @@ export type { DiscountLine } from './interfaces/discount-line';
 export type { Estimate as EstimateInterface } from './interfaces/estimate';
 export type { GroupLineDetail } from './interfaces/group-line-detail';
 export type { GroupLine } from './interfaces/group-line';
+export type { IdToken } from './interfaces/id-token';
+export type { IdTokenClaims } from './interfaces/id-token';
 export type { IntuitErrorData } from './interfaces/intuit-error-data';
 export type { IntuitErrorItem, OldIntuitErrorItem } from './interfaces/intuit-error-item';
 export type { IntuitErrorResponse } from './interfaces/intuit-error-response';
@@ -94,6 +96,7 @@ export type { TokenResponse } from './interfaces/token-response';
 export type { Token } from './interfaces/token';
 export type { TxnTaxDetail } from './interfaces/txn-tax-detail';
 export type { UserAuthResponse } from './interfaces/user-auth-response';
+export type { UserProfile } from './interfaces/user-profile';
 export type { WebsiteAddress } from './interfaces/website-address';
 
 // Export the Types

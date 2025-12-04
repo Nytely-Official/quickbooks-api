@@ -10,6 +10,8 @@ foundation for accounting, payments, and commerce operations.
 ## Key Features
 
 - **OAuth 2.0 Authentication:** Simplified and secure authentication flow.
+- **Single Sign-On (SSO):** Built-in OpenID Connect support for QuickBooks Single Sign-On with automatic ID token validation and user
+  profile management.
 - **Token Management:** Automatic refresh, rotation, and secure serialization/deserialization.
 - **API Coverage:**
   - Invoices
@@ -86,6 +88,86 @@ import { ApiClient, Environment } from 'quickbooks-api';
 
 const apiClient = new ApiClient(authProvider, Environment.Sandbox);
 ```
+
+---
+
+## Single Sign-On (SSO) Support
+
+The SDK includes built-in support for QuickBooks Single Sign-On using OpenID Connect, making it incredibly simple to authenticate users with
+their Intuit credentials.
+
+### Enable SSO
+
+Simply include the `openid` scope (and optionally `profile`, `email`, `phone`, `address`) when initializing the AuthProvider:
+
+```typescript
+import { AuthProvider, AuthScopes } from 'quickbooks-api';
+
+const authProvider = new AuthProvider('YOUR_CLIENT_ID', 'YOUR_CLIENT_SECRET', 'YOUR_REDIRECT_URI', [
+  AuthScopes.Accounting,
+  AuthScopes.OpenId, // Required for SSO
+  AuthScopes.Profile, // Optional: Get user profile info
+  AuthScopes.Email, // Optional: Get user email
+  AuthScopes.Phone, // Optional: Get user phone
+  AuthScopes.Address, // Optional: Get user address
+]);
+```
+
+### Automatic SSO Handling
+
+When you exchange the authorization code, the SDK automatically:
+
+- Decodes and validates the ID token
+- Fetches the user profile (if `profile` scope is included)
+- Stores everything in the token for easy access
+
+```typescript
+// Exchange code - SSO is handled automatically!
+const token = await authProvider.exchangeCode(code, realmId);
+
+// Access user profile
+if (authProvider.isSsoEnabled()) {
+  const userProfile = await authProvider.getCurrentUserProfile();
+  console.log('User:', userProfile?.name);
+  console.log('Email:', userProfile?.email);
+  console.log('Email Verified:', userProfile?.emailVerified);
+}
+
+// Access ID token claims
+if (token.idToken) {
+  console.log('User ID:', token.idToken.claims.sub);
+  console.log('Issuer:', token.idToken.claims.iss);
+}
+```
+
+### Manual User Profile Retrieval
+
+You can also manually fetch the user profile at any time:
+
+```typescript
+const userProfile = await authProvider.getUserProfile();
+console.log('User Profile:', userProfile);
+```
+
+### ID Token Validation
+
+The SDK automatically validates ID tokens, but you can also validate them manually:
+
+```typescript
+// Decode and validate an ID token
+const idToken = await authProvider.decodeIdToken(idTokenString);
+const isValid = await authProvider.validateIdToken(idToken, nonce);
+```
+
+### Check SSO Status
+
+```typescript
+if (authProvider.isSsoEnabled()) {
+  console.log('SSO is enabled');
+}
+```
+
+That's it! SSO is fully integrated and works seamlessly with the existing OAuth flow.
 
 ### 5. Make API Calls (with Invoice Options)
 
