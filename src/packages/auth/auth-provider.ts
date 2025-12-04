@@ -2,7 +2,18 @@
 import { TinyEmitter } from 'tiny-emitter';
 
 // Internal Imports
-import { Endpoints, AuthScopes, GrantType, type Token, type TokenResponse, QuickbooksError } from '../../types/types';
+import {
+	Endpoints,
+	AuthScopes,
+	GrantType,
+	type Token,
+	type TokenResponse,
+	type IdToken,
+	type IdTokenClaims,
+	type UserProfile,
+	QuickbooksError,
+	Environment,
+} from '../../types/types';
 import { ApiClient } from '../api/api-client';
 
 /**
@@ -34,6 +45,7 @@ export class AuthProvider {
 	 * @param redirectUri The redirect URI for the application *Required*
 	 * @param scopes The scopes for the application *Required*
 	 * @param token The token for the application (optional)
+	 * @param environment The environment to use for the application (optional, defaults to Production)
 	 */
 
 	constructor(
@@ -42,6 +54,7 @@ export class AuthProvider {
 		private readonly redirectUri: string,
 		private readonly scopes: Array<AuthScopes>,
 		private token?: Token,
+		private readonly environment: Environment = Environment.Production,
 	) {
 		// Generate the Auth Header
 		this.authHeader = 'Basic ' + Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64');
@@ -99,10 +112,11 @@ export class AuthProvider {
 
 	/**
 	 * Generates the OAuth2 URL to get the auth code from the user
-	 * @param state The state to use for the OAuth2 URL
+	 * @param state The state to use for the OAuth2 URL (optional, auto-generated if not provided)
+	 * @param nonce The nonce to use for OpenID Connect (optional, auto-generated if SSO is enabled)
 	 * @returns {URL} The OAuth2 URL to get the auth code from the user
 	 */
-	public generateAuthUrl(state: string = crypto.randomUUID()): URL {
+	public generateAuthUrl(state: string = crypto.randomUUID(), nonce?: string): URL {
 		// Join the scopes into a string
 		const scopeUriString = this.scopes.join(' ');
 
@@ -116,17 +130,26 @@ export class AuthProvider {
 		authUrl.searchParams.set('response_type', 'code');
 		authUrl.searchParams.set('state', state);
 
+		// Add nonce for OpenID Connect if SSO is enabled
+		if (this.isSsoEnabled()) {
+			const nonceValue = nonce ?? crypto.randomUUID();
+			authUrl.searchParams.set('nonce', nonceValue);
+		}
+
 		// Return the Auth URL
 		return authUrl;
 	}
 
 	/**
 	 * Exchanges an Auth Code for a Token
-	 * @param authCode The auth code to exchange for a token
+	 * @param code The auth code to exchange for a token
+	 * @param realmId The realm ID from the OAuth callback
+	 * @param nonce Optional nonce to validate the ID token (should match the one used in generateAuthUrl)
+	 * @param autoFetchUserProfile Whether to automatically fetch user profile when SSO is enabled (default: true)
 	 * @throws {QuickbooksError} If the token is not provided or the refresh token is expired
 	 * @returns {Promise<Token>} The token
 	 */
-	public async exchangeCode(code: string, realmId: string): Promise<Token> {
+	public async exchangeCode(code: string, realmId: string, nonce?: string, autoFetchUserProfile: boolean = true): Promise<Token> {
 		// Setup the Request Data
 		const requestData = new URLSearchParams({
 			redirect_uri: this.redirectUri,
@@ -169,7 +192,7 @@ export class AuthProvider {
 		this.token = undefined;
 
 		// Parse the token response
-		const token = this.parseTokenResponse(data, realmId);
+		const token = await this.parseTokenResponse(data, realmId, nonce, autoFetchUserProfile);
 
 		// Update the Token
 		this.token = token;
@@ -231,7 +254,7 @@ export class AuthProvider {
 		});
 
 		// Parse the token response
-		const newToken = this.parseTokenResponse(data, this.token.realmId);
+		const newToken = await this.parseTokenResponse(data, this.token.realmId);
 
 		// Update the Token
 		this.token = newToken;
@@ -447,6 +470,164 @@ export class AuthProvider {
 	}
 
 	/**
+	 * Decodes an ID token from a JWT string
+	 * @param idTokenString The ID token JWT string
+	 * @returns {IdToken} The decoded ID token
+	 * @throws {QuickbooksError} If the ID token is invalid or cannot be decoded
+	 */
+	public async decodeIdToken(idTokenString: string): Promise<IdToken> {
+		try {
+			// Split the JWT into parts (header.payload.signature)
+			const parts = idTokenString.split('.');
+			if (parts.length !== 3) throw new Error('Invalid ID token format');
+
+			// Decode the payload (second part)
+			const payload = parts[1];
+			// Add padding if needed for base64 decoding
+			const paddedPayload = payload + '='.repeat((4 - (payload.length % 4)) % 4);
+			const decodedPayload = Buffer.from(paddedPayload, 'base64').toString('utf-8');
+			const claims: IdTokenClaims = JSON.parse(decodedPayload);
+
+			return {
+				raw: idTokenString,
+				claims,
+			};
+		} catch (error) {
+			throw new QuickbooksError(
+				`Failed to decode ID token: ${error instanceof Error ? error.message : 'Unknown error'}`,
+				await ApiClient.getIntuitErrorDetails(null),
+			);
+		}
+	}
+
+	/**
+	 * Validates an ID token
+	 * @param idToken The ID token to validate
+	 * @param nonce Optional nonce to validate against (should match the one used in generateAuthUrl)
+	 * @returns {boolean} True if the ID token is valid
+	 * @throws {QuickbooksError} If the ID token is invalid
+	 */
+	public async validateIdToken(idToken: IdToken, nonce?: string): Promise<boolean> {
+		// Get the claims from the ID token
+		const claims = idToken.claims;
+		const now = Math.floor(Date.now() / 1000);
+
+		// Validate issuer (should be Intuit)
+		if (!claims.iss || !claims.iss.includes('intuit.com'))
+			throw new QuickbooksError('Invalid ID token issuer', await ApiClient.getIntuitErrorDetails(null));
+
+		// Validate audience (should match client ID)
+		// The aud claim can be either a string or an array of strings per OpenID Connect spec
+		const audienceMatches =
+			typeof claims.aud === 'string' ? claims.aud === this.clientId : Array.isArray(claims.aud) && claims.aud.includes(this.clientId);
+
+		// Check if the Audience does not match the client ID
+		if (!audienceMatches) {
+			// Get the received audience
+			const receivedAud = typeof claims.aud === 'string' ? claims.aud : JSON.stringify(claims.aud);
+
+			// Throw an error
+			throw new QuickbooksError(
+				`ID token audience does not match client ID. Expected: ${this.clientId}, Received: ${receivedAud}`,
+				await ApiClient.getIntuitErrorDetails(null),
+			);
+		}
+
+		// Validate expiration
+		if (claims.exp && claims.exp < now) throw new QuickbooksError('ID token has expired', await ApiClient.getIntuitErrorDetails(null));
+
+		// Validate nonce if provided
+		if (nonce && claims.nonce !== nonce)
+			throw new QuickbooksError('ID token nonce does not match', await ApiClient.getIntuitErrorDetails(null));
+
+		// Validate email verification if email is present
+		if (claims.email && claims.email_verified === false)
+			throw new QuickbooksError('Email is not verified', await ApiClient.getIntuitErrorDetails(null));
+
+		// Return true if the ID token is valid
+		return true;
+	}
+
+	/**
+	 * Retrieves the user profile from Intuit's user info endpoint
+	 * This method requires an access token and is used for SSO flows
+	 * @returns {Promise<UserProfile>} The user profile information
+	 * @throws {QuickbooksError} If the request fails or the token is not available
+	 */
+	public async getUserProfile(): Promise<UserProfile> {
+		// Get the access token
+		const token = await this.getToken();
+
+		// Determine the endpoint based on environment
+		// If not specified, try to detect from ID token issuer, otherwise default to production
+		const userInfoEndpoint = this.environment === Environment.Sandbox ? Endpoints.SandboxUserInfo : Endpoints.ProductionUserInfo;
+
+		// Setup the Request Options
+		const requestOptions: RequestInit = {
+			method: 'GET',
+			headers: {
+				Accept: 'application/json',
+				Authorization: `Bearer ${token.accessToken}`,
+			},
+		};
+
+		// Request the User Profile
+		const response = await fetch(userInfoEndpoint, requestOptions);
+
+		// Check if the response is successful
+		if (!response.ok) {
+			// Get the error message
+			const errorMessage = await response.text();
+
+			// Throw an error
+			throw new QuickbooksError(`Failed to retrieve user profile: ${errorMessage}`, await ApiClient.getIntuitErrorDetails(response));
+		}
+
+		// Parse the response
+		const data: UserProfile = await response.json().catch(async () => {
+			throw new QuickbooksError('Failed to parse the user profile response', await ApiClient.getIntuitErrorDetails(response));
+		});
+
+		// Return the user profile
+		return data;
+	}
+
+	/**
+	 * Checks if SSO (OpenID Connect) is enabled
+	 * @returns {boolean} True if the openid scope is included
+	 */
+	public isSsoEnabled(): boolean {
+		// Return true if the openid scope is included
+		return this.scopes.includes(AuthScopes.OpenId);
+	}
+
+	/**
+	 * Gets the current user profile if SSO is enabled
+	 * This is a convenience method that returns the cached user profile from the token
+	 * or fetches it if not available
+	 * @returns {Promise<UserProfile | undefined>} The user profile or undefined if SSO is not enabled
+	 */
+	public async getCurrentUserProfile(): Promise<UserProfile | undefined> {
+		// Check if SSO is enabled
+		if (!this.isSsoEnabled()) return undefined;
+
+		// Check if we have a token with user profile
+		if (this.token?.userProfile) return this.token.userProfile;
+
+		// Try to get the user profile
+		try {
+			const userProfile = await this.getUserProfile();
+			// Cache it in the token if we have one
+			if (this.token) this.token.userProfile = userProfile;
+
+			return userProfile;
+		} catch (error) {
+			// If we can't get the profile, return undefined
+			return undefined;
+		}
+	}
+
+	/**
 	 * Derives a Crypto Key
 	 * @param secretKey The secret key to derive the key from
 	 * @param salt The salt to derive the key from
@@ -480,9 +661,16 @@ export class AuthProvider {
 	 * Parses the Token Response
 	 * @param response The token response to parse
 	 * @param realmId The realm ID for the token
-	 * @returns {Token} The parsed token
+	 * @param nonce Optional nonce to validate the ID token
+	 * @param autoFetchUserProfile Whether to automatically fetch user profile when SSO is enabled
+	 * @returns {Promise<Token>} The parsed token
 	 */
-	private parseTokenResponse(response: TokenResponse, realmId: string): Token {
+	private async parseTokenResponse(
+		response: TokenResponse,
+		realmId: string,
+		nonce?: string,
+		autoFetchUserProfile: boolean = true,
+	): Promise<Token> {
 		// Calculate the New Expiry Data
 		const newRefreshTokenExpiryDate = new Date(Date.now() + response.x_refresh_token_expires_in * 1000);
 
@@ -498,6 +686,78 @@ export class AuthProvider {
 			accessTokenExpiryDate: accessTokenExpiryDate,
 			realmId: realmId,
 		};
+
+		// Check if there is no Id token and return the parsed token
+		if (!response.id_token) return parsedToken;
+
+		/**
+		 * Handle ID Token if present
+		 * The flow after this is only to handle SSO related functionality
+		 * If you want to use the ID token for other purposes, you can decode it using the decodeIdToken method
+		 */
+
+		// Decode the ID token
+		const idToken = await this.decodeIdToken(response.id_token).catch(async (error: Error) => {
+			// Log a warning
+			console.warn('Failed to decode ID token:', error);
+
+			// Do not throw an error, we want to continue with the token exchange even if the ID token is not valid
+			return null;
+		});
+
+		// Check if the ID token is not valid and return the parsed token
+		if (!idToken) return parsedToken;
+
+		// Store the ID token
+		parsedToken.idToken = idToken;
+
+		// Validate the ID token
+		const isValid = await this.validateIdToken(idToken, nonce).catch(async (error: Error) => {
+			// Log a warning
+			console.warn('Failed to validate ID token:', error);
+
+			// Do not throw an error, we want to continue with the token exchange even if the ID token is not valid
+			return false;
+		});
+
+		// Check if the ID token is not valid and return the parsed token
+		if (!isValid) return parsedToken;
+
+		// Store the ID token
+		parsedToken.idToken = idToken;
+
+		// Check if Auto Fetch User Profile is disable or SSO is not enabled and return the parsed token
+		if (!autoFetchUserProfile || !this.isSsoEnabled()) return parsedToken;
+
+		// Temporarily set the token to fetch user profile
+		const tempToken = this.token;
+
+		// Update the token
+		this.token = parsedToken;
+
+		// Get the user profile
+		const userProfile = await this.getUserProfile().catch(async (error: Error) => {
+			// Log a warning
+			console.warn('Failed to fetch user profile:', error);
+
+			// Do not throw an error, we want to continue with the token exchange even if the user profile is not available
+			return null;
+		});
+
+		// Check if the user profile is not available and return the parsed token
+		if (!userProfile) {
+			// Restore the token
+			this.token = tempToken;
+
+			// Return the parsed token
+			return parsedToken;
+		}
+
+		// Update the token
+		parsedToken.userProfile = userProfile;
+
+		// Restore the token
+		this.token = tempToken;
 
 		// Return the parsed token
 		return parsedToken;
