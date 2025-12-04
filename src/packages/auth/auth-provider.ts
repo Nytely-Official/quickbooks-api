@@ -539,7 +539,7 @@ export class AuthProvider {
 
 		// Validate email verification if email is present
 		// This ensures that if an email claim is present, it has been verified by Intuit
-		if (claims.email && claims.email_verified === false)
+		if (claims.email && !claims.email_verified)
 			throw new QuickbooksError('Email is not verified', await ApiClient.getIntuitErrorDetails(null));
 
 		// Return true if all additional validations pass
