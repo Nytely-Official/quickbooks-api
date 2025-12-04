@@ -1,5 +1,6 @@
 // External Imports
 import { TinyEmitter } from 'tiny-emitter';
+import * as jose from 'jose';
 
 // Internal Imports
 import {
@@ -471,87 +472,78 @@ export class AuthProvider {
 	}
 
 	/**
-	 * Decodes an ID token from a JWT string
+	 * Decodes and verifies an ID token from a JWT string using cryptographic signature verification
 	 * @param idTokenString The ID token JWT string
-	 * @returns {IdToken} The decoded ID token
-	 * @throws {QuickbooksError} If the ID token is invalid or cannot be decoded
+	 * @returns {IdToken} The decoded and verified ID token
+	 * @throws {QuickbooksError} If the ID token is invalid, signature verification fails, or cannot be decoded
+	 * @remarks This method performs cryptographic signature verification using Intuit's JWKS endpoint.
+	 * The token signature, issuer, audience, and expiration are all verified before the token is accepted.
+	 * Token claims are cryptographically verified and safe for authorization decisions.
 	 */
 	public async decodeIdToken(idTokenString: string): Promise<IdToken> {
 		try {
-			// Split the JWT into parts (header.payload.signature)
-			const parts = idTokenString.split('.');
-			if (parts.length !== 3) throw new Error('Invalid ID token format');
+			// Create a remote JWKS set for signature verification
+			const JWKS = jose.createRemoteJWKSet(new URL(APIUrls.JWKS));
 
-			// Decode the payload (second part)
-			const payload = parts[1];
-			// Add padding if needed for base64 decoding
-			const paddedPayload = payload + '='.repeat((4 - (payload.length % 4)) % 4);
-			const decodedPayload = Buffer.from(paddedPayload, 'base64').toString('utf-8');
-			const claims: IdTokenClaims = JSON.parse(decodedPayload);
+			// Verify the JWT signature, issuer, audience, and expiration
+			// This performs cryptographic signature verification using the public keys from Intuit's JWKS endpoint
+			const { payload } = await jose.jwtVerify(idTokenString, JWKS, {
+				issuer: APIUrls.Issuer,
+				audience: this.clientId,
+			});
 
-			return {
-				raw: idTokenString,
-				claims,
-			};
-		} catch (error) {
-			throw new QuickbooksError(
-				`Failed to decode ID token: ${error instanceof Error ? error.message : 'Unknown error'}`,
-				await ApiClient.getIntuitErrorDetails(null),
-			);
+			// Return the verified token with claims
+			return { raw: idTokenString, claims: payload as IdTokenClaims };
+		} catch (error: unknown) {
+			// Setup the Error Message
+			let errorMessage = 'Failed to decode and verify ID token';
+
+			// Check if the error is an expired token
+			if (error instanceof jose.errors.JWTExpired) errorMessage = 'ID token has expired';
+
+			// Check if the error is an invalid token
+			if (error instanceof jose.errors.JWTInvalid) errorMessage = 'ID token is invalid';
+
+			// Check if the error is a signature verification failed
+			if (error instanceof jose.errors.JWSSignatureVerificationFailed)
+				errorMessage = 'ID token signature verification failed - token may be forged or tampered with';
+
+			// Check if the error is a claim validation failed
+			if (error instanceof jose.errors.JWTClaimValidationFailed)
+				errorMessage = `ID token claim validation failed: ${error.claim} - ${error.reason}`;
+
+			// Check if the error is an unknown error
+			if (error instanceof Error) errorMessage = `Failed to decode and verify ID token: ${error.message}`;
+
+			// Throw the Quickbooks Error
+			throw new QuickbooksError(errorMessage, await ApiClient.getIntuitErrorDetails(null));
 		}
 	}
 
 	/**
-	 * Validates an ID token
-	 * @param idToken The ID token to validate
+	 * Validates additional ID token claims (nonce and email verification)
+	 * Note: Signature, issuer, audience, and expiration are already validated by decodeIdToken using cryptographic verification
+	 * @param idToken The ID token to validate (must already be decoded and signature-verified)
 	 * @param nonce Optional nonce to validate against (should match the one used in generateAuthUrl)
-	 * @returns {boolean} True if the ID token is valid
-	 * @throws {QuickbooksError} If the ID token is invalid
+	 * @returns {boolean} True if the ID token claims are valid
+	 * @throws {QuickbooksError} If the ID token claims are invalid
 	 */
 	public async validateIdToken(idToken: IdToken, nonce?: string): Promise<boolean> {
 		// Get the claims from the ID token
 		const claims = idToken.claims;
-		const now = Math.floor(Date.now() / 1000);
-
-		// Validate issuer (null-safety check first)
-		if (!claims.iss) throw new QuickbooksError('ID token issuer is missing', await ApiClient.getIntuitErrorDetails(null));
-
-		// Validate issuer with strict equality check
-		if (claims.iss !== APIUrls.Issuer)
-			throw new QuickbooksError(
-				`Invalid ID token issuer. Expected: ${APIUrls.Issuer}, Received: ${claims.iss}`,
-				await ApiClient.getIntuitErrorDetails(null),
-			);
-
-		// Validate audience (should match client ID)
-		// The aud claim can be either a string or an array of strings per OpenID Connect spec
-		const audienceMatches =
-			typeof claims.aud === 'string' ? claims.aud === this.clientId : Array.isArray(claims.aud) && claims.aud.includes(this.clientId);
-
-		// Check if the Audience does not match the client ID
-		if (!audienceMatches) {
-			// Get the received audience
-			const receivedAud = typeof claims.aud === 'string' ? claims.aud : JSON.stringify(claims.aud);
-
-			// Throw an error
-			throw new QuickbooksError(
-				`ID token audience does not match client ID. Expected: ${this.clientId}, Received: ${receivedAud}`,
-				await ApiClient.getIntuitErrorDetails(null),
-			);
-		}
-
-		// Validate expiration
-		if (claims.exp && claims.exp < now) throw new QuickbooksError('ID token has expired', await ApiClient.getIntuitErrorDetails(null));
 
 		// Validate nonce if provided
+		// The nonce is used to prevent replay attacks and must match the one sent in the authorization request
 		if (nonce && claims.nonce !== nonce)
 			throw new QuickbooksError('ID token nonce does not match', await ApiClient.getIntuitErrorDetails(null));
 
 		// Validate email verification if email is present
+		// This ensures that if an email claim is present, it has been verified by Intuit
 		if (claims.email && claims.email_verified === false)
 			throw new QuickbooksError('Email is not verified', await ApiClient.getIntuitErrorDetails(null));
 
-		// Return true if the ID token is valid
+		// Return true if all additional validations pass
+		// Note: Signature, issuer, audience, and expiration were already verified in decodeIdToken
 		return true;
 	}
 
@@ -729,9 +721,6 @@ export class AuthProvider {
 
 		// Check if the ID token is not valid and return the parsed token
 		if (!isValid) return parsedToken;
-
-		// Store the ID token
-		parsedToken.idToken = idToken;
 
 		// Check if Auto Fetch User Profile is disable or SSO is not enabled and return the parsed token
 		if (!autoFetchUserProfile || !this.isSsoEnabled()) return parsedToken;

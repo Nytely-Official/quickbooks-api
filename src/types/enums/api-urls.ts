@@ -3,9 +3,11 @@
  */
 export enum APIUrls {
 	// Auth Related URL's
+	Issuer = 'https://oauth.platform.intuit.com/op/v1',
 	UserAuth = 'https://appcenter.intuit.com',
 	OAuth2 = 'https://oauth.platform.intuit.com/oauth2/v1',
 	OAuthDeveloper = 'https://developer.api.intuit.com/v2/oauth2',
+	JWKS = 'https://oauth.platform.intuit.com/op/v1/jwks',
 
 	// OpenID Connect URL's
 	SandboxPlatform = 'https://sandbox-accounts.platform.intuit.com/v1',
@@ -14,7 +16,4 @@ export enum APIUrls {
 	// API Related URL's
 	SandboxApiBaseUrl = 'https://sandbox-quickbooks.api.intuit.com/v3',
 	ProductionApiBaseUrl = 'https://quickbooks.api.intuit.com/v3',
-
-	// Issuers
-	Issuer = 'https://oauth.platform.intuit.com/op/v1',
 }
