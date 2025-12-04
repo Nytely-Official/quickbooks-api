@@ -20,6 +20,8 @@ const authProvider = new AuthProvider(
 		AuthScopes.Phone,
 		AuthScopes.Address,
 	], // Scopes
+	null,
+	Environment.Sandbox,
 );
 
 // Auth endpoint to initiate OAuth flow
@@ -38,6 +40,8 @@ app.get('/test-token', (_req: Request, res: Response) => {
 			AuthScopes.Phone,
 			AuthScopes.Address,
 		], // Scopes
+		null,
+		Environment.Sandbox,
 	);
 
 	// Generate the Auth URL
@@ -69,10 +73,26 @@ app.get('/auth-code', async (req: Request, res: Response) => {
 		}
 
 		// Exchange authorization code for tokens
+		// When using SSO (OpenID Connect), the ID token and user profile are automatically handled
 		await authProvider.exchangeCode(code as string, realmId as string);
 
 		// Log the progress
 		console.log('Exchanged code for tokens');
+
+		// Example: Get user profile if SSO is enabled
+		if (authProvider.isSsoEnabled()) {
+			// Get the user profile
+			const userProfile = await authProvider.getCurrentUserProfile();
+
+			// Log the user profile
+			console.log('User profile:', userProfile);
+
+			// Access ID token if available
+			const token = await authProvider.getToken();
+
+			// Log the ID token claims
+			if (token.idToken) console.log('ID Token claims:', token.idToken.claims);
+		}
 
 		// Refresh the Token
 		await authProvider.refresh();
@@ -86,17 +106,26 @@ app.get('/auth-code', async (req: Request, res: Response) => {
 		// Find a Customer by ID
 		const foundCustomer = await apiClient.customers.getCustomerById('1');
 
-		// Log the progress
-		console.log(`Got found customer ${foundCustomer?.BillAddr?.PostalCode}`);
+		// Check if the customer was found
+		if (!foundCustomer) {
+			console.log('Customer with ID "1" not found, skipping customer update example');
+		} else {
+			// Log the progress
+			console.log(`Got found customer ${foundCustomer?.BillAddr?.PostalCode}`);
 
-		// Change the Customer Name
-		foundCustomer.BillAddr.PostalCode = '94326';
+			// Change the Customer Postal Code
+			if (foundCustomer.BillAddr) {
+				foundCustomer.BillAddr.PostalCode = '94326';
 
-		// Save the Customer
-		await foundCustomer.save();
+				// Save the Customer
+				await foundCustomer.save();
 
-		// Log the progress
-		console.log(`Reloaded customer ${foundCustomer?.BillAddr?.PostalCode}`);
+				// Log the progress
+				console.log(`Reloaded customer ${foundCustomer?.BillAddr?.PostalCode}`);
+			} else {
+				console.log('Customer does not have a billing address, skipping address update');
+			}
+		}
 
 		// Example: Get invoices using the authenticated client
 		const invoices = await apiClient.invoices.getAllInvoices();
@@ -282,6 +311,8 @@ app.get('/generate-test-token', async (req: Request, res: Response): Promise<voi
 			AuthScopes.Phone,
 			AuthScopes.Address,
 		], // Scopes
+		null,
+		Environment.Sandbox,
 	);
 
 	try {
