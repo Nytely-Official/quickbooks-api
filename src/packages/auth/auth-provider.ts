@@ -13,6 +13,7 @@ import {
 	type UserProfile,
 	QuickbooksError,
 	Environment,
+	APIUrls,
 } from '../../types/types';
 import { ApiClient } from '../api/api-client';
 
@@ -512,9 +513,15 @@ export class AuthProvider {
 		const claims = idToken.claims;
 		const now = Math.floor(Date.now() / 1000);
 
-		// Validate issuer (should be Intuit)
-		if (!claims.iss || !claims.iss.includes('intuit.com'))
-			throw new QuickbooksError('Invalid ID token issuer', await ApiClient.getIntuitErrorDetails(null));
+		// Validate issuer (null-safety check first)
+		if (!claims.iss) throw new QuickbooksError('ID token issuer is missing', await ApiClient.getIntuitErrorDetails(null));
+
+		// Validate issuer with strict equality check
+		if (claims.iss !== APIUrls.Issuer)
+			throw new QuickbooksError(
+				`Invalid ID token issuer. Expected: ${APIUrls.Issuer}, Received: ${claims.iss}`,
+				await ApiClient.getIntuitErrorDetails(null),
+			);
 
 		// Validate audience (should match client ID)
 		// The aud claim can be either a string or an array of strings per OpenID Connect spec

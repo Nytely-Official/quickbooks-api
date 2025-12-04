@@ -11,8 +11,8 @@ export enum Endpoints {
 	TokenRevoke = `${APIUrls.OAuthDeveloper}/tokens/revoke`,
 
 	// OpenID Connect Endpoints
-	SandboxUserInfo = 'https://sandbox-accounts.platform.intuit.com/v1/openid_connect/userinfo',
-	ProductionUserInfo = 'https://accounts.platform.intuit.com/v1/openid_connect/userinfo',
+	SandboxUserInfo = `${APIUrls.SandboxPlatform}/openid_connect/userinfo`,
+	ProductionUserInfo = `${APIUrls.ProductionPlatform}/openid_connect/userinfo`,
 
 	// API Related Endpoints
 	SandboxCompanyApi = `${APIUrls.SandboxApiBaseUrl}/company`,
