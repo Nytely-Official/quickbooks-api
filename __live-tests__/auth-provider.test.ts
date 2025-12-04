@@ -1,13 +1,18 @@
 // Imports
-import { AuthProvider, AuthScopes, type Token } from '../src/app';
+import { AuthProvider, AuthScopes, Environment, type Token } from '../src/app';
 import { describe, expect, test } from 'bun:test';
 
 // Describe the Auth Provider
 describe('Live Auth Provider', async () => {
 	// Initialize the Auth Provider
-	const authProvider = new AuthProvider(process.env.QB_CLIENT_ID!, process.env.QB_CLIENT_SECRET!, process.env.REDIRECT_URI!, [
-		AuthScopes.Accounting,
-	]);
+	const authProvider = new AuthProvider(
+		process.env.QB_CLIENT_ID!,
+		process.env.QB_CLIENT_SECRET!,
+		process.env.REDIRECT_URI!,
+		[AuthScopes.Accounting],
+		null,
+		Environment.Sandbox,
+	);
 
 	// Set the Token
 	await authProvider.deserializeToken(process.env.SERIALIZED_TOKEN!, process.env.SECRET_KEY!);

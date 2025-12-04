@@ -15,9 +15,14 @@ import { describe, expect, test } from 'bun:test';
 // Describe the Invoice API
 describe('Live API: Invoices', async () => {
 	// Initialize the Auth Provider
-	const authProvider = new AuthProvider(process.env.QB_CLIENT_ID!, process.env.QB_CLIENT_SECRET!, process.env.REDIRECT_URI!, [
-		AuthScopes.Accounting,
-	]);
+	const authProvider = new AuthProvider(
+		process.env.QB_CLIENT_ID!,
+		process.env.QB_CLIENT_SECRET!,
+		process.env.REDIRECT_URI!,
+		[AuthScopes.Accounting],
+		null,
+		Environment.Sandbox,
+	);
 
 	// Deserialize the Token
 	await authProvider.deserializeToken(process.env.SERIALIZED_TOKEN!, process.env.SECRET_KEY!);
