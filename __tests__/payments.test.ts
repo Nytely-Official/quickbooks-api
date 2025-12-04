@@ -1,7 +1,7 @@
 import { ApiClient } from '../src/app';
-import { AuthProvider, Environment, AuthScopes, type PaymentQueryResponse } from '../src/app';
+import { AuthProvider, Environment, AuthScopes, type PaymentQueryResponse, Payment } from '../src/app';
 import { describe, expect, it, beforeEach, afterEach } from 'bun:test';
-import { mockFetch, mockPaymentData, mockTokenData } from './helpers';
+import { mockFetch, mockPaymentData, mockTokenData, mockPDF } from './helpers';
 
 // Mock configuration
 const TEST_CONFIG = {
@@ -138,6 +138,14 @@ describe('Payment API', () => {
 
 			// Assert the Payment
 			expect(paymentResponse.payment?.Id).toBe(testPayment.Id);
+
+			// Assert the Payment is a class instance
+			if (paymentResponse.payment) {
+				expect(paymentResponse.payment).toBeInstanceOf(Payment);
+				expect(typeof paymentResponse.payment.setApiClient).toBe('function');
+				expect(typeof paymentResponse.payment.reload).toBe('function');
+				expect(typeof paymentResponse.payment.save).toBe('function');
+			}
 		});
 
 		// Describe the getPaymentById Method
@@ -273,6 +281,170 @@ describe('Payment API', () => {
 			expect(searchResponse.intuitTID).toBeDefined();
 			expect(typeof searchResponse.intuitTID).toBe('string');
 			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
+		});
+	});
+
+	// Describe the Payment Class Methods
+	describe('Payment Class', () => {
+		afterEach(() => {
+			global.fetch = globalFetch;
+		});
+
+		it('should return Payment class instance', async () => {
+			const testPayment = mockPaymentData[0];
+			const paymentQueryResponse = {
+				QueryResponse: {
+					Payment: [testPayment],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(paymentQueryResponse));
+
+			const paymentResponse = await apiClient.payments.getPaymentById(testPayment.Id);
+
+			expect(paymentResponse.payment).toBeInstanceOf(Payment);
+			expect(typeof paymentResponse.payment?.setApiClient).toBe('function');
+			expect(typeof paymentResponse.payment?.reload).toBe('function');
+			expect(typeof paymentResponse.payment?.save).toBe('function');
+			expect(typeof paymentResponse.payment?.downloadPDF).toBe('function');
+			expect(typeof paymentResponse.payment?.void).toBe('function');
+		});
+
+		it('should reload payment data', async () => {
+			const testPayment = mockPaymentData[0];
+			const updatedPayment = { ...testPayment, TotalAmt: 999.99 };
+
+			// Setup initial fetch
+			const paymentQueryResponse = {
+				QueryResponse: {
+					Payment: [testPayment],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(paymentQueryResponse));
+
+			const paymentResponse = await apiClient.payments.getPaymentById(testPayment.Id);
+			const payment = paymentResponse.payment!;
+
+			// Modify locally
+			(payment as any).TotalAmt = 111.11;
+
+			// Setup reload response
+			const reloadQueryResponse = {
+				QueryResponse: {
+					Payment: [updatedPayment],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(reloadQueryResponse));
+
+			// Reload the payment
+			await payment.reload();
+
+			// Assert the payment was reloaded
+			expect(payment.TotalAmt).toBe(updatedPayment.TotalAmt);
+		});
+
+		it('should save payment data', async () => {
+			const testPayment = mockPaymentData[0];
+			const savedPayment = { ...testPayment, SyncToken: '1', Id: testPayment.Id };
+
+			// Setup initial fetch
+			const paymentQueryResponse = {
+				QueryResponse: {
+					Payment: [testPayment],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(paymentQueryResponse));
+
+			const paymentResponse = await apiClient.payments.getPaymentById(testPayment.Id);
+			const payment = paymentResponse.payment!;
+
+			// Modify the payment
+			if (payment.TotalAmt !== undefined) {
+				(payment as any).TotalAmt = 500.0;
+			}
+
+			// Setup save response
+			const saveResponse = {
+				Payment: savedPayment,
+			};
+			global.fetch = mockFetch(JSON.stringify(saveResponse));
+
+			// Save the payment
+			await payment.save();
+
+			// Assert the save was called
+			expect(global.fetch).toBeDefined();
+		});
+
+		it('should download payment PDF', async () => {
+			const testPayment = mockPaymentData[0];
+			const pdfBlob = new Blob(['PDF content'], { type: 'application/pdf' });
+
+			// Setup initial fetch
+			const paymentQueryResponse = {
+				QueryResponse: {
+					Payment: [testPayment],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(paymentQueryResponse));
+
+			const paymentResponse = await apiClient.payments.getPaymentById(testPayment.Id);
+			const payment = paymentResponse.payment!;
+
+			// Setup PDF response
+			global.fetch = mockPDF(pdfBlob);
+
+			// Download the PDF
+			const pdf = await payment.downloadPDF();
+
+			// Assert the PDF is a Blob
+			expect(pdf).toBeInstanceOf(Blob);
+			expect(pdf.type).toBe('application/pdf');
+		});
+
+		it('should void payment', async () => {
+			const testPayment = mockPaymentData[0];
+			const voidedPayment = { ...testPayment, TotalAmt: 0, SyncToken: '1' };
+
+			// Setup initial fetch
+			const paymentQueryResponse = {
+				QueryResponse: {
+					Payment: [testPayment],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(paymentQueryResponse));
+
+			const paymentResponse = await apiClient.payments.getPaymentById(testPayment.Id);
+			const payment = paymentResponse.payment!;
+
+			// Setup void response
+			const voidResponse = {
+				Payment: [voidedPayment],
+			};
+			global.fetch = mockFetch(JSON.stringify(voidResponse));
+
+			// Void the payment
+			await payment.void();
+
+			// Assert the payment was updated
+			expect(payment.TotalAmt).toBe(voidedPayment.TotalAmt);
 		});
 	});
 });

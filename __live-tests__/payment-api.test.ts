@@ -236,4 +236,39 @@ describe('Live API: Payments', async () => {
 			expect(typeof error.details.intuitTID).toBe('string');
 		}
 	});
+
+	// Test Payment class methods
+	describe('Payment Class Methods', () => {
+		// Test downloading payment PDF
+		test('should download payment PDF', async () => {
+			// Get all payments
+			const searchResponse = await apiClient.payments.getAllPayments({ searchOptions: { maxResults: 1 } });
+
+			// Check if we have at least one payment
+			if (searchResponse.results.length === 0) {
+				console.log('No payments found, skipping PDF download test');
+				return;
+			}
+
+			// Get the first payment
+			const payment = searchResponse.results[0];
+
+			// Get the payment by ID to get class instance
+			const paymentResponse = await apiClient.payments.getPaymentById(payment.Id);
+
+			// Check if payment exists
+			if (!paymentResponse.payment) {
+				console.log('Payment not found, skipping PDF download test');
+				return;
+			}
+
+			// Download the PDF
+			const pdf = await paymentResponse.payment.downloadPDF();
+
+			// Assert the PDF is a Blob
+			expect(pdf).toBeInstanceOf(Blob);
+			expect(pdf.type).toContain('application/pdf');
+			expect(pdf.size).toBeGreaterThan(0);
+		});
+	});
 });

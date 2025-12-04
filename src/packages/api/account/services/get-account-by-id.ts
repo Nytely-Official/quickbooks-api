@@ -1,5 +1,6 @@
 // Import the Query Builder
-import type { Account, AccountOptions } from '../../../../types/types';
+import { plainToClass } from 'class-transformer';
+import { Account, type AccountOptions } from '../../../../types/types';
 import { AccountAPI } from '../account-api';
 
 /**
@@ -38,9 +39,15 @@ export async function getAccountById(
 	// Format the Response
 	const accounts = await this.formatResponse(responseData);
 
+	// Convert the Account to a Class
+	const account = accounts[0] ? plainToClass(Account, accounts[0]) : null;
+
+	// Check if the Account is valid and set the API Client
+	if (account) account.setApiClient(this.apiClient);
+
 	// Return the Account with Intuit TID
 	return {
-		account: accounts[0],
+		account,
 		intuitTID,
 	};
 }

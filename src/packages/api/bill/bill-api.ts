@@ -1,6 +1,7 @@
 import { ApiClient } from '../api-client';
 import { Environment, Query, QuickbooksError, type Bill, type BillQueryResponse } from '../../../types/types';
 import { BillQueryBuilder } from './bill-query-builder';
+import path from 'path';
 
 // Import the Services
 import { getAllBills } from './services/get-all-bills';
@@ -65,6 +66,18 @@ export class BillAPI {
 
 		// Return the Bills
 		return queryResponse.Bill;
+	}
+
+	// Returns the Bill URL
+	public async getUrl() {
+		// Setup the URL
+		const url = new URL(await this.getCompanyEndpoint());
+
+		// Set the Bill Endpoint
+		url.pathname = path.join(url.pathname, 'bill');
+
+		// Return the URL
+		return url;
 	}
 
 	/**

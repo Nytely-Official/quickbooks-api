@@ -1,8 +1,8 @@
 // Imports
 import { ApiClient } from '../src/app';
-import { AuthProvider, Environment, AuthScopes, type EstimateQueryResponse } from '../src/app';
+import { AuthProvider, Environment, AuthScopes, type EstimateQueryResponse, Estimate } from '../src/app';
 import { describe, expect, it, beforeEach, afterEach } from 'bun:test';
-import { mockFetch, mockEstimateData, mockTokenData } from './helpers';
+import { mockFetch, mockEstimateData, mockTokenData, mockPDF } from './helpers';
 
 // Mock configuration
 const TEST_CONFIG = {
@@ -135,6 +135,14 @@ describe('Estimate API', () => {
 
 			// Assert the Estimate
 			expect(estimateResponse.estimate?.Id).toBe(testEstimate.Id);
+
+			// Assert the Estimate is a class instance
+			if (estimateResponse.estimate) {
+				expect(estimateResponse.estimate).toBeInstanceOf(Estimate);
+				expect(typeof estimateResponse.estimate.setApiClient).toBe('function');
+				expect(typeof estimateResponse.estimate.reload).toBe('function');
+				expect(typeof estimateResponse.estimate.save).toBe('function');
+			}
 		});
 
 		// Test the getEstimateById Method with an Invalid Estimate ID
@@ -271,6 +279,212 @@ describe('Estimate API', () => {
 			expect(searchResponse.intuitTID).toBeDefined();
 			expect(typeof searchResponse.intuitTID).toBe('string');
 			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
+		});
+	});
+
+	// Describe the Estimate Class Methods
+	describe('Estimate Class', () => {
+		afterEach(() => {
+			global.fetch = globalFetch;
+		});
+
+		it('should return Estimate class instance', async () => {
+			const testEstimate = mockEstimateData[0];
+			const estimateQueryResponse = {
+				QueryResponse: {
+					Estimate: [testEstimate],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(estimateQueryResponse));
+
+			const estimateResponse = await apiClient.estimates.getEstimateById(testEstimate.Id);
+
+			expect(estimateResponse.estimate).toBeInstanceOf(Estimate);
+			expect(typeof estimateResponse.estimate?.setApiClient).toBe('function');
+			expect(typeof estimateResponse.estimate?.reload).toBe('function');
+			expect(typeof estimateResponse.estimate?.save).toBe('function');
+			expect(typeof estimateResponse.estimate?.send).toBe('function');
+			expect(typeof estimateResponse.estimate?.downloadPDF).toBe('function');
+		});
+
+		it('should reload estimate data', async () => {
+			const testEstimate = mockEstimateData[0];
+			const updatedEstimate = { ...testEstimate, DocNumber: 'Updated-EST-123' };
+
+			// Setup initial fetch
+			const estimateQueryResponse = {
+				QueryResponse: {
+					Estimate: [testEstimate],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(estimateQueryResponse));
+
+			const estimateResponse = await apiClient.estimates.getEstimateById(testEstimate.Id);
+			const estimate = estimateResponse.estimate!;
+
+			// Modify locally
+			(estimate as any).DocNumber = 'Local-Change';
+
+			// Setup reload response
+			const reloadQueryResponse = {
+				QueryResponse: {
+					Estimate: [updatedEstimate],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(reloadQueryResponse));
+
+			// Reload the estimate
+			await estimate.reload();
+
+			// Assert the estimate was reloaded
+			expect(estimate.DocNumber).toBe(updatedEstimate.DocNumber);
+		});
+
+		it('should save estimate data', async () => {
+			const testEstimate = mockEstimateData[0];
+			const savedEstimate = { ...testEstimate, SyncToken: '1', Id: testEstimate.Id };
+
+			// Setup initial fetch
+			const estimateQueryResponse = {
+				QueryResponse: {
+					Estimate: [testEstimate],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(estimateQueryResponse));
+
+			const estimateResponse = await apiClient.estimates.getEstimateById(testEstimate.Id);
+			const estimate = estimateResponse.estimate!;
+
+			// Modify the estimate
+			if (estimate.DocNumber !== undefined) {
+				estimate.DocNumber = 'Updated-Doc-123';
+			}
+
+			// Setup save response
+			const saveResponse = {
+				Estimate: savedEstimate,
+			};
+			global.fetch = mockFetch(JSON.stringify(saveResponse));
+
+			// Save the estimate
+			await estimate.save();
+
+			// Assert the save was called
+			expect(global.fetch).toBeDefined();
+		});
+
+		it('should send estimate via email', async () => {
+			const testEstimate = mockEstimateData[0];
+			const sentEstimate = { ...testEstimate, EmailStatus: 'EmailSent' };
+
+			// Setup initial fetch
+			const estimateQueryResponse = {
+				QueryResponse: {
+					Estimate: [testEstimate],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(estimateQueryResponse));
+
+			const estimateResponse = await apiClient.estimates.getEstimateById(testEstimate.Id);
+			const estimate = estimateResponse.estimate!;
+
+			// Setup send response
+			const sendResponse = {
+				Estimate: [sentEstimate],
+			};
+			global.fetch = mockFetch(JSON.stringify(sendResponse));
+
+			// Send the estimate
+			await estimate.send();
+
+			// Assert the estimate was updated
+			expect(estimate.EmailStatus).toBe(sentEstimate.EmailStatus);
+		});
+
+		it('should throw error when sending estimate without ID', async () => {
+			const estimateQueryResponse = {
+				QueryResponse: {
+					Estimate: [mockEstimateData[0]],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(estimateQueryResponse));
+
+			const estimateResponse = await apiClient.estimates.getEstimateById(mockEstimateData[0].Id);
+			const estimate = estimateResponse.estimate!;
+
+			// Remove ID to simulate unsaved estimate
+			(estimate as any).Id = null;
+
+			// Assert send throws error
+			await expect(estimate.send()).rejects.toThrow('Estimate must be saved before sending');
+		});
+
+		it('should download estimate PDF', async () => {
+			const testEstimate = mockEstimateData[0];
+			const pdfBlob = new Blob(['PDF content'], { type: 'application/pdf' });
+
+			// Setup initial fetch
+			const estimateQueryResponse = {
+				QueryResponse: {
+					Estimate: [testEstimate],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(estimateQueryResponse));
+
+			const estimateResponse = await apiClient.estimates.getEstimateById(testEstimate.Id);
+			const estimate = estimateResponse.estimate!;
+
+			// Setup PDF response
+			global.fetch = mockPDF(pdfBlob);
+
+			// Download the PDF
+			const pdf = await estimate.downloadPDF();
+
+			// Assert the PDF is a Blob
+			expect(pdf).toBeInstanceOf(Blob);
+			expect(pdf.type).toBe('application/pdf');
+		});
+
+		it('should throw error when downloading PDF without ID', async () => {
+			const estimateQueryResponse = {
+				QueryResponse: {
+					Estimate: [mockEstimateData[0]],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+			global.fetch = mockFetch(JSON.stringify(estimateQueryResponse));
+
+			const estimateResponse = await apiClient.estimates.getEstimateById(mockEstimateData[0].Id);
+			const estimate = estimateResponse.estimate!;
+
+			// Remove ID to simulate unsaved estimate
+			(estimate as any).Id = null;
+
+			// Assert downloadPDF throws error
+			await expect(estimate.downloadPDF()).rejects.toThrow('Estimate must be saved before downloading PDF');
 		});
 	});
 });

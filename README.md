@@ -21,6 +21,12 @@ foundation for accounting, payments, and commerce operations.
   - Bills
   - Preferences
   - Credit Memos
+- **Entity Management:** Full CRUD operations with class-based entity methods:
+  - Create, update, and save entities
+  - Send entities via email (Invoice, Estimate, CreditMemo)
+  - Download entities as PDF (Invoice, Estimate, CreditMemo, Bill, Payment)
+  - Void transactions (Invoice, CreditMemo, Payment)
+  - Soft delete entities (Account, Customer)
 - **Type-Safe API:** Full TypeScript declarations for all requests and responses.
 - **Pagination:** Automatic handling of paginated responses.
 - **Environment Support:** Supports both Production and Sandbox environments.
@@ -270,6 +276,192 @@ The `intuitTID` is useful for:
 - **Support Requests**: Provide the transaction ID when contacting Intuit support
 - **Debugging**: Track specific API requests in logs
 - **Audit Trails**: Maintain records of API interactions
+
+---
+
+## Entity Management
+
+All entity classes provide instance methods for managing QuickBooks entities. After retrieving an entity using `get*ById()` methods, you can
+perform various operations on the entity instance.
+
+### Saving Entities
+
+The `save()` method handles both creating new entities and updating existing ones:
+
+```typescript
+// Get an invoice
+const { invoice, intuitTID } = await apiClient.invoices.getInvoiceById('123');
+if (invoice) {
+  // Modify the invoice
+  invoice.PrivateNote = 'Updated note';
+
+  // Save changes (update)
+  await invoice.save();
+
+  // Or create a new invoice
+  const newInvoice = new Invoice(apiClient, {
+    Line: [...],
+    CustomerRef: { value: '456' },
+    // ... other required fields
+  });
+  await newInvoice.save(); // Creates new invoice
+}
+```
+
+### Sending Entities via Email
+
+Send invoices, estimates, and credit memos directly via email:
+
+```typescript
+// Send an invoice via email
+const { invoice } = await apiClient.invoices.getInvoiceById('123');
+if (invoice) {
+  await invoice.send();
+  console.log('Invoice sent successfully');
+}
+
+// Send an estimate
+const { estimate } = await apiClient.estimates.getEstimateById('456');
+if (estimate) {
+  await estimate.send();
+  console.log('Estimate sent successfully');
+}
+
+// Send a credit memo
+const { creditMemo } = await apiClient.creditMemos.getCreditMemoById('789');
+if (creditMemo) {
+  await creditMemo.send();
+  console.log('Credit memo sent successfully');
+}
+```
+
+### Downloading PDFs
+
+Download invoices, estimates, credit memos, bills, and payments as PDF files:
+
+```typescript
+// Download invoice PDF
+const { invoice } = await apiClient.invoices.getInvoiceById('123');
+if (invoice) {
+  const pdfBlob = await invoice.downloadPDF();
+
+  // Save to file (Node.js example)
+  const fs = require('fs').promises;
+  await fs.writeFile('invoice.pdf', Buffer.from(await pdfBlob.arrayBuffer()));
+
+  // Or use in browser
+  const url = URL.createObjectURL(pdfBlob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'invoice.pdf';
+  link.click();
+}
+
+// Download estimate PDF
+const { estimate } = await apiClient.estimates.getEstimateById('456');
+if (estimate) {
+  const pdfBlob = await estimate.downloadPDF();
+  // Handle PDF blob...
+}
+
+// Download credit memo, bill, or payment PDF
+const { creditMemo } = await apiClient.creditMemos.getCreditMemoById('789');
+if (creditMemo) {
+  const pdfBlob = await creditMemo.downloadPDF();
+  // Handle PDF blob...
+}
+```
+
+### Voiding Transactions
+
+Void invoices, credit memos, and payments:
+
+```typescript
+// Void an invoice
+const { invoice } = await apiClient.invoices.getInvoiceById('123');
+if (invoice && invoice.Balance > 0) {
+  await invoice.void();
+  console.log('Invoice voided successfully');
+}
+
+// Void a credit memo
+const { creditMemo } = await apiClient.creditMemos.getCreditMemoById('456');
+if (creditMemo && creditMemo.Balance > 0) {
+  await creditMemo.void();
+  console.log('Credit memo voided successfully');
+}
+
+// Void a payment
+const { payment } = await apiClient.payments.getPaymentById('789');
+if (payment && payment.TotalAmt > 0) {
+  await payment.void();
+  console.log('Payment voided successfully');
+}
+```
+
+### Soft Deleting Entities
+
+Soft delete accounts and customers by setting `Active=false`:
+
+```typescript
+// Soft delete an account
+const { account } = await apiClient.accounts.getAccountById('123');
+if (account && account.Active) {
+  await account.delete(); // Sets Active=false
+  console.log('Account deactivated');
+
+  // Reactivate if needed
+  account.Active = true;
+  await account.save();
+}
+
+// Soft delete a customer
+const { customer } = await apiClient.customers.getCustomerById('456');
+if (customer && customer.Active) {
+  await customer.delete(); // Sets Active=false
+  console.log('Customer deactivated');
+
+  // Reactivate if needed
+  customer.Active = true;
+  await customer.save();
+}
+```
+
+### Reloading Entity Data
+
+Refresh entity data from the API:
+
+```typescript
+// Reload invoice data
+const { invoice } = await apiClient.invoices.getInvoiceById('123');
+if (invoice) {
+  // Make local changes
+  invoice.PrivateNote = 'Local change';
+
+  // Reload from API to get latest data
+  await invoice.reload();
+  console.log('Invoice data refreshed');
+}
+```
+
+### Error Handling with Entity Methods
+
+All entity methods throw `QuickbooksError` with detailed information:
+
+```typescript
+try {
+  const { invoice } = await apiClient.invoices.getInvoiceById('123');
+  if (invoice) {
+    // This will throw if invoice doesn't have an ID
+    await invoice.downloadPDF();
+  }
+} catch (error) {
+  if (error instanceof QuickbooksError) {
+    console.error('PDF download failed:', error.message);
+    console.error('Error details:', error.details);
+  }
+}
+```
 
 ---
 

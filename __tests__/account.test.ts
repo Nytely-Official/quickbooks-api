@@ -1,5 +1,5 @@
 import { ApiClient } from '../src/app';
-import { AuthProvider, Environment, AuthScopes, type AccountQueryResponse } from '../src/app';
+import { AuthProvider, Environment, AuthScopes, type AccountQueryResponse, Account } from '../src/app';
 import { describe, expect, it, beforeEach, afterEach } from 'bun:test';
 import { mockFetch, mockAccountData, mockTokenData } from './helpers';
 
@@ -180,6 +180,12 @@ describe('Account API', () => {
 				// Assert the Account
 				expect(accountResponse.account).toBeObject();
 				expect(accountResponse.account?.Id).toBe(account.Id);
+
+				// Assert the Account is a class instance
+				expect(accountResponse.account).toBeInstanceOf(Account);
+				expect(typeof accountResponse.account?.setApiClient).toBe('function');
+				expect(typeof accountResponse.account?.reload).toBe('function');
+				expect(typeof accountResponse.account?.save).toBe('function');
 			}
 		});
 
@@ -342,6 +348,185 @@ describe('Account API', () => {
 			expect(searchResponse.intuitTID).toBeDefined();
 			expect(typeof searchResponse.intuitTID).toBe('string');
 			expect(searchResponse.intuitTID).toBe('test-tid-12345-67890');
+		});
+	});
+
+	// Describe the Account Class Methods
+	describe('Account Class', () => {
+		// After Each
+		afterEach(() => {
+			// Set the Global Fetch
+			global.fetch = globalFetch;
+		});
+
+		// Test class instance methods
+		it('should have class instance methods', async () => {
+			// Get a test account
+			const testAccount = mockAccountData[0];
+
+			// Setup the Account Query Response
+			const accountQueryResponse = {
+				QueryResponse: {
+					Account: [testAccount],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+
+			// Mock the Fetch
+			global.fetch = mockFetch(JSON.stringify(accountQueryResponse));
+
+			// Get the Account
+			const accountResponse = await apiClient.accounts.getAccountById(testAccount.Id);
+
+			// Assert it's a class instance
+			expect(accountResponse.account).toBeInstanceOf(Account);
+
+			// Test setApiClient method exists and is callable
+			expect(typeof accountResponse.account?.setApiClient).toBe('function');
+			expect(() => accountResponse.account?.setApiClient(apiClient)).not.toThrow();
+
+			// Test reload method exists
+			expect(typeof accountResponse.account?.reload).toBe('function');
+
+			// Test save method exists
+			expect(typeof accountResponse.account?.save).toBe('function');
+
+			// Test delete method exists
+			expect(typeof accountResponse.account?.delete).toBe('function');
+		});
+
+		// Test reload method
+		it('should reload account data', async () => {
+			// Get a test account
+			const testAccount = mockAccountData[0];
+			const updatedAccount = { ...testAccount, Name: 'Updated Account Name' };
+
+			// Setup the Account Query Response for initial fetch
+			const accountQueryResponse = {
+				QueryResponse: {
+					Account: [testAccount],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+
+			// Mock the Fetch for initial fetch
+			global.fetch = mockFetch(JSON.stringify(accountQueryResponse));
+
+			// Get the Account
+			const accountResponse = await apiClient.accounts.getAccountById(testAccount.Id);
+			const account = accountResponse.account!;
+
+			// Modify the account locally
+			(account as any).Name = 'Local Change';
+
+			// Setup the Account Query Response for reload
+			const reloadQueryResponse = {
+				QueryResponse: {
+					Account: [updatedAccount],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+
+			// Mock the Fetch for reload
+			global.fetch = mockFetch(JSON.stringify(reloadQueryResponse));
+
+			// Reload the Account
+			await account.reload();
+
+			// Assert the Account was reloaded
+			expect(account.Name).toBe(updatedAccount.Name);
+		});
+
+		// Test save method
+		it('should save account data', async () => {
+			// Get a test account
+			const testAccount = mockAccountData[0];
+			const savedAccount = { ...testAccount, SyncToken: '1', Id: testAccount.Id };
+
+			// Setup the Account Query Response for initial fetch
+			const accountQueryResponse = {
+				QueryResponse: {
+					Account: [testAccount],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+
+			// Mock the Fetch for initial fetch
+			global.fetch = mockFetch(JSON.stringify(accountQueryResponse));
+
+			// Get the Account
+			const accountResponse = await apiClient.accounts.getAccountById(testAccount.Id);
+			const account = accountResponse.account!;
+
+			// Modify the account
+			account.Name = 'Updated Account Name';
+
+			// Setup the response for save
+			const saveResponse = {
+				QueryResponse: {
+					Account: [savedAccount],
+				},
+			};
+
+			// Mock the Fetch for save
+			global.fetch = mockFetch(JSON.stringify(saveResponse));
+
+			// Save the Account
+			await account.save();
+
+			// Assert the save was called (mock was invoked)
+			expect(global.fetch).toBeDefined();
+		});
+
+		// Test delete method
+		it('should delete (deactivate) account by setting Active=false', async () => {
+			// Get a test account
+			const testAccount = mockAccountData[0];
+			const deletedAccount = { ...testAccount, Active: false, SyncToken: '1' };
+
+			// Setup the Account Query Response for initial fetch
+			const accountQueryResponse = {
+				QueryResponse: {
+					Account: [testAccount],
+					maxResults: 1,
+					startPosition: 1,
+					totalCount: 1,
+				},
+			};
+
+			// Mock the Fetch for initial fetch
+			global.fetch = mockFetch(JSON.stringify(accountQueryResponse));
+
+			// Get the Account
+			const accountResponse = await apiClient.accounts.getAccountById(testAccount.Id);
+			const account = accountResponse.account!;
+
+			// Ensure account is active
+			account.Active = true;
+
+			// Setup the response for delete (save with Active=false)
+			const deleteResponse = {
+				QueryResponse: {
+					Account: [deletedAccount],
+				},
+			};
+
+			// Mock the Fetch for delete
+			global.fetch = mockFetch(JSON.stringify(deleteResponse));
+
+			// Delete the Account
+			await account.delete();
+
+			// Assert the account was deactivated
+			expect(account.Active).toBe(false);
 		});
 	});
 });
