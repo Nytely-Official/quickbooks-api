@@ -707,9 +707,6 @@ export class AuthProvider {
 		// Check if the ID token is not valid and return the parsed token
 		if (!idToken) return parsedToken;
 
-		// Store the ID token
-		parsedToken.idToken = idToken;
-
 		// Validate the ID token
 		const isValid = await this.validateIdToken(idToken, nonce).catch(async (error: Error) => {
 			// Log a warning
@@ -721,6 +718,9 @@ export class AuthProvider {
 
 		// Check if the ID token is not valid and return the parsed token
 		if (!isValid) return parsedToken;
+
+		// Store the ID token only after validation succeeds
+		parsedToken.idToken = idToken;
 
 		// Check if Auto Fetch User Profile is disable or SSO is not enabled and return the parsed token
 		if (!autoFetchUserProfile || !this.isSsoEnabled()) return parsedToken;
