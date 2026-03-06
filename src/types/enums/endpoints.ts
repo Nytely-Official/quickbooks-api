@@ -6,7 +6,7 @@ import { APIUrls } from './api-urls';
  */
 export enum Endpoints {
 	// Auth Related Endpoints
-	UserAuth = `${APIUrls.UserAuth}/connect/oauth2`,
+	UserAuth = `${APIUrls.UserAuth}/connect/oauth2/companyselection`,
 	TokenBearer = `${APIUrls.OAuth2}/tokens/bearer`,
 	TokenRevoke = `${APIUrls.OAuthDeveloper}/tokens/revoke`,
 
