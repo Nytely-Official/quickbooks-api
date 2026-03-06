@@ -4,17 +4,17 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+  id-token: write # Required for npm trusted publishing (OIDC)
+
 jobs:
   publish:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-      pull-requests: read
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Needed to get full git history for version detection
+          fetch-depth: 0
 
       - uses: oven-sh/setup-bun@v1
         with:
@@ -26,8 +26,17 @@ jobs:
       - name: Build package
         run: bun run build
 
-      - name: Publish to NPM
-        uses: JS-DevTools/npm-publish@v3
+      - name: Run tests
+        run: bun run test
+
+      - name: Setup Node for npm publish
+        uses: actions/setup-node@v4
         with:
-          token: ${{ secrets.NPM_TOKEN }}
-          access: public
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Ensure npm supports trusted publishing
+        run: npm install -g npm@latest
+
+      - name: Publish to npm (trusted publishing)
+        run: npm publish --provenance
