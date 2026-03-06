@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.11.1] - 2026-03-06
+
+### Changed
+
+- **OAuth User Auth endpoint:** Updated `UserAuth` in `Endpoints` from `/connect/oauth2` to `/connect/oauth2/companyselection` so the
+  authorization URL uses Intuit’s company selection flow
+- **Dependencies:** Bumped `jose` from `^6.1.3` to `^6.2.0`
+
+### Tests
+
+- Updated auth-provider test to assert the generated auth URL uses the new company selection path
+
 ## [0.11.0] - 2025-12-04
 
 ### Features

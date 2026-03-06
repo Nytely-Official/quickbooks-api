@@ -41,7 +41,7 @@ describe('AuthProvider', () => {
 			const url = authProvider.generateAuthUrl();
 
 			// Assert the URL
-			expect(url.toString()).toStartWith('https://appcenter.intuit.com/connect/oauth2');
+			expect(url.toString()).toStartWith('https://appcenter.intuit.com/connect/oauth2/companyselection');
 			expect(url.searchParams.get('client_id')).toBe(TEST_CONFIG.clientId);
 			expect(url.searchParams.get('scope')).toBe(TEST_CONFIG.scopes.join(' '));
 			expect(url.searchParams.get('redirect_uri')).toBe(TEST_CONFIG.redirectUri);
