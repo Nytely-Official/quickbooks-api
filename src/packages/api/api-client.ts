@@ -18,6 +18,7 @@ import { PreferenceAPI } from './preferences/preference-api';
 import { CreditMemoAPI } from './credit-memo/credit-memo-api';
 import { CompanyInfoAPI } from './company-info/company-info-api';
 import { BillAPI } from './bill/bill-api';
+import { RecurringTransactionAPI } from './recurring-transaction/recurring-transaction-api';
 
 /**
  * API Client
@@ -68,6 +69,11 @@ export class ApiClient {
 	public bills: BillAPI;
 
 	/**
+	 * RecurringTransactions API
+	 */
+	public recurringTransactions: RecurringTransactionAPI;
+
+	/**
 	 * Automatically check for a next page (This creates an extra query to the API to check if there is a next page)
 	 */
 	public autoCheckNextPage: boolean = true;
@@ -88,6 +94,7 @@ export class ApiClient {
 		this.creditMemos = new CreditMemoAPI(this);
 		this.companyInfo = new CompanyInfoAPI(this);
 		this.bills = new BillAPI(this);
+		this.recurringTransactions = new RecurringTransactionAPI(this);
 	}
 
 	/**

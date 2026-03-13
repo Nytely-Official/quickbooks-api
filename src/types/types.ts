@@ -9,6 +9,8 @@ export { Estimate } from './classes/estimate';
 export { Payment } from './classes/payment';
 export { Preferences } from './classes/preferences';
 export { QuickbooksError } from './classes/quickbooks-error';
+export { RecurringTransaction } from './classes/recurring-transaction';
+export type { RecurringTransactionCreationData } from './classes/recurring-transaction';
 
 // Export the Enums
 export { APIUrls } from './enums/api-urls';
@@ -66,6 +68,7 @@ export type {
 	CreditMemoOptions,
 	PreferenceOptions,
 	BillOptions,
+	RecurringTransactionOptions,
 } from './interfaces/options';
 export type { Account as AccountInterface } from './interfaces/account';
 export type { CompanyInfo as CompanyInfoInterface } from './interfaces/company';
@@ -82,6 +85,7 @@ export type {
 	CreditMemoQueryResponse,
 	CompanyInfoQueryResponse,
 	BillQueryResponse,
+	RecurringTransactionQueryResponse,
 } from './interfaces/query-response';
 export type { ReferenceType } from './interfaces/reference-type';
 export type { SalesItemLineDetail } from './interfaces/sales-item-line-detail';
@@ -98,6 +102,16 @@ export type { TxnTaxDetail } from './interfaces/txn-tax-detail';
 export type { UserAuthResponse } from './interfaces/user-auth-response';
 export type { UserProfile } from './interfaces/user-profile';
 export type { WebsiteAddress } from './interfaces/website-address';
+export type {
+	RecurringTransactionData,
+	RecurringInfo,
+	ScheduleInfo,
+	RecurringInvoice,
+	RecurringBill,
+	RecurType,
+	IntervalType,
+	RecurringTxnType,
+} from './interfaces/recurring-transaction';
 
 // Export the Types
 export type { DeepKeys } from './types/deep-keys';
