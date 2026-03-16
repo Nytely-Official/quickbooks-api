@@ -13,6 +13,8 @@
 
 ### Changed
 
+- **README badges:** Wrapped Version, Downloads, and GitHub Actions badges in links so they open the npm package page and CI workflow page;
+  set workflow badge to `main` branch; switched Downloads badge to total (all-time) instead of monthly.
 - **CI publish workflow:** Updated the publish workflow to use Node 24 with `npm publish --provenance`, global latest npm installation, and
   an explicit test step before publishing, while keeping OIDC-based trusted publishing permissions at the workflow level.
 - **Repository metadata:** Normalized `repository.url` in `package.json` to use a standard HTTPS GitHub URL.

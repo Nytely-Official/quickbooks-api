@@ -1,8 +1,8 @@
 # QuickBooks API SDK
 
-![Version](https://img.shields.io/npm/v/quickbooks-api?style=for-the-badge&link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fquickbooks-api)
-![Downloads](https://img.shields.io/npm/d18m/quickbooks-api?style=for-the-badge&link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fquickbooks-api)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Nytely-Official/quickbooks-api/ci.yml?style=for-the-badge&link=https%3A%2F%2Fgithub.com%2FNytely-Official%2Fquickbooks-api)
+[![Version](https://img.shields.io/npm/v/quickbooks-api?style=for-the-badge)](https://www.npmjs.com/package/quickbooks-api)
+[![Downloads](https://img.shields.io/npm/dt/quickbooks-api?style=for-the-badge)](https://www.npmjs.com/package/quickbooks-api)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Nytely-Official/quickbooks-api/ci.yml?branch=main&style=for-the-badge)](https://github.com/Nytely-Official/quickbooks-api/actions/workflows/ci.yml)
 
 A modular TypeScript SDK for seamless integration with Intuit QuickBooks APIs. Provides robust authentication handling and a future-ready
 foundation for accounting, payments, and commerce operations
