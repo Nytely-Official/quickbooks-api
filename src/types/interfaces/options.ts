@@ -10,6 +10,7 @@ import {
 	InvoiceStatus,
 	Payment,
 	Preferences,
+	RecurringTransaction,
 	SearchOptions,
 } from '../types';
 
@@ -41,6 +42,9 @@ export interface PreferenceOptions extends Options<Preferences> {}
 
 // Setup the Bill Options
 export interface BillOptions extends Options<Bill> {}
+
+// Setup the RecurringTransaction Options
+export interface RecurringTransactionOptions extends Options<RecurringTransaction> {}
 
 // Export the Options
 export interface Options<T> {
