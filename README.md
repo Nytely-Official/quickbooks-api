@@ -5,7 +5,7 @@
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Nytely-Official/quickbooks-api/ci.yml?style=for-the-badge&link=https%3A%2F%2Fgithub.com%2FNytely-Official%2Fquickbooks-api)
 
 A modular TypeScript SDK for seamless integration with Intuit QuickBooks APIs. Provides robust authentication handling and a future-ready
-foundation for accounting, payments, and commerce operations.
+foundation for accounting, payments, and commerce operations
 
 ## Key Features
 
