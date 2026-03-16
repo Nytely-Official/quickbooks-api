@@ -2,14 +2,14 @@
 	"name": "quickbooks-api",
 	"author": "JackNytely <jacknytely@gmail.com>",
 	"license": "MIT",
-	"version": "0.11.1",
+	"version": "0.12.0",
 	"description": "A modular TypeScript SDK for seamless integration with Intuit QuickBooks APIs. Provides robust authentication handling and future-ready foundation for accounting, payments, and commerce operations.",
 	"type": "module",
 	"main": "dist/app.js",
 	"types": "dist/app.d.ts",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/Nytely-Official/quickbooks-api.git"
+		"url": "https://github.com/Nytely-Official/quickbooks-api.git"
 	},
 	"keywords": [
 		"quickbooks",

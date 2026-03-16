@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.12.0] - 2026-03-16
+
+### Features
+
+- **RecurringTransaction API:** Added full RecurringTransaction support, including `RecurringTransactionAPI`, query builder, service methods
+  (`getAllRecurringTransactions`, `getRecurringTransactionById`, `getUpdatedRecurringTransactions`, `rawRecurringTransactionQuery`), and the
+  `RecurringTransaction` class with `save()`, `reload()`, and `delete()` instance methods.
+- **Types:** Added strongly typed RecurringTransaction interfaces (`RecurringInfo`, `ScheduleInfo`, `RecurringInvoice`, `RecurringBill`,
+  `RecurringTransactionData`, `RecurringTxnType`, `RecurType`, `IntervalType`) plus `RecurringTransactionOptions` and
+  `RecurringTransactionQueryResponse` wiring into the shared type exports.
+
+### Changed
+
+- **CI publish workflow:** Updated the publish workflow to use Node 24 with `npm publish --provenance`, global latest npm installation, and
+  an explicit test step before publishing, while keeping OIDC-based trusted publishing permissions at the workflow level.
+- **Repository metadata:** Normalized `repository.url` in `package.json` to use a standard HTTPS GitHub URL.
+
 ## [0.11.1] - 2026-03-06
 
 ### Changed
