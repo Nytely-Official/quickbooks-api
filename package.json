@@ -35,7 +35,7 @@
 		"@types/express": "^5.0.6",
 		"express": "^5.2.1",
 		"tsc-alias": "^1.8.16",
-		"typescript": "^5.9.3"
+		"typescript": "^6.0.2"
 	},
 	"peerDependencies": {
 		"typescript": "^5.0.0"
